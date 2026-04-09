@@ -1009,7 +1009,7 @@ function _renderInsightsHome() {
             <div class="insights-person-list">
               ${persons.map(p => {
                 const sm = (typeof getPersonSignalSummary === 'function') ? getPersonSignalSummary(p.id) : { level: 'none' };
-                const dotColor = { high: '#C17C7C', medium: '#D4A574', low: '#7BA89C', none: '#989898' }[sm.level] || '#989898';
+                const dotColor = { high: '#C17C7C', medium: '#C8A882', low: '#7BA89C', none: '#989898' }[sm.level] || '#989898';
                 const s = (typeof getStats === 'function') ? getStats(p.id) : {};
                 return `
                   <button class="insights-person-list-item" onclick="navigate('person',{personId:'${_esc(p.id)}'})">
