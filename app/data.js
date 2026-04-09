@@ -169,6 +169,7 @@ function addInteraction(data) {
     type: data.type != null ? data.type : 'text',
     initiatedBy: data.initiatedBy != null ? data.initiatedBy : 'mutual',
     mood: data.mood != null ? data.mood : 'neutral',
+    moodRaw: data.moodRaw != null ? data.moodRaw : null,
     responseTime: data.responseTime != null ? data.responseTime : 'normal',
     redFlags: Array.isArray(data.redFlags) ? data.redFlags : [],
     greenFlags: Array.isArray(data.greenFlags) ? data.greenFlags : [],

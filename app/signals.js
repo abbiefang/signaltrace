@@ -36,6 +36,23 @@
 
   const MOOD_SCORE = { positive: 2, neutral: 1, negative: 0 };
 
+  /**
+   * data.js stores responseTime as a string: "fast"|"normal"|"slow"|"no_response".
+   * Detectors that need numeric comparison use this map (minutes).
+   * null means "not recorded / no response" — excluded from avg calculations.
+   */
+  const RESPONSE_TIME_MINUTES = { fast: 15, normal: 120, slow: 360 };
+
+  /**
+   * Convert a string OR numeric responseTime to minutes.
+   * Returns null for "no_response", unknown strings, or already-null values.
+   */
+  function _rtMinutes(rt) {
+    if (rt === null || rt === undefined) return null;
+    if (typeof rt === 'number')          return rt > 0 ? rt : null;
+    return RESPONSE_TIME_MINUTES[rt] !== undefined ? RESPONSE_TIME_MINUTES[rt] : null;
+  }
+
   // ─── Data Access ──────────────────────────────────────────────────────────
 
   /**
@@ -201,19 +218,22 @@
    * RESPONSE TIME DETERIORATION
    * Detects a trend where response times are getting slower over time.
    * Compares average response time in the first half of interactions vs. the second half.
+   * Works with both numeric responseTime (legacy) and string values from data.js
+   * ("fast"|"normal"|"slow"|"no_response").
    */
   function detectResponseTimeDeterioration(interactions) {
-    const withRT = interactions.filter(
-      (i) => typeof i.responseTime === 'number' && i.responseTime > 0
-    );
+    // Convert string responseTime to numeric minutes; exclude no_response / null
+    const withRT = interactions
+      .map((i) => ({ ...i, _rtNum: _rtMinutes(i.responseTime) }))
+      .filter((i) => i._rtNum !== null);
     if (withRT.length < 4) return null;
 
     const mid = Math.floor(withRT.length / 2);
     const firstHalf = withRT.slice(0, mid);
     const secondHalf = withRT.slice(mid);
 
-    const avgEarly = mean(firstHalf.map((i) => i.responseTime));
-    const avgRecent = mean(secondHalf.map((i) => i.responseTime));
+    const avgEarly = mean(firstHalf.map((i) => i._rtNum));
+    const avgRecent = mean(secondHalf.map((i) => i._rtNum));
 
     if (avgEarly === null || avgRecent === null) return null;
 
@@ -236,16 +256,22 @@
     );
   }
 
+
   /**
    * GHOSTING PATTERN
    * Detects repeated instances of being left on read or receiving no response.
    * Threshold: 2 or more such instances.
+   *
+   * data.js has no `status` field — maps `responseTime === 'no_response'` as the
+   * ghosting indicator. Also accepts explicit `status` values for forward-compat.
    */
   function detectGhostingPattern(interactions) {
     if (interactions.length < MIN_INTERACTIONS) return null;
 
     const ghosted = interactions.filter(
-      (i) => i.status === 'left_on_read' || i.status === 'no_response'
+      (i) => i.responseTime === 'no_response'
+          || i.status === 'left_on_read'
+          || i.status === 'no_response'
     );
     if (ghosted.length < 2) return null;
 
@@ -402,10 +428,11 @@
     const myInitiations = tagged.filter((i) => i.initiatedBy === 'me').length;
     const myRatio = myInitiations / tagged.length;
 
-    const withRT = interactions.filter(
-      (i) => typeof i.responseTime === 'number' && i.responseTime > 0
-    );
-    const avgRT = withRT.length >= 3 ? mean(withRT.map((i) => i.responseTime)) : null;
+    // Convert string responseTime to numeric minutes; exclude no_response / null
+    const withRT = interactions
+      .map((i) => ({ ...i, _rtNum: _rtMinutes(i.responseTime) }))
+      .filter((i) => i._rtNum !== null);
+    const avgRT = withRT.length >= 3 ? mean(withRT.map((i) => i._rtNum)) : null;
 
     // Requires high initiation imbalance AND evidence of low effort from them
     const highInitiation = myRatio >= 0.75;
@@ -419,7 +446,7 @@
     const parts = [];
     const pct = Math.round(myRatio * 100);
     parts.push(`You initiated ${myInitiations} of ${tagged.length} interactions (${pct}%)`);
-    if (slowResponse) {
+    if (slowResponse && avgRT !== null) {
       const fmt = (m) => m < 60 ? `${Math.round(m)}m` : `${(m / 60).toFixed(1)}h`;
       parts.push(`average response time is ${fmt(avgRT)}`);
     }

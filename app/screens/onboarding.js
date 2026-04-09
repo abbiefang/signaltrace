@@ -39,11 +39,10 @@
         position: fixed;
         inset: 0;
         z-index: 100;
-        background: #12101c;
+        background: #FBF8F5;
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        /* hidden by default — shown by app.js navigate() */
       }
 
       .ob-wrap {
@@ -55,7 +54,7 @@
         width: 100%;
       }
 
-      /* ── Header: progress bar + skip ────────────── */
+      /* ── Header: dot progress + skip ────────────── */
       .ob-header {
         display: flex;
         align-items: center;
@@ -66,27 +65,31 @@
 
       .ob-progress {
         display: flex;
-        gap: 6px;
+        gap: 8px;
         align-items: center;
         flex: 1;
       }
 
+      /* Dot-style progress indicators */
       .ob-progress-seg {
-        height: 3px;
-        border-radius: 2px;
-        flex: 1;
-        background: #2d2840;
-        transition: background 0.35s ease;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        flex: none;
+        background: #E0D8D0;
+        transition: background 0.35s ease, transform 0.35s ease, width 0.35s ease;
       }
 
       .ob-progress-seg.done {
-        background: #e94560;
+        background: linear-gradient(135deg, #D4607A, #E8855A);
+        width: 24px;
+        border-radius: 4px;
       }
 
       .ob-skip {
         background: none;
         border: none;
-        color: #8b87a8;
+        color: #B0A89E;
         font-size: 14px;
         font-family: inherit;
         cursor: pointer;
@@ -96,7 +99,36 @@
         transition: color 0.2s;
       }
 
-      .ob-skip:hover { color: #f0eeff; }
+      .ob-skip:hover { color: #7A6E68; }
+
+      /* ── Slide 1 hero area ───────────────────────── */
+      .ob-hero {
+        width: 100%;
+        height: 160px;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #FCEEF1 0%, #FEF3EC 50%, #EEF2FC 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 28px;
+        flex-shrink: 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .ob-hero-icon {
+        font-size: 52px;
+        line-height: 1;
+        filter: drop-shadow(0 4px 12px rgba(212,96,122,0.20));
+      }
+
+      .ob-hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 30% 50%, rgba(212,96,122,0.12) 0%, transparent 60%),
+                    radial-gradient(circle at 70% 50%, rgba(232,133,90,0.10) 0%, transparent 60%);
+      }
 
       /* ── Viewport + slides ───────────────────────── */
       .ob-viewport {
@@ -108,7 +140,6 @@
       .ob-slides {
         display: flex;
         height: 100%;
-        /* translateX set inline; transition applied via .ob-slides--animating */
         will-change: transform;
       }
 
@@ -132,14 +163,14 @@
         font-weight: 600;
         letter-spacing: 0.12em;
         text-transform: uppercase;
-        color: #e94560;
+        color: #D4607A;
         margin: 0 0 14px;
       }
 
       .ob-title {
         font-size: 30px;
         font-weight: 700;
-        color: #f0eeff;
+        color: #1C1410;
         line-height: 1.15;
         margin: 0 0 12px;
         letter-spacing: -0.02em;
@@ -147,9 +178,9 @@
 
       .ob-subtitle {
         font-size: 16px;
-        color: #8b87a8;
+        color: #7A6E68;
         line-height: 1.55;
-        margin: 0 0 36px;
+        margin: 0 0 28px;
         font-weight: 400;
       }
 
@@ -157,14 +188,18 @@
       .ob-props {
         display: flex;
         flex-direction: column;
-        gap: 18px;
-        margin-bottom: 40px;
+        gap: 16px;
+        margin-bottom: 32px;
       }
 
       .ob-prop {
         display: flex;
         align-items: flex-start;
         gap: 14px;
+        background: #FFFFFF;
+        border: 1px solid #EDE6DF;
+        border-radius: 14px;
+        padding: 14px 16px;
       }
 
       .ob-prop-icon {
@@ -177,9 +212,9 @@
       }
 
       .ob-prop-text {
-        font-size: 15px;
-        color: #c8c3e0;
-        line-height: 1.5;
+        font-size: 14px;
+        color: #4A3E38;
+        line-height: 1.55;
       }
 
       /* ── Form elements ───────────────────────────── */
@@ -191,31 +226,32 @@
         display: block;
         font-size: 12px;
         font-weight: 600;
-        letter-spacing: 0.08em;
+        letter-spacing: 0.07em;
         text-transform: uppercase;
-        color: #6b6789;
+        color: #B0A89E;
         margin-bottom: 8px;
       }
 
       .ob-input {
         width: 100%;
         box-sizing: border-box;
-        background: #1e1b2e;
-        border: 1px solid #2d2840;
-        border-radius: 10px;
-        color: #f0eeff;
+        background: #FFFFFF;
+        border: 1px solid #EDE6DF;
+        border-radius: 12px;
+        color: #1C1410;
         font-size: 16px;
         font-family: inherit;
         padding: 14px 16px;
         outline: none;
-        transition: border-color 0.2s;
+        transition: border-color 0.2s, box-shadow 0.2s;
         -webkit-appearance: none;
       }
 
-      .ob-input::placeholder { color: #4a4567; }
+      .ob-input::placeholder { color: #C8BDB4; }
 
       .ob-input:focus {
-        border-color: #e94560;
+        border-color: #D4607A;
+        box-shadow: 0 0 0 3px rgba(212,96,122,0.12);
       }
 
       /* ── Chip selectors ──────────────────────────── */
@@ -226,13 +262,13 @@
       }
 
       .ob-chip {
-        background: #1e1b2e;
-        border: 1px solid #2d2840;
-        border-radius: 20px;
-        color: #8b87a8;
+        background: #FFFFFF;
+        border: 1px solid #EDE6DF;
+        border-radius: 999px;
+        color: #7A6E68;
         font-size: 14px;
         font-family: inherit;
-        padding: 8px 16px;
+        padding: 8px 18px;
         cursor: pointer;
         transition: all 0.18s ease;
         white-space: nowrap;
@@ -240,14 +276,15 @@
       }
 
       .ob-chip:hover {
-        border-color: #4a4567;
-        color: #c8c3e0;
+        border-color: #C8BDB4;
+        color: #1C1410;
       }
 
       .ob-chip.selected {
-        background: rgba(233, 69, 96, 0.15);
-        border-color: #e94560;
-        color: #f0eeff;
+        background: linear-gradient(135deg, #D4607A, #E8855A);
+        border-color: transparent;
+        color: #fff;
+        font-weight: 600;
       }
 
       /* ── Mood row ────────────────────────────────── */
@@ -258,39 +295,40 @@
       }
 
       .ob-mood-btn {
-        background: #1e1b2e;
-        border: 1px solid #2d2840;
-        border-radius: 10px;
-        color: #8b87a8;
+        background: #FFFFFF;
+        border: 1px solid #EDE6DF;
+        border-radius: 14px;
+        color: #7A6E68;
         font-size: 13px;
         font-family: inherit;
-        padding: 12px 8px;
+        padding: 14px 8px;
         cursor: pointer;
         transition: all 0.18s ease;
         display: flex;
         flex-direction: column;
         align-items: center;
-        gap: 4px;
+        gap: 6px;
         -webkit-appearance: none;
       }
 
-      .ob-mood-btn .mood-icon { font-size: 20px; }
+      .ob-mood-btn .mood-icon { font-size: 26px; }
 
       .ob-mood-btn:hover {
-        border-color: #4a4567;
-        color: #c8c3e0;
+        border-color: #C8BDB4;
+        color: #1C1410;
       }
 
       .ob-mood-btn.selected {
-        background: rgba(233, 69, 96, 0.15);
-        border-color: #e94560;
-        color: #f0eeff;
+        background: rgba(212,96,122,0.08);
+        border-color: #D4607A;
+        color: #D4607A;
+        font-weight: 600;
       }
 
       /* ── Optional label ──────────────────────────── */
       .ob-optional {
         font-size: 11px;
-        color: #4a4567;
+        color: #C8BDB4;
         font-weight: 400;
         letter-spacing: 0;
         text-transform: none;
@@ -305,39 +343,42 @@
       .ob-cta {
         display: block;
         width: 100%;
-        background: #e94560;
+        background: linear-gradient(135deg, #D4607A 0%, #E8855A 100%);
         color: #fff;
         border: none;
-        border-radius: 14px;
+        border-radius: 16px;
         font-size: 16px;
         font-weight: 600;
         font-family: inherit;
         padding: 17px 24px;
         cursor: pointer;
-        transition: opacity 0.2s, transform 0.1s;
+        transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
         letter-spacing: 0.01em;
+        box-shadow: 0 4px 16px rgba(212,96,122,0.30);
         -webkit-appearance: none;
       }
 
-      .ob-cta:hover { opacity: 0.9; }
+      .ob-cta:hover { box-shadow: 0 6px 22px rgba(212,96,122,0.40); opacity: 0.95; }
       .ob-cta:active { transform: scale(0.98); }
 
       .ob-cta-secondary {
         background: transparent;
-        border: 1px solid #2d2840;
-        color: #8b87a8;
+        border: 1px solid #EDE6DF;
+        color: #B0A89E;
         margin-top: 10px;
+        box-shadow: none;
       }
 
       .ob-cta-secondary:hover {
-        border-color: #4a4567;
-        color: #c8c3e0;
+        border-color: #C8BDB4;
+        color: #7A6E68;
         opacity: 1;
+        box-shadow: none;
       }
 
       /* ── Date input fix ──────────────────────────── */
       input[type="date"].ob-input::-webkit-calendar-picker-indicator {
-        filter: invert(0.4);
+        opacity: 0.4;
         cursor: pointer;
       }
     `;
@@ -353,6 +394,12 @@
   function _slide1() {
     return `
       <div class="ob-slide" id="ob-slide-1" role="tabpanel" aria-label="Step 1 of 3">
+
+        <!-- Hero illustration area -->
+        <div class="ob-hero" aria-hidden="true">
+          <span class="ob-hero-icon">📡</span>
+        </div>
+
         <p class="ob-eyebrow">SignalTrace</p>
         <h1 class="ob-title">Track what actually<br>happens.</h1>
         <p class="ob-subtitle">See the patterns. Trust yourself.</p>
@@ -640,7 +687,9 @@
 
   function _goToStep(next, skipData) {
     if (next > TOTAL) {
-      _finish(false);
+      // skipData=true means "Skip for now" on this step — save the person but
+      // do NOT save the interaction, since the user opted out of logging it.
+      _finish(false, !skipData);
       return;
     }
 
@@ -668,9 +717,10 @@
       ctaWrap.innerHTML = _ctaForStep(_step);
     }
 
-    // Re-attach listeners for new CTA buttons
-    const root = document.getElementById('screen-onboarding');
-    if (root) _attachEvents(root);
+    // NOTE: _attachEvents is intentionally NOT called again here.
+    // The root listener added once by renderOnboarding() covers all CTA buttons
+    // via event delegation (closest() selectors). Re-attaching on each step would
+    // stack duplicate handlers and cause _finish() to fire multiple times.
 
     // Focus heading of new step for accessibility
     const slide = document.getElementById(`ob-slide-${_step}`);
@@ -693,19 +743,28 @@
 
   // ── Finish ─────────────────────────────────────────────────────────────────
 
-  function _finish(skipped) {
+  /**
+   * @param {boolean} skipAll         – true when the top-level "Skip" button is
+   *                                    pressed; skips both person and interaction.
+   * @param {boolean} [saveInteraction=true] – false when the user pressed
+   *                                    "Skip for now" on step 3; saves the
+   *                                    person but omits the interaction entry.
+   */
+  function _finish(skipAll, saveInteraction) {
+    if (saveInteraction === undefined) saveInteraction = true;
     let personId = null;
 
-    if (!skipped && _form.name.trim()) {
-      // Save person
+    if (!skipAll && _form.name.trim()) {
+      // Always save the person if a name was entered and not fully skipping.
       const person = addPerson({
         name: _form.name.trim(),
         platform: _form.platform,
       });
       personId = person.id;
 
-      // Save interaction if we have a person and reached step 3
-      if (_step === 3 && personId) {
+      // Save interaction only when the user clicked Done (saveInteraction=true)
+      // and we are actually on step 3 (i.e. they filled in the form).
+      if (saveInteraction && _step === 3 && personId) {
         addInteraction({
           personId,
           date: _form.date || new Date().toISOString().slice(0, 10),

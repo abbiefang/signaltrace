@@ -150,17 +150,27 @@ function renderEmptyState() {
 }
 
 /**
- * Count how many interactions occurred in the last 7 days.
- * Falls back gracefully if persons have no interaction data.
+ * Count the total number of interactions logged in the last 7 days.
+ * Iterates every person's actual interaction records so the dashboard summary
+ * bar shows a real activity count, not just "how many people were active".
  * @param {Array} persons
  * @returns {number}
  */
 function countWeeklyInteractions(persons) {
-  const oneWeekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  return persons.reduce((total, person) => {
-    if (!person.lastInteractionAt) return total;
-    return new Date(person.lastInteractionAt).getTime() > oneWeekAgo ? total + 1 : total;
-  }, 0);
+  if (typeof getInteractions !== 'function') return 0;
+
+  // Use an ISO date string cutoff so string-comparison works with ix.date (YYYY-MM-DD)
+  const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+    .toISOString().slice(0, 10);
+
+  let count = 0;
+  persons.forEach(function (person) {
+    var ixs = getInteractions(person.id);
+    ixs.forEach(function (ix) {
+      if (ix.date && ix.date >= cutoff) count++;
+    });
+  });
+  return count;
 }
 
 // ─── Main render function ─────────────────────────────────────────────────────

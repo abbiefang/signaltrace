@@ -17,6 +17,7 @@ window.AppState = {
   currentScreen: null,      // string: 'dashboard' | 'person' | 'log' | 'profile' | 'onboarding'
   currentPersonId: null,    // string | null — set when viewing a person detail page
   logContext: null,         // object | null — { personId, type } when adding a log entry
+  editPersonId: null,       // string | null — set when editing an existing person
   isFirstRun: false,        // bool — true on very first launch
   navVisible: true,         // bool — hide nav on onboarding
 };
