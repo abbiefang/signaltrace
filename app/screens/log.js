@@ -1177,11 +1177,11 @@ function _handleSubmit(e) {
 
   // ── Validate ─────────────────────────────────────
   if (!_form.personId) {
-    _showError('Please select a person before saving.');
+    _showError('Who is this with? Pick someone to continue.');
     return;
   }
   if (!_form.date) {
-    _showError('Please select a date.');
+    _showError('Set a date to continue.');
     return;
   }
 
