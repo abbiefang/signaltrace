@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#12101c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="SignalTrace" />
+  <meta name="description" content="Turn messy dating signals into clear judgment." />
+
+  <!-- PWA manifest -->
+  <link rel="manifest" href="manifest.json" />
+
+  <!-- App icon placeholders (swap with real assets) -->
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+
+  <title>SignalTrace</title>
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ─────────────────────────────────────────────
+       ROOT CONTAINER
+       All screens are injected / shown here.
+  ────────────────────────────────────────────── -->
+  <div id="app">
+
+    <!-- ── SCREEN: Onboarding ─────────────────── -->
+    <div class="screen" id="screen-onboarding" data-screen="onboarding" aria-hidden="true">
+      <!-- Rendered by screens/onboarding.js -->
+    </div>
+
+    <!-- ── SCREEN: Dashboard (Home) ──────────── -->
+    <div class="screen" id="screen-dashboard" data-screen="dashboard" aria-hidden="true">
+      <!-- Rendered by screens/dashboard.js -->
+    </div>
+
+    <!-- ── SCREEN: Person Detail ─────────────── -->
+    <div class="screen" id="screen-person" data-screen="person" aria-hidden="true">
+      <!-- Rendered by screens/person.js -->
+    </div>
+
+    <!-- ── SCREEN: Log / Add Entry ───────────── -->
+    <div class="screen" id="screen-log" data-screen="log" aria-hidden="true">
+      <!-- Rendered by screens/log.js -->
+    </div>
+
+    <!-- ── SCREEN: Profile / About Me ────────── -->
+    <div class="screen" id="screen-profile" data-screen="profile" aria-hidden="true">
+      <!-- Rendered by screens/profile.js -->
+    </div>
+
+    <!-- ── SCREEN: Add / Edit Person ─────────── -->
+    <div class="screen" id="screen-add-person" data-screen="add-person" aria-hidden="true">
+      <!-- Rendered by screens/person.js (renderAddPerson / renderEditPerson) -->
+    </div>
+
+    <!-- ── BOTTOM NAVIGATION ──────────────────── -->
+    <nav id="bottom-nav" aria-label="Main navigation">
+
+      <button
+        class="nav-tab"
+        data-nav="dashboard"
+        aria-label="Home"
+        aria-current="false"
+        type="button"
+      >
+        <!-- Home icon -->
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/>
+          <polyline points="9 21 9 13 15 13 15 21"/>
+        </svg>
+        <span class="nav-label">Home</span>
+      </button>
+
+      <button
+        class="nav-tab nav-tab--add"
+        data-nav="log"
+        aria-label="Add entry"
+        type="button"
+      >
+        <!-- Plus icon -->
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <line x1="12" y1="5" x2="12" y2="19"/>
+          <line x1="5" y1="12" x2="19" y2="12"/>
+        </svg>
+        <span class="nav-label">Add</span>
+      </button>
+
+      <button
+        class="nav-tab"
+        data-nav="profile"
+        aria-label="Insights"
+        aria-current="false"
+        type="button"
+      >
+        <!-- Signal / insights icon -->
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+             aria-hidden="true">
+          <circle cx="12" cy="12" r="2"/>
+          <path d="M6.3 6.3a8 8 0 0 0 0 11.4"/>
+          <path d="M17.7 6.3a8 8 0 0 1 0 11.4"/>
+          <path d="M3.5 3.5a13.5 13.5 0 0 0 0 17"/>
+          <path d="M20.5 3.5a13.5 13.5 0 0 1 0 17"/>
+        </svg>
+        <span class="nav-label">Insights</span>
+      </button>
+
+    </nav>
+
+  </div><!-- /#app -->
+
+  <!-- ─────────────────────────────────────────────
+       SCRIPTS — load order matters:
+       data layer → signal logic → screens → app
+  ────────────────────────────────────────────── -->
+  <script src="data.js"></script>
+  <script src="signals.js"></script>
+  <script src="screens/dashboard.js"></script>
+  <script src="screens/person.js"></script>
+  <script src="screens/log.js"></script>
+  <script src="screens/profile.js"></script>
+  <script src="screens/onboarding.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
