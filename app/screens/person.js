@@ -1289,26 +1289,29 @@ function _ensurePdStyles() {
   style.textContent = `
     .pd-root {
       display: flex; flex-direction: column; height: 100%;
-      background: var(--color-bg, #12101c);
-      color: var(--color-text, #f0eeff);
+      background: var(--color-bg, #FAFAF9);
+      color: var(--color-text, #2B2B2B);
       font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
       overflow: hidden;
     }
     .pd-header {
       display: flex; align-items: center; justify-content: space-between;
       padding: 16px 20px 12px; flex-shrink: 0;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid #EEEEEE;
+      background: rgba(250,250,249,0.92);
+      -webkit-backdrop-filter: blur(8px);
+      backdrop-filter: blur(8px);
     }
     .pd-back-btn, .pd-edit-btn {
       width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
-      background: rgba(255,255,255,0.06); border: none; border-radius: 50%;
-      cursor: pointer; color: rgba(240,238,255,0.7);
+      background: rgba(200,168,130,0.1); border: none; border-radius: 50%;
+      cursor: pointer; color: #6B6B6B;
       transition: background 0.2s; flex-shrink: 0;
     }
-    .pd-back-btn:hover, .pd-edit-btn:hover { background: rgba(255,255,255,0.12); color: #f0eeff; }
+    .pd-back-btn:hover, .pd-edit-btn:hover { background: rgba(200,168,130,0.2); color: #2B2B2B; }
     .pd-back-btn svg, .pd-edit-btn svg { width: 18px; height: 18px; }
     .pd-header-title {
-      font-size: 17px; font-weight: 700; color: #f0eeff;
+      font-size: 17px; font-weight: 700; color: #2B2B2B;
       text-align: center; flex: 1; margin: 0 8px;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
@@ -1322,46 +1325,47 @@ function _ensurePdStyles() {
     .pd-avatar {
       width: 60px; height: 60px; border-radius: 50%; flex-shrink: 0;
       display: flex; align-items: center; justify-content: center;
-      font-size: 24px; font-weight: 700; color: rgba(255,255,255,0.9);
+      font-size: 24px; font-weight: 700; color: rgba(255,255,255,0.95);
     }
     .pd-hero-info { display: flex; flex-direction: column; gap: 4px; }
-    .pd-name { font-size: 20px; font-weight: 700; color: #f0eeff; }
+    .pd-name { font-size: 20px; font-weight: 700; color: #2B2B2B; }
     .pd-meta { display: flex; gap: 8px; align-items: center; }
     .pd-platform, .pd-met {
-      font-size: 13px; color: rgba(240,238,255,0.45);
+      font-size: 13px; color: #989898;
     }
     .pd-level-pill {
       display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 10px;
       border-radius: 20px; letter-spacing: 0.3px; margin-top: 2px;
     }
-    .pd-pill--high   { background: rgba(239,68,68,0.15);   color: #f87171; }
-    .pd-pill--medium { background: rgba(251,146,60,0.15);  color: #fb923c; }
-    .pd-pill--low    { background: rgba(250,204,21,0.12);  color: #facc15; }
-    .pd-pill--none   { background: rgba(255,255,255,0.06); color: rgba(240,238,255,0.4); }
+    .pd-pill--high   { background: rgba(193,124,124,0.15); color: #9A5A5A; }
+    .pd-pill--medium { background: rgba(212,165,116,0.18); color: #8B6A3A; }
+    .pd-pill--low    { background: rgba(123,168,156,0.18); color: #4A7A6E; }
+    .pd-pill--none   { background: #F2F2F2; color: #989898; }
 
     /* Stats row */
     .pd-stats-row {
       display: flex; align-items: stretch; margin: 0 16px 8px;
-      background: rgba(255,255,255,0.04); border-radius: 14px;
-      border: 1px solid rgba(255,255,255,0.07);
+      background: #FFFFFF; border-radius: 14px;
+      border: 1px solid #EEEEEE;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
     }
     .pd-stat { flex: 1; display: flex; flex-direction: column; align-items: center; padding: 14px 8px; }
-    .pd-stat-value { font-size: 20px; font-weight: 700; color: #f0eeff; }
-    .pd-stat-label { font-size: 11px; color: rgba(240,238,255,0.4); margin-top: 3px; text-align: center; }
-    .pd-stat-divider { width: 1px; background: rgba(255,255,255,0.07); margin: 12px 0; }
+    .pd-stat-value { font-size: 20px; font-weight: 700; color: #C8A882; }
+    .pd-stat-label { font-size: 11px; color: #989898; margin-top: 3px; text-align: center; }
+    .pd-stat-divider { width: 1px; background: #EEEEEE; margin: 12px 0; }
 
     /* Section */
     .pd-section { padding: 16px 20px 0; }
     .pd-section-title {
       font-size: 12px; font-weight: 600; letter-spacing: 0.7px;
-      text-transform: uppercase; color: rgba(240,238,255,0.35); margin-bottom: 10px;
+      text-transform: uppercase; color: #989898; margin-bottom: 10px;
     }
     .pd-notes-text {
-      font-size: 14px; color: rgba(240,238,255,0.6); line-height: 1.6;
-      background: rgba(255,255,255,0.04); border-radius: 10px; padding: 12px 14px;
+      font-size: 14px; color: #6B6B6B; line-height: 1.6;
+      background: #F5F5F5; border-radius: 10px; padding: 12px 14px;
     }
-    .pd-empty-hint { font-size: 13px; color: rgba(240,238,255,0.35); padding: 4px 0; }
-    .pd-empty-hint-sub { font-size: 12px; color: rgba(240,238,255,0.22); padding: 2px 0; }
+    .pd-empty-hint { font-size: 13px; color: #989898; padding: 4px 0; }
+    .pd-empty-hint-sub { font-size: 12px; color: #C0C0C0; padding: 2px 0; }
     .pd-empty-interactions { padding: 8px 0; }
 
     /* Signal cards */
@@ -1370,13 +1374,13 @@ function _ensurePdStyles() {
       display: flex; gap: 10px; align-items: flex-start;
       padding: 12px 14px; border-radius: 12px; border: 1px solid transparent;
     }
-    .pd-signal-card--high   { background: rgba(239,68,68,0.1);  border-color: rgba(239,68,68,0.2);  }
-    .pd-signal-card--medium { background: rgba(251,146,60,0.1); border-color: rgba(251,146,60,0.2); }
-    .pd-signal-card--low    { background: rgba(250,204,21,0.07); border-color: rgba(250,204,21,0.15); }
+    .pd-signal-card--high   { background: rgba(193,124,124,0.08);  border-color: rgba(193,124,124,0.2);  }
+    .pd-signal-card--medium { background: rgba(212,165,116,0.08);  border-color: rgba(212,165,116,0.2);  }
+    .pd-signal-card--low    { background: rgba(123,168,156,0.08);  border-color: rgba(123,168,156,0.18); }
     .pd-signal-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
     .pd-signal-body { display: flex; flex-direction: column; gap: 2px; }
-    .pd-signal-type { font-size: 12px; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase; color: rgba(240,238,255,0.5); }
-    .pd-signal-msg  { font-size: 14px; color: rgba(240,238,255,0.85); line-height: 1.45; }
+    .pd-signal-type { font-size: 12px; font-weight: 600; letter-spacing: 0.4px; text-transform: uppercase; color: #989898; }
+    .pd-signal-msg  { font-size: 14px; color: #2B2B2B; line-height: 1.45; }
 
     /* Interactions */
     .pd-interactions-list { display: flex; flex-direction: column; gap: 1px; }
