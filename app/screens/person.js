@@ -29,11 +29,9 @@
  *   },
  *
  * ─── NOTE on vibeTags ────────────────────────────────────────────────────────
- *   data.js's addPerson() explicitly maps Person fields and does not forward
- *   vibeTags. To persist vibeTags on creation, add `vibeTags` to the Person
- *   object inside addPerson():
- *     vibeTags: Array.isArray(data.vibeTags) ? data.vibeTags : [],
- *   updatePerson() already persists it via spread.
+ *   Both addPerson() and updatePerson() in data.js persist vibeTags.
+ *   addPerson() uses: vibeTags: Array.isArray(data.vibeTags) ? data.vibeTags : []
+ *   updatePerson() persists via object spread.
  */
 
 'use strict';
