@@ -73,10 +73,11 @@ const PF_AVATAR_PALETTE = [
 ───────────────────────────────────────────────────────────────────────────── */
 
 let _pf = {
-  mode:       'add',          // 'add' | 'edit'
-  personId:   null,           // string | null
-  platform:   '',             // selected platform value
-  vibeTags:   new Set(),      // selected vibe tag values
+  mode:         'add',        // 'add' | 'edit'
+  personId:     null,         // string | null
+  platform:     '',           // selected platform value
+  vibeTags:     new Set(),    // selected vibe tag values
+  photoDataUrl: null,         // base64 data URL of staged photo (not yet persisted)
 };
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -88,7 +89,7 @@ let _pf = {
  * Starts with a blank form.
  */
 function renderAddPerson() {
-  _pf = { mode: 'add', personId: null, platform: '', vibeTags: new Set() };
+  _pf = { mode: 'add', personId: null, platform: '', vibeTags: new Set(), photoDataUrl: null };
   _ensureStyles();
   _renderIntoContainer(null);
 }
@@ -102,11 +103,14 @@ function renderAddPerson() {
 function renderEditPerson(personId) {
   const person = (typeof getPerson === 'function') ? getPerson(personId) : null;
 
+  const existingPhoto = (typeof Photos !== 'undefined') ? Photos.getPersonPhoto(personId) : null;
+
   _pf = {
-    mode:     'edit',
-    personId: personId,
-    platform: person?.platform ?? '',
-    vibeTags: new Set(Array.isArray(person?.vibeTags) ? person.vibeTags : []),
+    mode:         'edit',
+    personId:     personId,
+    platform:     person?.platform ?? '',
+    vibeTags:     new Set(Array.isArray(person?.vibeTags) ? person.vibeTags : []),
+    photoDataUrl: existingPhoto,
   };
 
   _ensureStyles();
@@ -149,12 +153,30 @@ function _renderIntoContainer(person) {
       <!-- ── Scrollable body ── -->
       <div class="pf-body">
 
-        <!-- Avatar preview -->
-        <div class="pf-avatar-wrap" aria-hidden="true">
-          <div class="pf-avatar" id="pf-avatar">
-            ${_renderAvatarContent(name)}
-          </div>
-          <span class="pf-avatar-hint">Updates as you type</span>
+        <!-- Avatar / photo upload -->
+        <div class="pf-avatar-wrap">
+          <button type="button" class="pf-avatar-upload-btn" id="pf-avatar-upload-btn"
+                  aria-label="Upload photo"
+                  onclick="document.getElementById('pf-photo-input').click()">
+            <div class="pf-avatar" id="pf-avatar">
+              ${_pf.photoDataUrl
+                ? `<img src="${_pf.photoDataUrl}" class="pf-avatar-img" alt="Photo">`
+                : _renderAvatarContent(name)}
+            </div>
+            <div class="pf-avatar-camera-overlay" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                   stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                <circle cx="12" cy="13" r="4"/>
+              </svg>
+            </div>
+          </button>
+          <input type="file" id="pf-photo-input" accept="image/*"
+                 style="display:none; position:absolute; pointer-events:none;"
+                 onchange="_pfHandlePhotoSelect(this.files[0])">
+          <span class="pf-avatar-hint">
+            ${_pf.photoDataUrl ? 'Tap to change photo' : 'Tap to add photo · updates as you type'}
+          </span>
         </div>
 
         <!-- Form -->
@@ -280,10 +302,13 @@ function _renderIntoContainer(person) {
    All prefixed _pf to minimise global namespace pollution.
 ───────────────────────────────────────────────────────────────────────────── */
 
-/** Called on each keystroke in the name input. Updates avatar, clears error. */
+/** Called on each keystroke in the name input. Updates avatar (unless a photo is set), clears error. */
 function _pfHandleNameInput(value) {
-  const avatar = document.getElementById('pf-avatar');
-  if (avatar) avatar.innerHTML = _renderAvatarContent(value.trim());
+  // Don't overwrite avatar if user has already staged a real photo
+  if (!_pf.photoDataUrl) {
+    const avatar = document.getElementById('pf-avatar');
+    if (avatar) avatar.innerHTML = _renderAvatarContent(value.trim());
+  }
 
   // Clear error eagerly as soon as user starts typing
   if (value.trim()) _pfClearNameError();
@@ -312,6 +337,40 @@ function _pfToggleVibe(value) {
   if (chipEl) {
     chipEl.classList.toggle('pf-vibe-chip--selected', _pf.vibeTags.has(value));
     chipEl.setAttribute('aria-pressed', String(_pf.vibeTags.has(value)));
+  }
+}
+
+/**
+ * Handle photo file selection from the file input.
+ * Compresses the image, updates the avatar preview, and stages the data URL
+ * so _pfHandleSubmit can persist it after the person record is saved.
+ *
+ * @param {File|null} file
+ */
+async function _pfHandlePhotoSelect(file) {
+  if (!file) return;
+
+  if (typeof Photos === 'undefined') {
+    console.warn('[person.js] Photos module not loaded');
+    return;
+  }
+
+  try {
+    const dataUrl = await Photos.processImage(file, 400, 0.72);
+    _pf.photoDataUrl = dataUrl;
+
+    // Update preview
+    const avatar = document.getElementById('pf-avatar');
+    if (avatar) {
+      avatar.innerHTML = `<img src="${dataUrl}" class="pf-avatar-img" alt="Photo">`;
+    }
+
+    // Update hint text
+    const hint = document.querySelector('.pf-avatar-hint');
+    if (hint) hint.textContent = 'Tap to change photo';
+
+  } catch (err) {
+    console.warn('[person.js] Photo processing failed:', err);
   }
 }
 
@@ -368,11 +427,19 @@ function _pfHandleSubmit() {
         _pfResetSubmitBtn();
         return;
       }
+      // Persist staged photo (if any)
+      if (_pf.photoDataUrl && typeof Photos !== 'undefined') {
+        Photos.savePersonPhotoDataUrl(_pf.personId, _pf.photoDataUrl);
+      }
       navigate('person', { personId: _pf.personId });
 
     } else {
       // ── Add mode ──
       const newPerson = addPerson(data);
+      // Persist staged photo (if any)
+      if (_pf.photoDataUrl && typeof Photos !== 'undefined') {
+        Photos.savePersonPhotoDataUrl(newPerson.id, _pf.photoDataUrl);
+      }
       // Use logContext format so renderLog receives personId correctly
       navigate('log', { logContext: { personId: newPerson.id } });
     }
@@ -489,9 +556,9 @@ function _ensureStyles() {
       display: flex;
       flex-direction: column;
       height: 100%;
-      background: var(--color-bg, #12101c);
-      color: var(--color-text, #f0eeff);
-      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+      background: #FBF8F5;
+      color: #1C1410;
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
       overflow: hidden;
     }
 
@@ -503,7 +570,8 @@ function _ensureStyles() {
       justify-content: space-between;
       padding: 16px 20px 12px;
       flex-shrink: 0;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      border-bottom: 1px solid #EDE6DF;
+      background: #FBF8F5;
     }
 
     .pf-back-btn {
@@ -512,23 +580,23 @@ function _ensureStyles() {
       display: flex;
       align-items: center;
       justify-content: center;
-      background: rgba(255,255,255,0.06);
-      border: none;
+      background: #FFFFFF;
+      border: 1px solid #EDE6DF;
       border-radius: 50%;
       cursor: pointer;
-      color: rgba(240,238,255,0.7);
+      color: #7A6E68;
       transition: background 0.2s, color 0.2s;
       flex-shrink: 0;
     }
 
-    .pf-back-btn:hover { background: rgba(255,255,255,0.1); color: #f0eeff; }
+    .pf-back-btn:hover { background: #F5F0EC; color: #1C1410; }
     .pf-back-btn:active { transform: scale(0.95); }
     .pf-back-btn svg { width: 18px; height: 18px; }
 
     .pf-title {
       font-size: 17px;
       font-weight: 700;
-      color: #f0eeff;
+      color: #1C1410;
       text-align: center;
       flex: 1;
       margin: 0 8px;
@@ -546,6 +614,7 @@ function _ensureStyles() {
       overflow-y: auto;
       padding: 20px 20px 0;
       -webkit-overflow-scrolling: touch;
+      background: #FBF8F5;
     }
 
     .pf-body::-webkit-scrollbar { display: none; }
@@ -562,9 +631,9 @@ function _ensureStyles() {
     .pf-avatar {
       width: 72px;
       height: 72px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.06);
-      border: 2px dashed rgba(255,255,255,0.12);
+      border-radius: 20px;
+      background: #EDE6DF;
+      border: 2px dashed #C8BDB4;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -581,12 +650,14 @@ function _ensureStyles() {
       height: 100%;
       font-size: 28px;
       font-weight: 700;
-      color: rgba(255,255,255,0.9);
+      color: #FFFFFF;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.18);
       border: none;
+      border-radius: 18px;
     }
 
     .pf-avatar-placeholder {
-      color: rgba(240,238,255,0.2);
+      color: #C8BDB4;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -596,8 +667,56 @@ function _ensureStyles() {
 
     .pf-avatar-hint {
       font-size: 11px;
-      color: rgba(240,238,255,0.3);
+      color: #B0A89E;
       letter-spacing: 0.3px;
+    }
+
+    /* ── Avatar upload button ── */
+
+    .pf-avatar-upload-btn {
+      position: relative;
+      background: none;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      border-radius: 20px;
+      display: block;
+      margin-bottom: 8px;
+    }
+
+    .pf-avatar-upload-btn:active { opacity: 0.85; }
+
+    .pf-avatar-camera-overlay {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      background: rgba(0,0,0,0.30);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.18s;
+      pointer-events: none;
+    }
+
+    .pf-avatar-camera-overlay svg {
+      width: 22px;
+      height: 22px;
+      color: #fff;
+    }
+
+    @media (hover: none) {
+      .pf-avatar-camera-overlay { opacity: 1; background: rgba(0,0,0,0.20); }
+    }
+
+    .pf-avatar-upload-btn:hover .pf-avatar-camera-overlay { opacity: 1; }
+
+    .pf-avatar-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 20px;
+      display: block;
     }
 
     /* ── Form ── */
@@ -611,42 +730,42 @@ function _ensureStyles() {
     .pf-label {
       font-size: 12px;
       font-weight: 600;
-      letter-spacing: 0.7px;
+      letter-spacing: 0.07em;
       text-transform: uppercase;
-      color: rgba(240,238,255,0.4);
+      color: #B0A89E;
     }
 
-    .pf-required { color: #e94560; }
+    .pf-required { color: #D4607A; }
 
     .pf-optional {
       font-weight: 400;
       text-transform: none;
       letter-spacing: 0;
       font-size: 11px;
-      color: rgba(240,238,255,0.3);
+      color: #C8BDB4;
     }
 
     /* ── Text input & textarea ── */
 
     .pf-input {
       width: 100%;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.1);
+      background: #FFFFFF;
+      border: 1px solid #EDE6DF;
       border-radius: 12px;
       padding: 13px 16px;
       font-size: 16px;
-      color: #f0eeff;
+      color: #1C1410;
       font-family: inherit;
       outline: none;
-      transition: border-color 0.2s, background 0.2s;
+      transition: border-color 0.2s, box-shadow 0.2s;
       -webkit-appearance: none;
     }
 
-    .pf-input::placeholder { color: rgba(240,238,255,0.25); }
+    .pf-input::placeholder { color: #C8BDB4; }
 
     .pf-input:focus {
-      border-color: rgba(233,69,96,0.5);
-      background: rgba(233,69,96,0.04);
+      border-color: #D4607A;
+      box-shadow: 0 0 0 3px rgba(212,96,122,0.12);
     }
 
     .pf-textarea {
@@ -662,7 +781,7 @@ function _ensureStyles() {
 
     .pf-input--date {
       padding-right: 44px;
-      color-scheme: dark;
+      color-scheme: light;
     }
 
     .pf-date-icon {
@@ -670,7 +789,7 @@ function _ensureStyles() {
       right: 14px;
       top: 50%;
       transform: translateY(-50%);
-      color: rgba(240,238,255,0.3);
+      color: #B0A89E;
       pointer-events: none;
     }
 
@@ -679,13 +798,13 @@ function _ensureStyles() {
     /* ── Error state ── */
 
     .pf-field--error .pf-input {
-      border-color: rgba(239,68,68,0.6);
-      background: rgba(239,68,68,0.04);
+      border-color: #C44040;
+      box-shadow: 0 0 0 3px rgba(196,64,64,0.10);
     }
 
     .pf-error {
       font-size: 13px;
-      color: #ef4444;
+      color: #C44040;
       min-height: 18px;
       display: block;
     }
@@ -694,61 +813,63 @@ function _ensureStyles() {
 
     .pf-field-hint {
       font-size: 11px;
-      color: rgba(240,238,255,0.3);
+      color: #B0A89E;
       line-height: 1.4;
     }
 
-    /* ── Platform grid ── */
+    /* ── Platform grid — big icon cards ── */
 
     .pf-platform-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 8px;
+      gap: 10px;
     }
 
     .pf-platform-chip {
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 5px;
-      padding: 10px 6px;
-      border-radius: 12px;
-      border: 1px solid rgba(255,255,255,0.09);
-      background: rgba(255,255,255,0.04);
+      gap: 6px;
+      padding: 14px 6px;
+      border-radius: 16px;
+      border: 1.5px solid #EDE6DF;
+      background: #FFFFFF;
       cursor: pointer;
-      transition: border-color 0.18s, background 0.18s, transform 0.12s;
+      transition: border-color 0.18s, background 0.18s, transform 0.12s, box-shadow 0.18s;
       font-family: inherit;
+      box-shadow: 0 1px 4px rgba(28,20,16,0.05);
     }
 
     .pf-platform-chip:hover {
-      border-color: rgba(233,69,96,0.35);
-      background: rgba(233,69,96,0.06);
+      border-color: #D4607A;
+      box-shadow: 0 2px 8px rgba(212,96,122,0.12);
     }
 
     .pf-platform-chip:active { transform: scale(0.96); }
 
     .pf-platform-chip--selected {
-      border-color: #e94560;
-      background: rgba(233,69,96,0.12);
+      background: #F3EDF8;
+      border-color: #B090C8;
+      box-shadow: 0 2px 8px rgba(176,144,200,0.18);
     }
 
     .pf-platform-emoji {
-      font-size: 20px;
+      font-size: 24px;
       line-height: 1;
       display: block;
     }
 
     .pf-platform-label {
       font-size: 11px;
-      font-weight: 500;
-      color: rgba(240,238,255,0.6);
+      font-weight: 600;
+      color: #7A6E68;
       text-align: center;
       white-space: nowrap;
     }
 
-    .pf-platform-chip--selected .pf-platform-label { color: #f0eeff; }
+    .pf-platform-chip--selected .pf-platform-label { color: #7050A0; }
 
-    /* ── Vibe tags ── */
+    /* ── Vibe tags — rounded gradient chips ── */
 
     .pf-vibe-group {
       display: flex;
@@ -760,11 +881,11 @@ function _ensureStyles() {
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      padding: 9px 14px;
-      border-radius: 24px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: rgba(255,255,255,0.04);
-      color: rgba(240,238,255,0.6);
+      padding: 10px 18px;
+      border-radius: 999px;
+      border: 1.5px solid #EDE6DF;
+      background: #FFFFFF;
+      color: #7A6E68;
       font-size: 14px;
       font-weight: 500;
       font-family: inherit;
@@ -773,16 +894,17 @@ function _ensureStyles() {
     }
 
     .pf-vibe-chip:hover {
-      border-color: rgba(240,147,251,0.4);
-      color: #f0eeff;
+      border-color: #B090C8;
+      color: #7050A0;
     }
 
     .pf-vibe-chip:active { transform: scale(0.97); }
 
     .pf-vibe-chip--selected {
-      border-color: #f093fb;
-      background: rgba(240,147,251,0.1);
-      color: #f0eeff;
+      background: linear-gradient(135deg, #D4607A, #E8855A);
+      border-color: transparent;
+      color: #fff;
+      font-weight: 600;
     }
 
     /* Checkmark icon inside vibe chip */
@@ -790,7 +912,7 @@ function _ensureStyles() {
       width: 16px;
       height: 16px;
       border-radius: 50%;
-      border: 1.5px solid rgba(255,255,255,0.2);
+      border: 1.5px solid rgba(0,0,0,0.15);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -798,16 +920,17 @@ function _ensureStyles() {
       transition: background 0.18s, border-color 0.18s;
     }
 
+    .pf-vibe-chip--selected .pf-vibe-check {
+      background: rgba(255,255,255,0.3);
+      border-color: rgba(255,255,255,0.5);
+    }
+
     .pf-vibe-check svg {
       width: 9px;
       height: 9px;
       opacity: 0;
       transition: opacity 0.15s;
-    }
-
-    .pf-vibe-chip--selected .pf-vibe-check {
-      background: #f093fb;
-      border-color: #f093fb;
+      color: #fff;
     }
 
     .pf-vibe-chip--selected .pf-vibe-check svg { opacity: 1; }
@@ -820,29 +943,30 @@ function _ensureStyles() {
       padding-bottom: max(14px, env(safe-area-inset-bottom));
       background: linear-gradient(
         to top,
-        #12101c 60%,
-        rgba(18,16,28,0)
+        #FBF8F5 70%,
+        rgba(251,248,245,0)
       );
-      border-top: 1px solid rgba(255,255,255,0.05);
+      border-top: 1px solid #EDE6DF;
     }
 
     .pf-submit-btn {
       display: block;
       width: 100%;
       padding: 16px;
-      border-radius: 14px;
-      background: linear-gradient(135deg, #e94560 0%, #f093fb 100%);
+      border-radius: 16px;
+      background: linear-gradient(135deg, #D4607A 0%, #E8855A 100%);
       color: #fff;
       font-size: 16px;
       font-weight: 700;
       border: none;
       cursor: pointer;
       letter-spacing: 0.2px;
-      transition: opacity 0.2s, transform 0.15s;
+      transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
       font-family: inherit;
+      box-shadow: 0 4px 16px rgba(212,96,122,0.30);
     }
 
-    .pf-submit-btn:hover  { opacity: 0.9; }
+    .pf-submit-btn:hover  { box-shadow: 0 6px 22px rgba(212,96,122,0.40); }
     .pf-submit-btn:active { transform: scale(0.98); }
 
     .pf-submit-btn:disabled {
@@ -867,11 +991,12 @@ window.renderEditPerson = renderEditPerson;
 
 // Internal handlers exposed to window for inline onclick use.
 // Prefixed _pf to signal they are implementation details.
-window._pfHandleNameInput = _pfHandleNameInput;
-window._pfSelectPlatform  = _pfSelectPlatform;
-window._pfToggleVibe      = _pfToggleVibe;
-window._pfHandleBack      = _pfHandleBack;
-window._pfHandleSubmit    = _pfHandleSubmit;
+window._pfHandleNameInput    = _pfHandleNameInput;
+window._pfSelectPlatform     = _pfSelectPlatform;
+window._pfToggleVibe         = _pfToggleVibe;
+window._pfHandleBack         = _pfHandleBack;
+window._pfHandleSubmit       = _pfHandleSubmit;
+window._pfHandlePhotoSelect  = _pfHandlePhotoSelect;
 
 
 /* ═════════════════════════════════════════════════════════════════════════════

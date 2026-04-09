@@ -177,6 +177,12 @@ function _buildHeader(person, daysSinceMet) {
     ? `Met ${daysSinceMet} day${daysSinceMet === 1 ? '' : 's'} ago`
     : 'Date unknown';
 
+  // Use real photo if available, fall back to initial
+  const photoUrl   = (typeof Photos !== 'undefined') ? Photos.getPersonPhoto(person.id) : null;
+  const avatarHTML = photoUrl
+    ? `<div class="prf-avatar prf-avatar--photo"><img src="${photoUrl}" alt="${_esc(person.name || '')}"></div>`
+    : `<div class="prf-avatar" style="background:${avatarColor}">${_esc(initial)}</div>`;
+
   return /* html */`
     <header class="prf-header">
       <div class="prf-header-top">
@@ -195,7 +201,7 @@ function _buildHeader(person, daysSinceMet) {
       </div>
 
       <div class="prf-avatar-wrap">
-        <div class="prf-avatar" style="background:${avatarColor}">${_esc(initial)}</div>
+        ${avatarHTML}
       </div>
 
       <div class="prf-identity">
@@ -390,6 +396,7 @@ function _buildInteractionRow(ix, idx, total) {
   const dateStr    = _formatDate(ix.date);
   const notesPreview = ix.notes ? _truncate(ix.notes, 72) : null;
   const hasFlags   = (ix.redFlags && ix.redFlags.length > 0) || (ix.greenFlags && ix.greenFlags.length > 0);
+  const photos     = (typeof Photos !== 'undefined') ? Photos.getInteractionPhotos(ix.id) : [];
 
   return /* html */`
     <div class="prf-ix-row${isLast ? ' prf-ix-row--last' : ''}" id="prf-ix-${_esc(ix.id)}">
@@ -412,6 +419,7 @@ function _buildInteractionRow(ix, idx, total) {
               </div>
               <div class="prf-ix-date">${dateStr}</div>
               ${notesPreview ? `<div class="prf-ix-preview">${_esc(notesPreview)}</div>` : ''}
+              ${photos.length > 0 ? `<div class="prf-ix-photo-badge">📷 ${photos.length}</div>` : ''}
             </div>
           </div>
           <div class="prf-ix-right">
@@ -450,6 +458,18 @@ function _buildInteractionDetail(ix) {
     ? ix.greenFlags.map(f => `<span class="prf-flag prf-flag--green">${_esc(f)}</span>`).join('')
     : null;
 
+  // Screenshots
+  const photos     = (typeof Photos !== 'undefined') ? Photos.getInteractionPhotos(ix.id) : [];
+  const photosHTML = photos.length > 0
+    ? `<div class="prf-detail-photos">${photos.map((url, i) => `
+        <button type="button" class="prf-photo-thumb-btn"
+                data-action="view-photo" data-photo-url="${_esc(url)}"
+                aria-label="View screenshot ${i + 1}">
+          <img src="${url}" class="prf-photo-thumb-img" alt="Screenshot ${i + 1}">
+        </button>
+      `).join('')}</div>`
+    : '';
+
   return /* html */`
     <div class="prf-detail-grid">
       <div class="prf-detail-row">
@@ -467,6 +487,7 @@ function _buildInteractionDetail(ix) {
     ${ix.notes ? `<div class="prf-detail-notes">${_esc(ix.notes)}</div>` : ''}
     ${greenFlagsHTML ? `<div class="prf-flags-row">${greenFlagsHTML}</div>` : ''}
     ${redFlagsHTML   ? `<div class="prf-flags-row">${redFlagsHTML}</div>`   : ''}
+    ${photosHTML}
   `;
 }
 
@@ -543,6 +564,12 @@ function _attachEvents(container, person) {
       case 'delete':
         _handleDelete(person);
         break;
+
+      case 'view-photo': {
+        const photoUrl = btn.dataset.photoUrl;
+        if (photoUrl) _openLightbox(photoUrl);
+        break;
+      }
     }
   });
 }
@@ -555,8 +582,9 @@ function _handleBack() {
 
 function _handleEdit(personId) {
   if (typeof navigate === 'function') {
-    if (typeof updateState === 'function') updateState({ editPersonId: personId });
-    navigate('add-person', { personId });
+    // Pass editPersonId as a navigate param so app.js can manage it in state.
+    // Do NOT call updateState separately — navigate() handles it.
+    navigate('add-person', { editPersonId: personId });
   }
 }
 
@@ -627,6 +655,13 @@ function _handleDelete(person) {
 
   overlay.querySelector('.prf-dialog-confirm').addEventListener('click', function () {
     overlay.remove();
+
+    // Cascade-delete photos before deleting person record
+    if (typeof Photos !== 'undefined' && typeof getInteractions === 'function') {
+      const ixIds = getInteractions(person.id).map(i => i.id);
+      Photos.deletePersonPhotos(person.id, ixIds);
+    }
+
     if (typeof deletePerson === 'function') {
       deletePerson(person.id);
     }
@@ -635,6 +670,59 @@ function _handleDelete(person) {
     }
   });
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   LIGHTBOX
+───────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Open a full-screen lightbox to display a single photo.
+ * Dismissed by tapping the overlay or pressing Escape.
+ * @param {string} photoUrl — base64 data URL
+ */
+function _openLightbox(photoUrl) {
+  // Remove any existing lightbox
+  document.getElementById('prf-lightbox')?.remove();
+
+  const lb = document.createElement('div');
+  lb.id = 'prf-lightbox';
+  lb.className = 'prf-lightbox';
+  lb.setAttribute('role', 'dialog');
+  lb.setAttribute('aria-modal', 'true');
+  lb.setAttribute('aria-label', 'Screenshot');
+
+  lb.innerHTML = `
+    <div class="prf-lightbox-backdrop"></div>
+    <button class="prf-lightbox-close" aria-label="Close">
+      <svg viewBox="0 0 20 20" fill="none" stroke="currentColor"
+           stroke-width="2" stroke-linecap="round">
+        <line x1="4" y1="4" x2="16" y2="16"/>
+        <line x1="16" y1="4" x2="4" y2="16"/>
+      </svg>
+    </button>
+    <div class="prf-lightbox-img-wrap">
+      <img src="${photoUrl}" class="prf-lightbox-img" alt="Screenshot">
+    </div>
+  `;
+
+  document.body.appendChild(lb);
+
+  // Trigger animation on next frame
+  requestAnimationFrame(() => lb.classList.add('prf-lightbox--open'));
+
+  function _close() {
+    lb.classList.remove('prf-lightbox--open');
+    setTimeout(() => lb.remove(), 200);
+    document.removeEventListener('keydown', _onKey);
+  }
+
+  function _onKey(e) { if (e.key === 'Escape') _close(); }
+
+  lb.querySelector('.prf-lightbox-backdrop').addEventListener('click', _close);
+  lb.querySelector('.prf-lightbox-close').addEventListener('click', _close);
+  document.addEventListener('keydown', _onKey);
+}
+
 
 /* ─────────────────────────────────────────────────────────────────────────────
    PRIVATE — UTILITY
@@ -739,6 +827,63 @@ function _truncate(str, maxLen) {
   if (!str || str.length <= maxLen) return str;
   return str.slice(0, maxLen).trimEnd() + '…';
 }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   PERSON DETAIL — renders into #screen-person (routed from dashboard/log/edit)
+   This is the function called by app.js SCREENS['person'].render().
+───────────────────────────────────────────────────────────────────────────── */
+
+/**
+ * Render the Person Detail screen into #screen-person.
+ * Called by app.js SCREENS registry for the 'person' route.
+ *
+ * @param {string} [personId]  Falls back to AppState.currentPersonId.
+ */
+function renderPerson(personId) {
+  const id = personId
+    || (typeof AppState !== 'undefined' && AppState.currentPersonId)
+    || null;
+
+  if (!id) {
+    // No person in context — fall back to dashboard
+    if (typeof navigate === 'function') navigate('dashboard');
+    return;
+  }
+
+  const person = (typeof getPerson === 'function') ? getPerson(id) : null;
+
+  if (!person) {
+    // Person was deleted or ID is stale
+    const c = document.getElementById('screen-person');
+    if (c) {
+      c.innerHTML = /* html */`
+        <div class="prf-root prf-error-root">
+          <button class="prf-btn-icon prf-error-back" style="margin:24px" data-action="back"
+                  onclick="navigate('dashboard')">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor"
+                 stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 4l-6 6 6 6"/>
+            </svg>
+          </button>
+          <div class="prf-error-msg">Person not found. They may have been deleted.</div>
+        </div>`;
+    }
+    return;
+  }
+
+  // Reset module state for a clean render
+  _prf = { personId: id, expanded: new Set() };
+  _ensureStyles();
+
+  const container = document.getElementById('screen-person');
+  if (!container) return;
+
+  container.innerHTML = _buildHTML(person);
+  _attachEvents(container, person);
+}
+
+window.renderPerson = renderPerson;
+
 
 /* ─────────────────────────────────────────────────────────────────────────────
    AGGREGATE INSIGHTS HOME
@@ -1637,6 +1782,119 @@ function _ensureStyles() {
   text-align: center;
   max-width: 280px;
   line-height: 1.6;
+}
+
+/* ── Photo avatar ── */
+.prf-avatar--photo {
+  overflow: hidden;
+}
+.prf-avatar--photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+/* ── Interaction photo badge (timeline row) ── */
+.prf-ix-photo-badge {
+  font-size: 11px;
+  color: rgba(240,238,248,0.4);
+  margin-top: 2px;
+}
+
+/* ── Interaction photo thumbnails (expanded detail) ── */
+.prf-detail-photos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.prf-photo-thumb-btn {
+  width: 72px;
+  height: 72px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  background: rgba(255,255,255,0.05);
+  transition: opacity 0.15s, transform 0.15s;
+  flex-shrink: 0;
+}
+
+.prf-photo-thumb-btn:hover  { opacity: 0.85; }
+.prf-photo-thumb-btn:active { transform: scale(0.96); }
+
+.prf-photo-thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ── Lightbox ── */
+.prf-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+}
+
+.prf-lightbox--open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.prf-lightbox-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+}
+
+.prf-lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  z-index: 1;
+  transition: background 0.15s;
+}
+
+.prf-lightbox-close:hover { background: rgba(255,255,255,0.2); }
+.prf-lightbox-close svg { width: 16px; height: 16px; }
+
+.prf-lightbox-img-wrap {
+  position: relative;
+  z-index: 1;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 80px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.prf-lightbox-img {
+  max-width: 100%;
+  max-height: calc(100vh - 80px);
+  border-radius: 12px;
+  display: block;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.6);
 }
 
   `.trim();

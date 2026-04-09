@@ -261,12 +261,12 @@ function _buildVoiceModeHTML() {
   <!-- ── Voice Mode ─────────────────────────── -->
   <div class="voice-mode-entry" id="voice-mode-entry">
     <div class="voice-mode-entry__info">
-      <span class="voice-mode-entry__label">\${_micSVG(13)} Voice Mode</span>
+      <span class="voice-mode-entry__label">${_micSVG(13)} Voice Mode</span>
       <span class="voice-mode-entry__desc">Describe what happened — I'll fill in the fields</span>
     </div>
     <button type="button" class="voice-mode-trigger" id="voice-mode-trigger"
             aria-label="Start Voice Mode" aria-pressed="false">
-      \${_micSVG(18)}
+      ${_micSVG(18)}
     </button>
   </div>
 
@@ -277,7 +277,7 @@ function _buildVoiceModeHTML() {
       <button type="button"
               class="voice-mode-trigger voice-mode-trigger--sm voice-mode-trigger--recording"
               id="voice-mode-stop" aria-label="Stop recording">
-        \${_stopSVG(14)}
+        ${_stopSVG(14)}
       </button>
     </div>
     <div class="voice-mode-panel__transcript" id="voice-mode-transcript"
