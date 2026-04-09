@@ -34,7 +34,8 @@ function renderSettings() {
   const container = document.getElementById('screen-settings');
   if (!container) return;
 
-  _ensureSettingsStyles();
+  // Styles now in styles.css (mobile app redesign)
+  // _ensureSettingsStyles();
   container.innerHTML = _buildSettingsHTML();
   _attachSettingsEvents(container);
 }

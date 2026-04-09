@@ -556,7 +556,8 @@
   // ── Render ─────────────────────────────────────────────────────────────────
 
   function renderOnboarding() {
-    _injectStyles();
+    // Styles now injected via styles.css (mobile app redesign)
+    // _injectStyles();
 
     const root = document.getElementById('screen-onboarding');
     if (!root) return;

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signal Trace — Logo Concepts</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: #0a0a0f;
+    color: #fff;
+    font-family: -apple-system, 'SF Pro Display', 'Helvetica Neue', sans-serif;
+    padding: 60px 40px;
+    min-height: 100vh;
+  }
+  h1 {
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #666;
+    margin-bottom: 60px;
+    text-align: center;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 60px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .concept {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+  .icon-wrap {
+    width: 200px;
+    height: 200px;
+    border-radius: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .label {
+    font-size: 12px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #555;
+    text-align: center;
+  }
+  .desc {
+    font-size: 13px;
+    color: #444;
+    text-align: center;
+    line-height: 1.5;
+    max-width: 220px;
+  }
+
+  /* === Concept A: Prism — confusion enters, clarity exits === */
+  .icon-a {
+    background: linear-gradient(135deg, #13111a 0%, #1a1725 100%);
+    box-shadow: 0 8px 40px rgba(233,69,96,0.08);
+  }
+  .icon-a svg { width: 120px; height: 120px; }
+
+  /* === Concept B: Focus Ring === */
+  .icon-b {
+    background: linear-gradient(135deg, #0f0f18 0%, #161624 100%);
+    box-shadow: 0 8px 40px rgba(102,126,234,0.08);
+  }
+  .icon-b svg { width: 130px; height: 130px; }
+
+  /* === Concept C: Intersection === */
+  .icon-c {
+    background: linear-gradient(135deg, #faf8fc 0%, #f3f0f7 100%);
+    box-shadow: 0 4px 30px rgba(0,0,0,0.06);
+  }
+  .icon-c svg { width: 120px; height: 120px; }
+
+  /* === Concept D: Cut Through === */
+  .icon-d {
+    background: linear-gradient(135deg, #12101c 0%, #1a1730 100%);
+    box-shadow: 0 8px 40px rgba(240,147,251,0.06);
+  }
+  .icon-d svg { width: 110px; height: 110px; }
+
+  /* === Concept E: Beacon === */
+  .icon-e {
+    background: linear-gradient(135deg, #f9f7fc 0%, #f0edf6 100%);
+    box-shadow: 0 4px 30px rgba(0,0,0,0.06);
+  }
+  .icon-e svg { width: 120px; height: 120px; }
+
+  /* === Concept F: Trace Mark === */
+  .icon-f {
+    background: linear-gradient(135deg, #111018 0%, #18152a 100%);
+    box-shadow: 0 8px 40px rgba(233,69,96,0.06);
+  }
+  .icon-f svg { width: 115px; height: 115px; }
+</style>
+</head>
+<body>
+
+<h1>Signal Trace — Icon Concepts</h1>
+
+<div class="grid">
+
+  <!-- A: Prism/Diamond — noise enters, clarity exits -->
+  <div class="concept">
+    <div class="icon-wrap icon-a">
+      <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Diamond shape -->
+        <path d="M100 30 L155 100 L100 170 L45 100 Z"
+              fill="none" stroke="url(#gradA)" stroke-width="2.5" opacity="0.9"/>
+        <!-- Scattered lines entering left -->
+        <line x1="10" y1="85" x2="45" y2="92" stroke="#e94560" stroke-width="1.2" opacity="0.2"/>
+        <line x1="10" y1="100" x2="45" y2="100" stroke="#e94560" stroke-width="1.2" opacity="0.25"/>
+        <line x1="10" y1="115" x2="45" y2="108" stroke="#e94560" stroke-width="1.2" opacity="0.2"/>
+        <line x1="10" y1="92" x2="45" y2="96" stroke="#e94560" stroke-width="1.2" opacity="0.15"/>
+        <line x1="10" y1="108" x2="45" y2="104" stroke="#e94560" stroke-width="1.2" opacity="0.15"/>
+        <!-- Single clear line exiting right -->
+        <line x1="155" y1="100" x2="192" y2="100" stroke="url(#gradA2)" stroke-width="2.8" stroke-linecap="round"/>
+        <!-- Bright dot at exit -->
+        <circle cx="192" cy="100" r="3.5" fill="#f093fb"/>
+        <circle cx="192" cy="100" r="8" fill="#f093fb" opacity="0.15"/>
+        <!-- Inner refraction lines -->
+        <line x1="55" y1="95" x2="145" y2="100" stroke="#fff" stroke-width="0.6" opacity="0.1"/>
+        <line x1="55" y1="105" x2="145" y2="100" stroke="#fff" stroke-width="0.6" opacity="0.1"/>
+        <defs>
+          <linearGradient id="gradA" x1="0" y1="0" x2="200" y2="200">
+            <stop offset="0%" stop-color="#667eea"/>
+            <stop offset="100%" stop-color="#e94560"/>
+          </linearGradient>
+          <linearGradient id="gradA2" x1="155" y1="100" x2="195" y2="100">
+            <stop offset="0%" stop-color="#e94560"/>
+            <stop offset="100%" stop-color="#f093fb"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <div class="label">A — Prism</div>
+    <div class="desc">Noise enters, clarity exits. The diamond refracts confusion into a single clear signal.</div>
+  </div>
+
+  <!-- B: Focus Ring — concentric circles with pulse -->
+  <div class="concept">
+    <div class="icon-wrap icon-b">
+      <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="100" r="70" stroke="#fff" stroke-width="1.2" opacity="0.06"/>
+        <circle cx="100" cy="100" r="50" stroke="#fff" stroke-width="1.5" opacity="0.1"/>
+        <circle cx="100" cy="100" r="28" stroke="url(#gradB)" stroke-width="2" opacity="0.7"/>
+        <!-- Center dot -->
+        <circle cx="100" cy="100" r="5" fill="#e94560"/>
+        <circle cx="100" cy="100" r="10" fill="#e94560" opacity="0.12"/>
+        <!-- Crosshair lines — very subtle -->
+        <line x1="100" y1="25" x2="100" y2="65" stroke="#fff" stroke-width="0.8" opacity="0.08"/>
+        <line x1="100" y1="135" x2="100" y2="175" stroke="#fff" stroke-width="0.8" opacity="0.08"/>
+        <line x1="25" y1="100" x2="65" y2="100" stroke="#fff" stroke-width="0.8" opacity="0.08"/>
+        <line x1="135" y1="100" x2="175" y2="100" stroke="#fff" stroke-width="0.8" opacity="0.08"/>
+        <!-- Small notch marks on the middle ring -->
+        <line x1="100" y1="50" x2="100" y2="56" stroke="#667eea" stroke-width="1.5" opacity="0.4"/>
+        <line x1="100" y1="144" x2="100" y2="150" stroke="#667eea" stroke-width="1.5" opacity="0.4"/>
+        <line x1="50" y1="100" x2="56" y2="100" stroke="#667eea" stroke-width="1.5" opacity="0.4"/>
+        <line x1="144" y1="100" x2="150" y2="100" stroke="#667eea" stroke-width="1.5" opacity="0.4"/>
+        <defs>
+          <linearGradient id="gradB" x1="70" y1="70" x2="130" y2="130">
+            <stop offset="0%" stop-color="#667eea"/>
+            <stop offset="100%" stop-color="#e94560"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <div class="label">B — Focus</div>
+    <div class="desc">Calibration target. Locking onto the signal that matters.</div>
+  </div>
+
+  <!-- C: Intersection — two soft circles with bright overlap -->
+  <div class="concept">
+    <div class="icon-wrap icon-c">
+      <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="80" cy="100" r="52" fill="#e94560" opacity="0.07"/>
+        <circle cx="120" cy="100" r="52" fill="#6c5ce7" opacity="0.07"/>
+        <!-- Overlap highlight -->
+        <clipPath id="clipL"><circle cx="80" cy="100" r="52"/></clipPath>
+        <circle cx="120" cy="100" r="52" fill="#e94560" opacity="0.12" clip-path="url(#clipL)"/>
+        <!-- Center point in overlap -->
+        <circle cx="100" cy="100" r="4" fill="#e94560"/>
+        <circle cx="100" cy="100" r="9" fill="#e94560" opacity="0.1"/>
+        <!-- Borders -->
+        <circle cx="80" cy="100" r="52" stroke="#e94560" stroke-width="1.2" opacity="0.2"/>
+        <circle cx="120" cy="100" r="52" stroke="#6c5ce7" stroke-width="1.2" opacity="0.2"/>
+      </svg>
+    </div>
+    <div class="label">C — Intersection</div>
+    <div class="desc">Where you and the other person overlap. The signal lives at the center.</div>
+  </div>
+
+  <!-- D: Abstract S trace -->
+  <div class="concept">
+    <div class="icon-wrap icon-d">
+      <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Elegant flowing S-curve -->
+        <path d="M 55 50 C 130 50, 150 90, 100 105 C 50 120, 70 160, 145 155"
+              stroke="url(#gradD)" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <!-- Three precise dots -->
+        <circle cx="55" cy="50" r="4.5" fill="#667eea"/>
+        <circle cx="100" cy="105" r="4.5" fill="#b06ce7"/>
+        <circle cx="145" cy="155" r="5.5" fill="#e94560"/>
+        <circle cx="145" cy="155" r="11" fill="#e94560" opacity="0.1"/>
+        <defs>
+          <linearGradient id="gradD" x1="55" y1="50" x2="145" y2="155">
+            <stop offset="0%" stop-color="#667eea"/>
+            <stop offset="50%" stop-color="#b06ce7"/>
+            <stop offset="100%" stop-color="#e94560"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <div class="label">D — Trace</div>
+    <div class="desc">A flowing path with tracked points. The journey from start to decision.</div>
+  </div>
+
+  <!-- E: Minimal eye / lens -->
+  <div class="concept">
+    <div class="icon-wrap icon-e">
+      <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Eye shape from two arcs -->
+        <path d="M 30 100 Q 100 45 170 100" stroke="#2d2d3f" stroke-width="2" fill="none" opacity="0.6"/>
+        <path d="M 30 100 Q 100 155 170 100" stroke="#2d2d3f" stroke-width="2" fill="none" opacity="0.6"/>
+        <!-- Iris -->
+        <circle cx="100" cy="100" r="22" fill="none" stroke="#e94560" stroke-width="2" opacity="0.5"/>
+        <!-- Pupil -->
+        <circle cx="100" cy="100" r="8" fill="#e94560" opacity="0.8"/>
+        <!-- Subtle inner glow -->
+        <circle cx="100" cy="100" r="15" fill="#e94560" opacity="0.04"/>
+        <!-- Light catch -->
+        <circle cx="94" cy="95" r="2.5" fill="#fff" opacity="0.6"/>
+      </svg>
+    </div>
+    <div class="label">E — Clarity</div>
+    <div class="desc">The eye that sees clearly. Perception, not just observation.</div>
+  </div>
+
+  <!-- F: Minimal mark — slash + dot -->
+  <div class="concept">
+    <div class="icon-wrap icon-f">
+      <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <!-- Single decisive diagonal stroke -->
+        <line x1="60" y1="145" x2="140" y2="55" stroke="url(#gradF)" stroke-width="3.5" stroke-linecap="round"/>
+        <!-- Signal dot near the end — the "found it" moment -->
+        <circle cx="140" cy="55" r="8" fill="#e94560"/>
+        <circle cx="140" cy="55" r="15" fill="#e94560" opacity="0.08"/>
+        <circle cx="140" cy="55" r="24" fill="#e94560" opacity="0.04"/>
+        <!-- Small tick marks along the line — like a ruler / trace -->
+        <line x1="78" y1="124" x2="83" y2="127" stroke="#fff" stroke-width="1" opacity="0.15"/>
+        <line x1="92" y1="108" x2="97" y2="111" stroke="#fff" stroke-width="1" opacity="0.15"/>
+        <line x1="106" y1="92" x2="111" y2="95" stroke="#fff" stroke-width="1" opacity="0.15"/>
+        <line x1="120" y1="76" x2="125" y2="79" stroke="#fff" stroke-width="1" opacity="0.15"/>
+        <defs>
+          <linearGradient id="gradF" x1="60" y1="145" x2="140" y2="55">
+            <stop offset="0%" stop-color="#444"/>
+            <stop offset="100%" stop-color="#e94560"/>
+          </linearGradient>
+        </defs>
+      </svg>
+    </div>
+    <div class="label">F — Mark</div>
+    <div class="desc">One line, one point. The moment the signal becomes clear.</div>
+  </div>
+
+</div>
+
+</body>
+</html>

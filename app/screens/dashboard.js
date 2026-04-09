@@ -36,20 +36,20 @@ function formatRelativeTime(timestamp) {
 
 /**
  * Derive a flat background colour for a letter avatar from a name string.
- * Uses a restrained dark palette — text is always warm parchment (#F5F0E8).
+ * Uses warm neutral palette (taupe, greens, earth tones).
  * @param {string} name
  * @returns {string} CSS colour string
  */
 function avatarColour(name) {
   const AVATAR_COLORS = [
-    '#8B6B4A',   // deep brown
-    '#4A6B5A',   // moss green
-    '#6B4A6B',   // deep plum
-    '#6B5A3A',   // tobacco brown
-    '#3A5A6B',   // steel blue
-    '#6B3A4A',   // deep rose
-    '#4A5A3A',   // olive
-    '#5A3A6B',   // dark violet
+    '#C8A882',   // taupe
+    '#8FA89F',   // forest green
+    '#B8867A',   // rust
+    '#7C98B6',   // slate blue
+    '#A89B8F',   // warm grey
+    '#9BA882',   // sage
+    '#A882A8',   // mauve
+    '#82A8A4',   // dusty teal
   ];
   if (!name) return AVATAR_COLORS[0];
   let hash = 0;
@@ -96,7 +96,7 @@ function renderPersonCard(person) {
 
   card.innerHTML = `
     <div class="person-card__avatar"
-         style="background:${colour}; border-radius:14px; color:#F5F0E8;"
+         style="background:${colour}; color:#FFFFFF;"
          aria-hidden="true">
       ${initial}
     </div>
@@ -111,9 +111,6 @@ function renderPersonCard(person) {
         <span class="signal-pill ${signalCls}">${signalLabel}</span>
       </div>
     </div>
-
-    <div class="person-card__signal-stripe person-card__signal-stripe--${signalSummary.level}"
-         aria-hidden="true"></div>
   `;
 
   card.addEventListener('click', () => {
@@ -133,12 +130,12 @@ function renderEmptyState() {
 
   wrapper.innerHTML = `
     <div class="empty-state">
-      <div class="empty-state__icon" aria-hidden="true">◎</div>
-      <h2 class="empty-state__heading">Your board is empty.</h2>
+      <div class="empty-state__icon" aria-hidden="true">👤</div>
+      <h2 class="empty-state__heading">No one yet</h2>
       <p class="empty-state__body">
-        Add someone worth watching.
+        Start tracking someone you care about. Add their communication patterns and stay aware of the signals.
       </p>
-      <button class="btn btn--primary" id="empty-add-btn" type="button">
+      <button class="btn btn--primary btn--full" id="empty-add-btn" type="button">
         Add someone
       </button>
     </div>
@@ -200,7 +197,7 @@ function renderDashboard() {
   const header = document.createElement('header');
   header.className = 'dashboard__header';
   header.innerHTML = `
-    <div class="dashboard__logo" style="font-family:'Instrument Serif',Georgia,serif;font-size:28px;font-weight:400;letter-spacing:-0.04em;color:#1C1410;">SignalTrace</div>
+    <div class="dashboard__logo">SignalTrace</div>
     <button
       class="dashboard__settings-btn icon-btn"
       type="button"
@@ -370,33 +367,7 @@ function renderDashboard() {
 
   screen.appendChild(listSection);
 
-  // ── FAB (Floating Action Button) ─────────────────────────────────────────────
-  const fab = document.createElement('button');
-  fab.className  = 'fab';
-  fab.type       = 'button';
-  fab.setAttribute('aria-label', 'Add a new person');
-  fab.style.cssText = `
-    background: linear-gradient(135deg, #D4607A 0%, #E8855A 100%);
-    border-radius: 20px;
-    box-shadow: 0 6px 20px rgba(212,96,122,0.35), 0 2px 6px rgba(212,96,122,0.20);
-    color: #fff;
-    border: none;
-  `;
-  fab.innerHTML  = `
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-         stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
-         stroke-linejoin="round" aria-hidden="true">
-      <line x1="12" y1="5" x2="12" y2="19"/>
-      <line x1="5"  y1="12" x2="19" y2="12"/>
-    </svg>
-    <span style="font-size:14px;font-weight:600;letter-spacing:0.01em;">Add person</span>
-  `;
-
-  fab.addEventListener('click', () => {
-    navigate('add-person', {});
-  });
-
-  screen.appendChild(fab);
+  // ── FAB removed: now using center tab bar button instead ─────────────────
 }
 
 // ─── Utility ──────────────────────────────────────────────────────────────────
@@ -418,8 +389,10 @@ function escapeHtml(str) {
 }
 
 // ─── Search bar styles (injected once) ────────────────────────────────────────
+// NOTE: Styles now included in styles.css (mobile app redesign)
 (function _injectSearchStyles() {
   if (document.getElementById('dashboard-search-styles')) return;
+  return; // Skip injection since styles are in CSS
   const style = document.createElement('style');
   style.id = 'dashboard-search-styles';
   style.textContent = `

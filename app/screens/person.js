@@ -90,7 +90,8 @@ let _pf = {
  */
 function renderAddPerson() {
   _pf = { mode: 'add', personId: null, platform: '', vibeTags: new Set(), photoDataUrl: null };
-  _ensureStyles();
+  // Styles now in styles.css (mobile app redesign)
+  // _ensureStyles();
   _renderIntoContainer(null);
 }
 
@@ -113,7 +114,8 @@ function renderEditPerson(personId) {
     photoDataUrl: existingPhoto,
   };
 
-  _ensureStyles();
+  // Styles now in styles.css (mobile app redesign)
+  // _ensureStyles();
   _renderIntoContainer(person);
 }
 

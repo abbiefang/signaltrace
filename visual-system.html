@@ -1,0 +1,2263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Signal Trace — Visual System</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   SIGNAL TRACE — VISUAL SYSTEM REFERENCE
+   ============================================================ */
+
+:root {
+  /* === BRAND COLORS === */
+  --coral:        #e94560;
+  --coral-light:  #f05573;
+  --coral-dark:   #c73851;
+  --purple:       #6c5ce7;
+  --purple-light: #8b7ff0;
+  --purple-dark:  #5549c0;
+  --pink:         #f093fb;
+
+  /* === GRADIENTS === */
+  --grad-brand:   linear-gradient(135deg, #e94560 0%, #f093fb 100%);
+  --grad-brand-h: linear-gradient(90deg,  #e94560 0%, #f093fb 100%);
+  --grad-purple:  linear-gradient(135deg, #6c5ce7 0%, #a855f7 100%);
+  --grad-surface: linear-gradient(135deg, #1a1830 0%, #12101c 100%);
+
+  /* === DARK SURFACES === */
+  --dk-base:      #0e0c1a;
+  --dk-primary:   #12101c;
+  --dk-secondary: #1a1830;
+  --dk-card:      #1e1c2e;
+  --dk-elevated:  #252240;
+  --dk-border:    rgba(255,255,255,0.07);
+  --dk-border-md: rgba(255,255,255,0.12);
+
+  /* === LIGHT SURFACES === */
+  --lt-primary:   #faf8fc;
+  --lt-secondary: #f2f0f8;
+  --lt-card:      #ffffff;
+  --lt-elevated:  #f8f6ff;
+  --lt-border:    #e4e1f0;
+  --lt-border-md: #d0ccec;
+
+  /* === DARK TEXT === */
+  --dk-text-1:    #f0eef8;
+  --dk-text-2:    #9490b8;
+  --dk-text-3:    #5a5780;
+  --dk-text-4:    #3a3860;
+
+  /* === LIGHT TEXT === */
+  --lt-text-1:    #1a1830;
+  --lt-text-2:    #5e5a7e;
+  --lt-text-3:    #9490b8;
+  --lt-text-4:    #c5c3d8;
+
+  /* === SEMANTIC === */
+  --success:      #10b981;
+  --success-bg:   rgba(16,185,129,0.12);
+  --warning:      #f59e0b;
+  --warning-bg:   rgba(245,158,11,0.12);
+  --danger:       #ef4444;
+  --danger-bg:    rgba(239,68,68,0.10);
+  --neutral:      #8b9eb7;
+  --neutral-bg:   rgba(139,158,183,0.12);
+
+  /* === SPACING === */
+  --s1: 4px;   --s2: 8px;   --s3: 12px;  --s4: 16px;
+  --s5: 20px;  --s6: 24px;  --s8: 32px;  --s10: 40px;
+  --s12: 48px; --s16: 64px; --s20: 80px;
+
+  /* === RADIUS === */
+  --r-sm: 6px;   --r-md: 10px; --r-lg: 14px;
+  --r-xl: 18px;  --r-2xl: 24px; --r-full: 9999px;
+
+  /* === SHADOWS === */
+  --shadow-sm: 0 1px 3px rgba(10,8,26,0.20), 0 1px 2px rgba(10,8,26,0.12);
+  --shadow-md: 0 4px 16px rgba(10,8,26,0.28), 0 2px 4px rgba(10,8,26,0.14);
+  --shadow-lg: 0 8px 40px rgba(10,8,26,0.38), 0 2px 8px rgba(10,8,26,0.18);
+
+  /* DOC LAYOUT */
+  --doc-bg:   #0e0c1a;
+  --doc-text: #f0eef8;
+  --doc-muted: #9490b8;
+  --doc-dim:  #5a5780;
+  --section-gap: 96px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--doc-bg);
+  color: var(--doc-text);
+  font-family: 'Inter', -apple-system, 'Helvetica Neue', sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ---- DOC STRUCTURE ---- */
+.doc-wrap {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 80px 48px 120px;
+}
+
+.doc-header {
+  text-align: center;
+  margin-bottom: 100px;
+  padding-bottom: 64px;
+  border-bottom: 1px solid var(--dk-border);
+}
+
+.doc-wordmark {
+  font-size: 11px;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--doc-dim);
+  margin-bottom: 28px;
+}
+
+.doc-title {
+  font-size: 48px;
+  font-weight: 300;
+  letter-spacing: -1.5px;
+  color: var(--dk-text-1);
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+
+.doc-title span {
+  background: var(--grad-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 500;
+}
+
+.doc-subtitle {
+  font-size: 15px;
+  color: var(--doc-muted);
+  font-weight: 400;
+  max-width: 540px;
+  margin: 0 auto;
+  line-height: 1.65;
+}
+
+section {
+  margin-bottom: var(--section-gap);
+}
+
+.section-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--doc-dim);
+  margin-bottom: 8px;
+}
+
+.section-title {
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: -0.6px;
+  color: var(--dk-text-1);
+  margin-bottom: 8px;
+}
+
+.section-desc {
+  font-size: 14px;
+  color: var(--doc-muted);
+  margin-bottom: 40px;
+  max-width: 600px;
+  line-height: 1.65;
+}
+
+.divider {
+  height: 1px;
+  background: var(--dk-border);
+  margin-bottom: 48px;
+}
+
+/* ---- GRID UTILS ---- */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+.grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; }
+.grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
+.flex { display: flex; }
+.flex-wrap { display: flex; flex-wrap: wrap; gap: 12px; }
+.flex-col { display: flex; flex-direction: column; }
+.gap-sm { gap: 8px; }
+.gap-md { gap: 16px; }
+.gap-lg { gap: 24px; }
+.align-center { align-items: center; }
+
+/* ============================================================
+   1. COLOR SYSTEM
+   ============================================================ */
+
+.color-swatch {
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 1px solid var(--dk-border);
+}
+
+.swatch-block {
+  height: 100px;
+  width: 100%;
+}
+
+.swatch-info {
+  padding: 14px 16px;
+  background: var(--dk-card);
+}
+
+.swatch-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--dk-text-1);
+  margin-bottom: 2px;
+}
+
+.swatch-hex {
+  font-size: 11px;
+  color: var(--doc-dim);
+  font-family: 'SF Mono', 'Fira Mono', monospace;
+  letter-spacing: 0.5px;
+}
+
+.swatch-role {
+  font-size: 10px;
+  color: var(--doc-dim);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+/* Gradient swatch */
+.swatch-block.grad-brand   { background: var(--grad-brand); }
+.swatch-block.grad-purple  { background: var(--grad-purple); }
+
+/* Semantic row */
+.semantic-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.semantic-chip {
+  padding: 16px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--dk-border);
+}
+
+/* Surface row */
+.surface-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.surface-chip {
+  height: 72px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--dk-border);
+  display: flex;
+  align-items: flex-end;
+  padding: 10px 12px;
+  font-size: 10px;
+  color: var(--doc-muted);
+  letter-spacing: 0.5px;
+  position: relative;
+}
+
+/* ============================================================
+   2. TYPOGRAPHY
+   ============================================================ */
+
+.type-row {
+  display: flex;
+  align-items: baseline;
+  gap: 32px;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--dk-border);
+}
+
+.type-meta {
+  width: 140px;
+  flex-shrink: 0;
+}
+
+.type-label-name {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--doc-muted);
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+}
+
+.type-spec {
+  font-size: 10px;
+  color: var(--doc-dim);
+  font-family: 'SF Mono', 'Fira Mono', monospace;
+  margin-top: 3px;
+}
+
+.type-sample {
+  flex: 1;
+  color: var(--dk-text-1);
+}
+
+.ts-4xl   { font-size: 48px; font-weight: 300; letter-spacing: -1.5px; line-height: 1.1; }
+.ts-3xl   { font-size: 36px; font-weight: 400; letter-spacing: -0.8px; line-height: 1.15; }
+.ts-2xl   { font-size: 28px; font-weight: 500; letter-spacing: -0.5px; line-height: 1.2; }
+.ts-xl    { font-size: 22px; font-weight: 500; letter-spacing: -0.3px; line-height: 1.3; }
+.ts-lg    { font-size: 18px; font-weight: 500; letter-spacing: -0.2px; line-height: 1.4; }
+.ts-md    { font-size: 16px; font-weight: 400; letter-spacing: 0;      line-height: 1.55; }
+.ts-base  { font-size: 15px; font-weight: 400; letter-spacing: 0;      line-height: 1.6; }
+.ts-sm    { font-size: 13px; font-weight: 400; letter-spacing: 0.1px;  line-height: 1.5; }
+.ts-xs    { font-size: 11px; font-weight: 400; letter-spacing: 0.4px;  line-height: 1.45; }
+.ts-label { font-size: 10px; font-weight: 600; letter-spacing: 3px;    line-height: 1.4; text-transform: uppercase; }
+
+/* ============================================================
+   3. SPACING
+   ============================================================ */
+
+.spacing-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 0;
+  padding: 24px 0;
+}
+
+.spacing-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.spacing-bar {
+  background: linear-gradient(135deg, rgba(108,92,231,0.35), rgba(233,69,96,0.35));
+  border: 1px solid rgba(233,69,96,0.3);
+  border-radius: 3px;
+  width: 100%;
+  max-width: 60px;
+}
+
+.spacing-name {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--doc-muted);
+  font-family: 'SF Mono', 'Fira Mono', monospace;
+}
+
+.spacing-val {
+  font-size: 10px;
+  color: var(--doc-dim);
+}
+
+/* ============================================================
+   4. BUTTONS
+   ============================================================ */
+
+.btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: opacity 0.15s, transform 0.1s;
+  white-space: nowrap;
+}
+
+.btn-base:hover { opacity: 0.88; }
+.btn-base:active { transform: scale(0.98); }
+
+/* Sizes */
+.btn-lg { padding: 14px 28px; font-size: 15px; border-radius: var(--r-md); }
+.btn-md { padding: 10px 20px; font-size: 14px; border-radius: var(--r-md); }
+.btn-sm { padding: 7px 14px;  font-size: 12px; border-radius: var(--r-sm); }
+
+/* Variants */
+.btn-primary {
+  background: var(--grad-brand);
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(233,69,96,0.35);
+}
+
+.btn-secondary {
+  background: var(--grad-purple);
+  color: #fff;
+  box-shadow: 0 2px 12px rgba(108,92,231,0.30);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--coral);
+  border: 1.5px solid rgba(233,69,96,0.4);
+}
+
+.btn-ghost:hover {
+  background: rgba(233,69,96,0.08);
+  opacity: 1;
+}
+
+.btn-soft {
+  background: rgba(233,69,96,0.1);
+  color: var(--coral-light);
+  border: 1px solid rgba(233,69,96,0.18);
+}
+
+.btn-soft-purple {
+  background: rgba(108,92,231,0.1);
+  color: var(--purple-light);
+  border: 1px solid rgba(108,92,231,0.2);
+}
+
+.btn-neutral {
+  background: var(--dk-elevated);
+  color: var(--dk-text-2);
+  border: 1px solid var(--dk-border-md);
+}
+
+.btn-danger {
+  background: rgba(239,68,68,0.12);
+  color: #f87171;
+  border: 1px solid rgba(239,68,68,0.22);
+}
+
+.btn-disabled {
+  background: var(--dk-elevated);
+  color: var(--dk-text-4);
+  border: 1px solid var(--dk-border);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+/* Icon dot */
+.btn-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.7;
+}
+
+/* ============================================================
+   5. INPUTS
+   ============================================================ */
+
+.input-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--doc-muted);
+}
+
+.input-field {
+  width: 100%;
+  background: var(--dk-card);
+  border: 1.5px solid var(--dk-border-md);
+  border-radius: var(--r-md);
+  padding: 12px 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--dk-text-1);
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.input-field::placeholder { color: var(--dk-text-3); }
+
+.input-field:focus {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 3px rgba(108,92,231,0.15);
+}
+
+.input-field.input-error {
+  border-color: rgba(239,68,68,0.5);
+  box-shadow: 0 0 0 3px rgba(239,68,68,0.10);
+}
+
+.input-field.input-success {
+  border-color: rgba(16,185,129,0.5);
+}
+
+.input-hint {
+  font-size: 11px;
+  color: var(--doc-dim);
+}
+
+.input-hint.error-hint { color: #f87171; }
+
+.textarea-field {
+  width: 100%;
+  background: var(--dk-card);
+  border: 1.5px solid var(--dk-border-md);
+  border-radius: var(--r-md);
+  padding: 14px 16px;
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  color: var(--dk-text-1);
+  outline: none;
+  resize: vertical;
+  min-height: 100px;
+  line-height: 1.6;
+  transition: border-color 0.15s;
+}
+
+.textarea-field::placeholder { color: var(--dk-text-3); }
+.textarea-field:focus {
+  border-color: var(--purple);
+  box-shadow: 0 0 0 3px rgba(108,92,231,0.15);
+}
+
+.search-wrap {
+  position: relative;
+}
+
+.search-icon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--doc-dim);
+  pointer-events: none;
+}
+
+.input-search {
+  padding-left: 40px;
+}
+
+/* ============================================================
+   6. BADGES / STATUS CHIPS
+   ============================================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  padding: 4px 10px;
+  border-radius: var(--r-full);
+  white-space: nowrap;
+}
+
+.badge-dot {
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+}
+
+/* Status badges */
+.status-continue  { background: rgba(108,92,231,0.15); color: #8b7ff0; border: 1px solid rgba(108,92,231,0.25); }
+.status-observing { background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); }
+.status-stop      { background: rgba(139,158,183,0.12); color: #94a3b8; border: 1px solid rgba(139,158,183,0.22); }
+.status-waiting   { background: rgba(249,115,22,0.12); color: #fb923c; border: 1px solid rgba(249,115,22,0.22); }
+.status-suggest   { background: rgba(239,68,68,0.10); color: #f87171; border: 1px solid rgba(239,68,68,0.22); }
+.status-ended     { background: rgba(90,87,128,0.15); color: #5a5780; border: 1px solid rgba(90,87,128,0.2); }
+.status-committed { background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.25); }
+
+/* Evidence / signal tags */
+.tag { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; padding: 3px 9px; border-radius: var(--r-full); }
+.tag-words   { background: rgba(108,92,231,0.12); color: #8b7ff0; }
+.tag-action  { background: rgba(233,69,96,0.10);  color: #f05573; }
+.tag-pattern { background: rgba(245,158,11,0.10); color: #fbbf24; }
+.tag-conflict{ background: rgba(239,68,68,0.10);  color: #f87171; }
+.tag-mile    { background: rgba(16,185,129,0.10); color: #34d399; }
+
+/* Platform chips */
+.platform { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: var(--r-full); background: var(--dk-elevated); color: var(--dk-text-2); border: 1px solid var(--dk-border); }
+
+/* Confidence indicator */
+.confidence-bar {
+  height: 3px;
+  border-radius: var(--r-full);
+  background: var(--dk-elevated);
+  overflow: hidden;
+  margin-top: 8px;
+}
+.confidence-fill { height: 100%; border-radius: var(--r-full); transition: width 0.4s; }
+.conf-high   .confidence-fill { background: var(--grad-brand); }
+.conf-med    .confidence-fill { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.conf-low    .confidence-fill { background: rgba(90,87,128,0.5); }
+
+/* ============================================================
+   7. CARDS
+   ============================================================ */
+
+.card {
+  background: var(--dk-card);
+  border: 1px solid var(--dk-border);
+  border-radius: var(--r-xl);
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-elevated {
+  background: var(--dk-elevated);
+  border-color: var(--dk-border-md);
+  box-shadow: var(--shadow-md);
+}
+
+/* Person card */
+.person-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.person-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.person-avatar {
+  width: 44px; height: 44px;
+  border-radius: var(--r-full);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  font-weight: 500;
+  flex-shrink: 0;
+  background: var(--dk-elevated);
+  color: var(--dk-text-2);
+}
+
+.person-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--dk-text-1);
+  letter-spacing: -0.2px;
+}
+
+.person-meta {
+  font-size: 12px;
+  color: var(--doc-dim);
+  margin-top: 1px;
+}
+
+.person-ai-line {
+  font-size: 13px;
+  color: var(--dk-text-2);
+  line-height: 1.55;
+  padding: 12px 14px;
+  background: var(--dk-secondary);
+  border-radius: var(--r-md);
+  border-left: 2px solid var(--purple);
+}
+
+.card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px solid var(--dk-border);
+}
+
+/* Evidence card */
+.evidence-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px 16px;
+  background: var(--dk-secondary);
+  border-radius: var(--r-md);
+  border: 1px solid var(--dk-border);
+  border-left: 2px solid transparent;
+}
+
+.evidence-item.words   { border-left-color: var(--purple-light); }
+.evidence-item.action  { border-left-color: var(--coral); }
+.evidence-item.pattern { border-left-color: var(--warning); }
+.evidence-item.conflict{ border-left-color: var(--danger); }
+
+.evidence-text {
+  font-size: 13px;
+  color: var(--dk-text-1);
+  line-height: 1.55;
+}
+
+.evidence-text em {
+  font-style: normal;
+  color: var(--dk-text-2);
+  font-size: 12px;
+}
+
+.evidence-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.evidence-time {
+  font-size: 10px;
+  color: var(--doc-dim);
+  letter-spacing: 0.3px;
+}
+
+/* Decision card */
+.decision-card {
+  background: linear-gradient(135deg, rgba(108,92,231,0.06) 0%, rgba(233,69,96,0.04) 100%);
+  border: 1px solid rgba(108,92,231,0.2);
+}
+
+.decision-rec {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--dk-text-1);
+  letter-spacing: -0.2px;
+}
+
+.decision-body {
+  font-size: 13px;
+  color: var(--dk-text-2);
+  line-height: 1.65;
+  margin-top: 10px;
+}
+
+.decision-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+/* Committed card */
+.committed-card {
+  background: linear-gradient(135deg, rgba(16,185,129,0.06) 0%, rgba(16,185,129,0.02) 100%);
+  border: 1px solid rgba(16,185,129,0.2);
+}
+
+.committed-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.committed-icon {
+  width: 36px; height: 36px;
+  border-radius: var(--r-full);
+  background: rgba(16,185,129,0.15);
+  display: flex; align-items: center; justify-content: center;
+  color: #34d399;
+  font-size: 16px;
+}
+
+.committed-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #34d399;
+  letter-spacing: -0.2px;
+}
+
+.committed-reason-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.committed-reason-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--dk-text-2);
+  line-height: 1.55;
+}
+
+.committed-reason-list li::before {
+  content: '';
+  width: 5px; height: 5px;
+  border-radius: 50%;
+  background: #34d399;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+/* Exit criteria card */
+.exit-card {
+  background: rgba(245,158,11,0.04);
+  border: 1px solid rgba(245,158,11,0.18);
+}
+
+.exit-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.exit-item:last-child { border-bottom: none; }
+
+.exit-number {
+  width: 22px; height: 22px;
+  border-radius: var(--r-full);
+  background: rgba(245,158,11,0.12);
+  border: 1px solid rgba(245,158,11,0.25);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700;
+  color: #fbbf24;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.exit-text {
+  font-size: 13px;
+  color: var(--dk-text-2);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.exit-status {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--doc-dim);
+  white-space: nowrap;
+  margin-top: 3px;
+}
+
+.exit-status.approaching { color: #fbbf24; }
+.exit-status.met { color: #f87171; }
+
+/* Conflict card */
+.conflict-card {
+  background: rgba(239,68,68,0.04);
+  border: 1px solid rgba(239,68,68,0.15);
+}
+
+.conflict-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.conflict-side {
+  padding: 12px 14px;
+  border-radius: var(--r-md);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.conflict-side-a {
+  background: rgba(108,92,231,0.1);
+  border: 1px solid rgba(108,92,231,0.2);
+  color: var(--dk-text-2);
+}
+
+.conflict-side-b {
+  background: rgba(239,68,68,0.08);
+  border: 1px solid rgba(239,68,68,0.18);
+  color: var(--dk-text-2);
+}
+
+.conflict-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.conflict-label.a { color: var(--purple-light); }
+.conflict-label.b { color: #f87171; }
+
+.conflict-read {
+  font-size: 12px;
+  color: var(--dk-text-2);
+  line-height: 1.6;
+  padding: 10px 14px;
+  background: var(--dk-secondary);
+  border-radius: var(--r-md);
+  border-left: 2px solid #f87171;
+}
+
+/* Dashboard energy card */
+.energy-card {
+  background: rgba(245,158,11,0.06);
+  border: 1px solid rgba(245,158,11,0.18);
+}
+
+.energy-bar-wrap {
+  height: 6px;
+  background: var(--dk-elevated);
+  border-radius: var(--r-full);
+  overflow: hidden;
+  margin: 12px 0 6px;
+}
+
+.energy-bar {
+  height: 100%;
+  border-radius: var(--r-full);
+  background: linear-gradient(90deg, #10b981, #fbbf24, #f87171);
+}
+
+/* Timeline */
+.timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+
+.timeline-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 0 0 24px 0;
+  position: relative;
+}
+
+.timeline-item:last-child { padding-bottom: 0; }
+
+.timeline-left {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 20px;
+  flex-shrink: 0;
+}
+
+.timeline-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--dk-elevated);
+  border: 2px solid var(--dk-border-md);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+
+.timeline-dot.active {
+  background: var(--coral);
+  border-color: var(--coral-light);
+  box-shadow: 0 0 0 3px rgba(233,69,96,0.2);
+}
+
+.timeline-dot.committed {
+  background: #10b981;
+  border-color: #34d399;
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+}
+
+.timeline-line {
+  width: 1px;
+  flex: 1;
+  background: var(--dk-border);
+  min-height: 20px;
+  margin-top: 2px;
+}
+
+.timeline-content {
+  flex: 1;
+  padding-top: 0px;
+}
+
+.timeline-date {
+  font-size: 10px;
+  color: var(--doc-dim);
+  font-family: 'SF Mono', 'Fira Mono', monospace;
+  letter-spacing: 0.5px;
+  margin-bottom: 3px;
+}
+
+.timeline-event {
+  font-size: 13px;
+  color: var(--dk-text-2);
+  line-height: 1.5;
+}
+
+.timeline-event strong {
+  color: var(--dk-text-1);
+  font-weight: 500;
+}
+
+/* ============================================================
+   8. ICON STYLE
+   ============================================================ */
+
+.icon-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+}
+
+.icon-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 12px;
+  background: var(--dk-card);
+  border: 1px solid var(--dk-border);
+  border-radius: var(--r-lg);
+}
+
+.icon-preview {
+  color: var(--dk-text-2);
+  line-height: 1;
+}
+
+.icon-preview svg {
+  width: 22px; height: 22px;
+}
+
+.icon-name {
+  font-size: 10px;
+  color: var(--doc-dim);
+  text-align: center;
+  letter-spacing: 0.3px;
+}
+
+/* ============================================================
+   9. DARK / LIGHT MODE SURFACES
+   ============================================================ */
+
+.mode-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.mode-panel {
+  border-radius: var(--r-2xl);
+  padding: 32px;
+}
+
+.mode-panel.dark {
+  background: var(--dk-primary);
+  border: 1px solid var(--dk-border);
+}
+
+.mode-panel.light {
+  background: var(--lt-primary);
+  border: 1px solid var(--lt-border);
+}
+
+/* Light mode text overrides */
+.mode-panel.light .person-name { color: var(--lt-text-1); }
+.mode-panel.light .person-meta { color: var(--lt-text-3); }
+.mode-panel.light .person-ai-line { background: var(--lt-secondary); color: var(--lt-text-2); border-left-color: var(--purple); }
+.mode-panel.light .card { background: var(--lt-card); border-color: var(--lt-border); box-shadow: 0 2px 8px rgba(26,24,48,0.06); }
+.mode-panel.light .card-footer { border-top-color: var(--lt-border); }
+.mode-panel.light .evidence-item { background: var(--lt-secondary); border-color: var(--lt-border); }
+.mode-panel.light .evidence-text { color: var(--lt-text-1); }
+.mode-panel.light .evidence-time { color: var(--lt-text-3); }
+.mode-panel.light .decision-card { background: linear-gradient(135deg, rgba(108,92,231,0.04) 0%, rgba(233,69,96,0.02) 100%); border-color: rgba(108,92,231,0.15); }
+.mode-panel.light .decision-rec { color: var(--lt-text-1); }
+.mode-panel.light .decision-body { color: var(--lt-text-2); }
+
+.mode-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  margin-bottom: 24px;
+  color: var(--doc-dim);
+}
+
+.mode-panel.light .mode-label { color: var(--lt-text-3); }
+.mode-panel.light .confidence-bar { background: var(--lt-secondary); }
+.mode-panel.light .person-avatar { background: var(--lt-secondary); color: var(--lt-text-2); }
+
+/* ============================================================
+   10. TONE REFERENCE
+   ============================================================ */
+
+.tone-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.tone-block {
+  padding: 20px 24px;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--dk-border);
+}
+
+.tone-block.good {
+  border-color: rgba(16,185,129,0.25);
+  background: rgba(16,185,129,0.04);
+}
+
+.tone-block.bad {
+  border-color: rgba(239,68,68,0.2);
+  background: rgba(239,68,68,0.03);
+}
+
+.tone-header {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.tone-block.good .tone-header { color: #34d399; }
+.tone-block.bad  .tone-header { color: #f87171; }
+
+.tone-line {
+  font-size: 13px;
+  color: var(--dk-text-2);
+  line-height: 1.65;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+}
+
+.tone-line:last-child { border-bottom: none; padding-bottom: 0; }
+
+/* ============================================================
+   UTILITY
+   ============================================================ */
+
+.mt-sm { margin-top: 8px; }
+.mt-md { margin-top: 16px; }
+.mt-lg { margin-top: 24px; }
+.mb-sm { margin-bottom: 8px; }
+.mb-md { margin-bottom: 16px; }
+
+.text-muted { color: var(--doc-muted); }
+.text-dim   { color: var(--doc-dim); }
+
+.subhead {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--doc-dim);
+  margin-bottom: 16px;
+  margin-top: 32px;
+}
+
+.subhead:first-child { margin-top: 0; }
+
+/* ============================================================
+   SCROLL & PRINT
+   ============================================================ */
+
+html { scroll-behavior: smooth; }
+
+@media print {
+  body { background: white; color: black; }
+}
+</style>
+</head>
+<body>
+<div class="doc-wrap">
+
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
+  <header class="doc-header">
+    <div class="doc-wordmark">Signal Trace · Visual System · v1.0</div>
+    <h1 class="doc-title">Design Language<br><span>Reference</span></h1>
+    <p class="doc-subtitle">
+      A complete visual system for Signal Trace — an AI dating decision tool for women who are discerning, self-aware, and done with ambiguity.
+      Tone: intelligent, warm, trustworthy. Never clinical, never cute.
+    </p>
+  </header>
+
+
+  <!-- ============================================================
+       1. COLOR SYSTEM
+       ============================================================ -->
+  <section id="colors">
+    <div class="section-label">01 — Color System</div>
+    <h2 class="section-title">Palette</h2>
+    <p class="section-desc">
+      Two primary roles: coral drives action and draws attention; purple anchors AI-generated insight and secondary structure.
+      The gradient between them is the brand signature. Avoid bright blue — it reads as cold and generic tech.
+    </p>
+    <div class="divider"></div>
+
+    <div class="subhead">Brand</div>
+    <div class="grid-5">
+      <div class="color-swatch">
+        <div class="swatch-block grad-brand"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Brand Gradient</div>
+          <div class="swatch-hex">#e94560 → #f093fb</div>
+          <div class="swatch-role">Primary action, glow</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#e94560"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Coral</div>
+          <div class="swatch-hex">#e94560</div>
+          <div class="swatch-role">Primary action</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#f05573"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Coral Light</div>
+          <div class="swatch-hex">#f05573</div>
+          <div class="swatch-role">Hover / highlight</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block" style="background:#6c5ce7"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Purple</div>
+          <div class="swatch-hex">#6c5ce7</div>
+          <div class="swatch-role">AI, secondary</div>
+        </div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-block grad-purple"></div>
+        <div class="swatch-info">
+          <div class="swatch-name">Purple Gradient</div>
+          <div class="swatch-hex">#6c5ce7 → #a855f7</div>
+          <div class="swatch-role">Secondary action</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subhead">Dark Surfaces</div>
+    <div class="surface-row">
+      <div class="surface-chip" style="background:#0e0c1a">dk-base<br>#0e0c1a</div>
+      <div class="surface-chip" style="background:#12101c">dk-primary<br>#12101c</div>
+      <div class="surface-chip" style="background:#1a1830">dk-secondary<br>#1a1830</div>
+      <div class="surface-chip" style="background:#1e1c2e">dk-card<br>#1e1c2e</div>
+      <div class="surface-chip" style="background:#252240">dk-elevated<br>#252240</div>
+    </div>
+
+    <div class="subhead">Light Surfaces</div>
+    <div class="surface-row">
+      <div class="surface-chip" style="background:#faf8fc; color:#9490b8">lt-primary<br>#faf8fc</div>
+      <div class="surface-chip" style="background:#f2f0f8; color:#9490b8">lt-secondary<br>#f2f0f8</div>
+      <div class="surface-chip" style="background:#ffffff; color:#9490b8; border:1px solid #e4e1f0">lt-card<br>#ffffff</div>
+      <div class="surface-chip" style="background:#f8f6ff; color:#9490b8">lt-elevated<br>#f8f6ff</div>
+      <div class="surface-chip" style="background:#e4e1f0; color:#9490b8">lt-border<br>#e4e1f0</div>
+    </div>
+
+    <div class="subhead">Semantic</div>
+    <div class="semantic-row">
+      <div class="semantic-chip" style="background: rgba(16,185,129,0.1); border-color: rgba(16,185,129,0.25)">
+        <div class="swatch-name" style="color:#34d399">Success</div>
+        <div class="swatch-hex" style="color:#34d399; opacity:0.7">#10b981</div>
+        <div class="swatch-role">Committed, matched, confirmed</div>
+      </div>
+      <div class="semantic-chip" style="background: rgba(245,158,11,0.1); border-color: rgba(245,158,11,0.25)">
+        <div class="swatch-name" style="color:#fbbf24">Warning</div>
+        <div class="swatch-hex" style="color:#fbbf24; opacity:0.7">#f59e0b</div>
+        <div class="swatch-role">Approaching, energy check</div>
+      </div>
+      <div class="semantic-chip" style="background: rgba(239,68,68,0.08); border-color: rgba(239,68,68,0.22)">
+        <div class="swatch-name" style="color:#f87171">Danger</div>
+        <div class="swatch-hex" style="color:#f87171; opacity:0.7">#ef4444</div>
+        <div class="swatch-role">Exit criteria met, conflict</div>
+      </div>
+      <div class="semantic-chip" style="background: rgba(139,158,183,0.1); border-color: rgba(139,158,183,0.2)">
+        <div class="swatch-name" style="color:#94a3b8">Neutral</div>
+        <div class="swatch-hex" style="color:#94a3b8; opacity:0.7">#8b9eb7</div>
+        <div class="swatch-role">Ended, inactive, metadata</div>
+      </div>
+    </div>
+
+    <div class="subhead" style="margin-top:32px">Text Scale (dark mode)</div>
+    <div style="display:flex; gap:32px; align-items:center; padding:16px 0">
+      <div style="font-size:14px; color:#f0eef8; font-weight:500">Text Primary #f0eef8</div>
+      <div style="font-size:14px; color:#9490b8">Text Secondary #9490b8</div>
+      <div style="font-size:14px; color:#5a5780">Text Tertiary #5a5780</div>
+      <div style="font-size:14px; color:#3a3860">Text Disabled #3a3860</div>
+    </div>
+    <div style="display:flex; gap:32px; align-items:center; padding:16px; background:var(--lt-primary); border-radius:var(--r-md); margin-top:8px">
+      <div style="font-size:14px; color:#1a1830; font-weight:500">Text Primary #1a1830</div>
+      <div style="font-size:14px; color:#5e5a7e">Text Secondary #5e5a7e</div>
+      <div style="font-size:14px; color:#9490b8">Text Tertiary #9490b8</div>
+      <div style="font-size:14px; color:#c5c3d8">Text Disabled #c5c3d8</div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       2. TYPOGRAPHY
+       ============================================================ -->
+  <section id="typography">
+    <div class="section-label">02 — Typography</div>
+    <h2 class="section-title">Type Scale</h2>
+    <p class="section-desc">
+      Inter at all sizes. Light weight (300) for large display; medium/semibold for headings and UI labels.
+      No bold headlines — confidence doesn't shout. Tracking tightens at larger sizes; opens at label scale.
+    </p>
+    <div class="divider"></div>
+
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label-name">4XL</div>
+        <div class="type-spec">48px / 300 / -1.5px</div>
+      </div>
+      <div class="type-sample ts-4xl">See clearly. Decide well.</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label-name">3XL</div>
+        <div class="type-spec">36px / 400 / -0.8px</div>
+      </div>
+      <div class="type-sample ts-3xl">What's actually happening here.</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label-name">2XL</div>
+        <div class="type-spec">28px / 500 / -0.5px</div>
+      </div>
+      <div class="type-sample ts-2xl">Dashboard</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label-name">XL</div>
+        <div class="type-spec">22px / 500 / -0.3px</div>
+      </div>
+      <div class="type-sample ts-xl">Why This Person Made Sense</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label-name">LG</div>
+        <div class="type-spec">18px / 500 / -0.2px</div>
+      </div>
+      <div class="type-sample ts-lg">AI Recommendation</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label-name">MD</div>
+        <div class="type-spec">16px / 400 / 0</div>
+      </div>
+      <div class="type-sample ts-md">His words say interest. His actions say delay.</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label-name">BASE</div>
+        <div class="type-spec">15px / 400 / 0</div>
+      </div>
+      <div class="type-sample ts-base">The conflict is between stated intent and actual follow-through.</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label-name">SM</div>
+        <div class="type-spec">13px / 400 / 0.1px</div>
+      </div>
+      <div class="type-sample ts-sm" style="color:var(--dk-text-2)">Added via Hinge · Mar 21 · 3 dates completed</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label-name">XS</div>
+        <div class="type-spec">11px / 400 / 0.4px</div>
+      </div>
+      <div class="type-sample ts-xs" style="color:var(--dk-text-3)">2 days ago · Words said</div>
+    </div>
+    <div class="type-row">
+      <div class="type-meta">
+        <div class="type-label-name">LABEL</div>
+        <div class="type-spec">10px / 600 / 3px / caps</div>
+      </div>
+      <div class="type-sample ts-label" style="color:var(--doc-dim)">Evidence — 6 signals</div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       3. SPACING
+       ============================================================ -->
+  <section id="spacing">
+    <div class="section-label">03 — Spacing</div>
+    <h2 class="section-title">Spacing System</h2>
+    <p class="section-desc">
+      4px base unit. All spacing values are multiples of 4. Consistent internal rhythm makes the UI feel calm, not crowded.
+    </p>
+    <div class="divider"></div>
+    <div class="spacing-row">
+      <div class="spacing-item">
+        <div class="spacing-bar" style="height:4px"></div>
+        <div class="spacing-name">s1</div>
+        <div class="spacing-val">4px</div>
+      </div>
+      <div class="spacing-item">
+        <div class="spacing-bar" style="height:8px"></div>
+        <div class="spacing-name">s2</div>
+        <div class="spacing-val">8px</div>
+      </div>
+      <div class="spacing-item">
+        <div class="spacing-bar" style="height:12px"></div>
+        <div class="spacing-name">s3</div>
+        <div class="spacing-val">12px</div>
+      </div>
+      <div class="spacing-item">
+        <div class="spacing-bar" style="height:16px"></div>
+        <div class="spacing-name">s4</div>
+        <div class="spacing-val">16px</div>
+      </div>
+      <div class="spacing-item">
+        <div class="spacing-bar" style="height:20px"></div>
+        <div class="spacing-name">s5</div>
+        <div class="spacing-val">20px</div>
+      </div>
+      <div class="spacing-item">
+        <div class="spacing-bar" style="height:24px"></div>
+        <div class="spacing-name">s6</div>
+        <div class="spacing-val">24px</div>
+      </div>
+      <div class="spacing-item">
+        <div class="spacing-bar" style="height:32px"></div>
+        <div class="spacing-name">s8</div>
+        <div class="spacing-val">32px</div>
+      </div>
+      <div class="spacing-item">
+        <div class="spacing-bar" style="height:40px"></div>
+        <div class="spacing-name">s10</div>
+        <div class="spacing-val">40px</div>
+      </div>
+      <div class="spacing-item">
+        <div class="spacing-bar" style="height:48px"></div>
+        <div class="spacing-name">s12</div>
+        <div class="spacing-val">48px</div>
+      </div>
+      <div class="spacing-item">
+        <div class="spacing-bar" style="height:64px"></div>
+        <div class="spacing-name">s16</div>
+        <div class="spacing-val">64px</div>
+      </div>
+      <div class="spacing-item">
+        <div class="spacing-bar" style="height:80px"></div>
+        <div class="spacing-name">s20</div>
+        <div class="spacing-val">80px</div>
+      </div>
+    </div>
+
+    <div class="subhead">Border Radius</div>
+    <div style="display:flex; gap:20px; align-items:flex-end; flex-wrap:wrap;">
+      <div style="text-align:center">
+        <div style="width:48px;height:48px;border-radius:6px;background:var(--dk-card);border:1px solid var(--dk-border-md);margin:0 auto 8px"></div>
+        <div class="spacing-name">sm</div><div class="spacing-val">6px</div>
+      </div>
+      <div style="text-align:center">
+        <div style="width:60px;height:60px;border-radius:10px;background:var(--dk-card);border:1px solid var(--dk-border-md);margin:0 auto 8px"></div>
+        <div class="spacing-name">md</div><div class="spacing-val">10px</div>
+      </div>
+      <div style="text-align:center">
+        <div style="width:72px;height:72px;border-radius:14px;background:var(--dk-card);border:1px solid var(--dk-border-md);margin:0 auto 8px"></div>
+        <div class="spacing-name">lg</div><div class="spacing-val">14px</div>
+      </div>
+      <div style="text-align:center">
+        <div style="width:84px;height:84px;border-radius:18px;background:var(--dk-card);border:1px solid var(--dk-border-md);margin:0 auto 8px"></div>
+        <div class="spacing-name">xl</div><div class="spacing-val">18px</div>
+      </div>
+      <div style="text-align:center">
+        <div style="width:96px;height:96px;border-radius:24px;background:var(--dk-card);border:1px solid var(--dk-border-md);margin:0 auto 8px"></div>
+        <div class="spacing-name">2xl</div><div class="spacing-val">24px</div>
+      </div>
+      <div style="text-align:center">
+        <div style="width:64px;height:32px;border-radius:9999px;background:var(--dk-card);border:1px solid var(--dk-border-md);margin:0 auto 8px"></div>
+        <div class="spacing-name">full</div><div class="spacing-val">9999px</div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       4. BUTTONS
+       ============================================================ -->
+  <section id="buttons">
+    <div class="section-label">04 — Buttons</div>
+    <h2 class="section-title">Button System</h2>
+    <p class="section-desc">
+      Buttons communicate action weight. Primary (coral gradient) for decisive actions. Secondary (purple) for AI-driven prompts. Ghost and soft variants for lower-stakes interactions. Danger variant reserved for irreversible actions only.
+    </p>
+    <div class="divider"></div>
+
+    <div class="subhead">Variants — Large</div>
+    <div class="flex-wrap align-center">
+      <button class="btn-base btn-primary btn-lg">Continue investing</button>
+      <button class="btn-base btn-secondary btn-lg">Ask AI</button>
+      <button class="btn-base btn-ghost btn-lg">Set exit criteria</button>
+      <button class="btn-base btn-neutral btn-lg">Dismiss</button>
+      <button class="btn-base btn-danger btn-lg">End it</button>
+    </div>
+
+    <div class="subhead">Variants — Medium</div>
+    <div class="flex-wrap align-center">
+      <button class="btn-base btn-primary btn-md">Mark Committed</button>
+      <button class="btn-base btn-secondary btn-md">Generate summary</button>
+      <button class="btn-base btn-ghost btn-md">View evidence</button>
+      <button class="btn-base btn-soft btn-md">Add signal</button>
+      <button class="btn-base btn-soft-purple btn-md">AI insight</button>
+      <button class="btn-base btn-neutral btn-md">Pause</button>
+      <button class="btn-base btn-danger btn-md">Override (recorded)</button>
+    </div>
+
+    <div class="subhead">Variants — Small</div>
+    <div class="flex-wrap align-center">
+      <button class="btn-base btn-primary btn-sm">Continue</button>
+      <button class="btn-base btn-secondary btn-sm">Ask AI</button>
+      <button class="btn-base btn-soft btn-sm">He did this</button>
+      <button class="btn-base btn-soft btn-sm">He didn't</button>
+      <button class="btn-base btn-neutral btn-sm">Something else</button>
+      <button class="btn-base btn-danger btn-sm">End it</button>
+      <button class="btn-base btn-disabled btn-sm" disabled>Unavailable</button>
+    </div>
+
+    <div class="subhead">Specific UI Patterns</div>
+    <div style="display:flex; flex-direction:column; gap:16px; max-width:480px">
+      <!-- Debrief CTA -->
+      <div style="padding:16px 20px; background:var(--dk-card); border:1px solid var(--dk-border); border-radius:var(--r-lg); display:flex; align-items:center; justify-content:space-between; gap:16px">
+        <div>
+          <div style="font-size:13px; font-weight:600; color:var(--dk-text-1)">Date debrief pending</div>
+          <div style="font-size:12px; color:var(--doc-muted); margin-top:2px">James · 2 days ago</div>
+        </div>
+        <button class="btn-base btn-soft btn-sm">Log now</button>
+      </div>
+      <!-- Exit criteria met -->
+      <div style="padding:16px 20px; background:rgba(239,68,68,0.06); border:1px solid rgba(239,68,68,0.2); border-radius:var(--r-lg); display:flex; align-items:center; justify-content:space-between; gap:16px">
+        <div>
+          <div style="font-size:13px; font-weight:600; color:#f87171">Exit criteria met</div>
+          <div style="font-size:12px; color:var(--doc-muted); margin-top:2px">You set this when you were clear-headed.</div>
+        </div>
+        <div class="flex gap-sm">
+          <button class="btn-base btn-danger btn-sm">End it</button>
+          <button class="btn-base btn-neutral btn-sm">Override</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       5. FORM ELEMENTS
+       ============================================================ -->
+  <section id="inputs">
+    <div class="section-label">05 — Inputs</div>
+    <h2 class="section-title">Form Elements</h2>
+    <p class="section-desc">
+      Clean, low-friction input fields. Subtle purple focus ring — authoritative but calm.
+      Placeholder copy is always actionable, never nagging.
+    </p>
+    <div class="divider"></div>
+
+    <div class="grid-2">
+      <div style="display:flex; flex-direction:column; gap:20px">
+        <div class="input-wrap">
+          <div class="input-label">Name</div>
+          <input class="input-field" type="text" placeholder="First name or nickname">
+        </div>
+        <div class="input-wrap">
+          <div class="input-label">Platform</div>
+          <input class="input-field" type="text" placeholder="Hinge, Bumble, IRL…">
+        </div>
+        <div class="input-wrap">
+          <div class="input-label">Search evidence</div>
+          <div class="search-wrap">
+            <svg class="search-icon" width="14" height="14" viewBox="0 0 16 16" fill="none">
+              <circle cx="6.5" cy="6.5" r="5.5" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M10.5 10.5L14.5 14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            <input class="input-field input-search" type="text" placeholder="Search signals, dates, statements…">
+          </div>
+        </div>
+        <div class="input-wrap">
+          <div class="input-label">Exit condition</div>
+          <input class="input-field input-error" type="text" value="If he cancels twice">
+          <div class="input-hint error-hint">This condition has already been met.</div>
+        </div>
+        <div class="input-wrap">
+          <div class="input-label">Decision deadline</div>
+          <input class="input-field input-success" type="text" value="Apr 20, 2026">
+          <div class="input-hint">Deadline is set. AI will flag if reached.</div>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:20px">
+        <div class="input-wrap" style="flex:1">
+          <div class="input-label">Quick capture</div>
+          <textarea class="textarea-field" placeholder="What just happened? Log a signal, a feeling, or a date debrief. No format required.&#10;&#10;Tip: Just describe what you observed. AI will categorize it." style="min-height:160px"></textarea>
+        </div>
+        <div class="input-wrap">
+          <div class="input-label">AI prompt override</div>
+          <textarea class="textarea-field" placeholder="Tell the AI what you want to focus on this week…" style="min-height:88px"></textarea>
+          <div class="input-hint">Optional. AI will use your input to weight its analysis.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       6. STATUS BADGES & TAGS
+       ============================================================ -->
+  <section id="badges">
+    <div class="section-label">06 — Badges &amp; Tags</div>
+    <h2 class="section-title">Status System</h2>
+    <p class="section-desc">
+      Every person has exactly one status at any time. Status color = decision temperature.
+      Evidence tags classify the type of signal logged.
+    </p>
+    <div class="divider"></div>
+
+    <div class="subhead">Decision Status</div>
+    <div class="flex-wrap">
+      <div class="badge status-continue"><span class="badge-dot"></span>Continue</div>
+      <div class="badge status-observing"><span class="badge-dot"></span>Observing</div>
+      <div class="badge status-stop"><span class="badge-dot"></span>Stop initiating</div>
+      <div class="badge status-waiting"><span class="badge-dot"></span>Waiting · deadline set</div>
+      <div class="badge status-suggest"><span class="badge-dot"></span>Suggest end</div>
+      <div class="badge status-ended"><span class="badge-dot"></span>Ended</div>
+      <div class="badge status-committed"><span class="badge-dot"></span>Committed</div>
+    </div>
+
+    <div class="subhead">Evidence Signal Tags</div>
+    <div class="flex-wrap">
+      <span class="tag tag-words">Words said</span>
+      <span class="tag tag-action">Action taken</span>
+      <span class="tag tag-pattern">Pattern observed</span>
+      <span class="tag tag-conflict">Conflicting signal</span>
+      <span class="tag tag-mile">Milestone</span>
+    </div>
+
+    <div class="subhead">Platform Chips</div>
+    <div class="flex-wrap">
+      <span class="platform">Hinge</span>
+      <span class="platform">Bumble</span>
+      <span class="platform">Tinder</span>
+      <span class="platform">Coffee Meets Bagel</span>
+      <span class="platform">IRL</span>
+      <span class="platform">Through friends</span>
+    </div>
+
+    <div class="subhead">Confidence Indicator</div>
+    <div style="max-width: 420px; display:flex; flex-direction:column; gap:14px">
+      <div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px">
+          <div style="font-size:12px; color:var(--doc-muted)">Decision confidence</div>
+          <div style="font-size:12px; font-weight:600; color:#f05573">High — 84%</div>
+        </div>
+        <div class="confidence-bar conf-high">
+          <div class="confidence-fill" style="width:84%"></div>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px">
+          <div style="font-size:12px; color:var(--doc-muted)">Decision confidence</div>
+          <div style="font-size:12px; font-weight:600; color:#fbbf24">Medium — 51%</div>
+        </div>
+        <div class="confidence-bar conf-med">
+          <div class="confidence-fill" style="width:51%"></div>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex; justify-content:space-between; margin-bottom:4px">
+          <div style="font-size:12px; color:var(--doc-muted)">Decision confidence</div>
+          <div style="font-size:12px; font-weight:600; color:var(--doc-dim)">Low — 28%</div>
+        </div>
+        <div class="confidence-bar conf-low">
+          <div class="confidence-fill" style="width:28%"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       7. CARD COMPONENTS
+       ============================================================ -->
+  <section id="cards">
+    <div class="section-label">07 — Cards</div>
+    <h2 class="section-title">Card Components</h2>
+    <p class="section-desc">
+      Cards carry real content. Person cards on the dashboard; Evidence, Decision, Committed, Exit Criteria, and Conflict cards within the Object Detail view.
+    </p>
+    <div class="divider"></div>
+
+    <div class="subhead">Person Cards (Dashboard)</div>
+    <div class="grid-3">
+      <!-- Person: Continue -->
+      <div class="card person-card">
+        <div class="person-header">
+          <div class="flex gap-md align-center">
+            <div class="person-avatar" style="background:linear-gradient(135deg,rgba(108,92,231,0.2),rgba(233,69,96,0.15));">A</div>
+            <div>
+              <div class="person-name">Alex</div>
+              <div class="person-meta">Hinge · added Mar 18 · 4 dates</div>
+            </div>
+          </div>
+          <div class="badge status-continue"><span class="badge-dot"></span>Continue</div>
+        </div>
+        <div class="person-ai-line">Consistent initiative and follow-through. Evidence supports continuing with intention.</div>
+        <div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px">
+            <div style="font-size:11px; color:var(--doc-dim)">Confidence</div>
+            <div style="font-size:11px; font-weight:600; color:#f05573">82%</div>
+          </div>
+          <div class="confidence-bar conf-high"><div class="confidence-fill" style="width:82%"></div></div>
+        </div>
+        <div class="card-footer">
+          <span class="platform">Hinge</span>
+          <button class="btn-base btn-soft btn-sm">View</button>
+        </div>
+      </div>
+
+      <!-- Person: Observing -->
+      <div class="card person-card">
+        <div class="person-header">
+          <div class="flex gap-md align-center">
+            <div class="person-avatar">J</div>
+            <div>
+              <div class="person-name">James</div>
+              <div class="person-meta">Bumble · added Mar 5 · 2 dates</div>
+            </div>
+          </div>
+          <div class="badge status-observing"><span class="badge-dot"></span>Observing</div>
+        </div>
+        <div class="person-ai-line">Words and actions have diverged twice. Watching initiative pattern over next 5 days.</div>
+        <div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px">
+            <div style="font-size:11px; color:var(--doc-dim)">Confidence</div>
+            <div style="font-size:11px; font-weight:600; color:#fbbf24">46%</div>
+          </div>
+          <div class="confidence-bar conf-med"><div class="confidence-fill" style="width:46%"></div></div>
+        </div>
+        <div class="card-footer">
+          <span class="platform">Bumble</span>
+          <button class="btn-base btn-soft btn-sm">View</button>
+        </div>
+      </div>
+
+      <!-- Person: Committed -->
+      <div class="card person-card" style="border-color:rgba(16,185,129,0.2);">
+        <div class="person-header">
+          <div class="flex gap-md align-center">
+            <div class="person-avatar" style="background:rgba(16,185,129,0.12); color:#34d399;">M</div>
+            <div>
+              <div class="person-name">Marcus</div>
+              <div class="person-meta">IRL · added Feb 12 · committed Apr 15</div>
+            </div>
+          </div>
+          <div class="badge status-committed"><span class="badge-dot"></span>Committed</div>
+        </div>
+        <div class="person-ai-line" style="border-left-color:#10b981">Decision was evidence-based across 6 dates and 4 weeks of steady consistency.</div>
+        <div class="card-footer">
+          <span class="platform">IRL</span>
+          <button class="btn-base btn-soft btn-sm" style="background:rgba(16,185,129,0.1);color:#34d399;border-color:rgba(16,185,129,0.2)">View card</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="subhead" style="margin-top:40px">Evidence Cards</div>
+    <div style="max-width:560px; display:flex; flex-direction:column; gap:10px">
+      <div class="evidence-item words">
+        <div style="display:flex; align-items:center; gap:8px">
+          <span class="tag tag-words">Words said</span>
+        </div>
+        <div class="evidence-text">"I really want to see you again soon." <em>— Said in person, end of date 2</em></div>
+        <div class="evidence-footer">
+          <div class="evidence-time">Mar 25 · 8 days ago</div>
+          <span class="tag tag-conflict">Unverified</span>
+        </div>
+      </div>
+      <div class="evidence-item action">
+        <div style="display:flex; align-items:center; gap:8px">
+          <span class="tag tag-action">Action taken</span>
+        </div>
+        <div class="evidence-text">Texted to follow up 12 hours after date — without being prompted.</div>
+        <div class="evidence-footer">
+          <div class="evidence-time">Mar 26 · 7 days ago</div>
+          <span class="tag tag-action">Follow-through</span>
+        </div>
+      </div>
+      <div class="evidence-item pattern">
+        <div style="display:flex; align-items:center; gap:8px">
+          <span class="tag tag-pattern">Pattern observed</span>
+        </div>
+        <div class="evidence-text">3 of 3 dates were suggested by him with a specific time and location.</div>
+        <div class="evidence-footer">
+          <div class="evidence-time">Apr 3 · observed across 3 events</div>
+        </div>
+      </div>
+      <div class="evidence-item conflict">
+        <div style="display:flex; align-items:center; gap:8px">
+          <span class="tag tag-conflict">Conflicting signal</span>
+        </div>
+        <div class="evidence-text">Said "we should do something this week" on Apr 1 but has not proposed anything specific since.</div>
+        <div class="evidence-footer">
+          <div class="evidence-time">Apr 1 → Apr 8 · 7 days gap</div>
+          <span class="tag tag-conflict">Active conflict</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="subhead" style="margin-top:40px">Decision Card (AI Recommendation)</div>
+    <div style="max-width:520px">
+      <div class="card decision-card">
+        <div style="font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:var(--purple-light); margin-bottom:12px">AI Recommendation</div>
+        <div class="decision-rec">Continue with intention — set a decision deadline.</div>
+        <div class="decision-body">He has met your initiative standard across 3 dates. The remaining uncertainty is around emotional depth, which requires more time, not more dates. Set a 2-week decision window and watch for whether conversations deepen.</div>
+        <div class="decision-actions">
+          <button class="btn-base btn-secondary btn-sm">Set deadline</button>
+          <button class="btn-base btn-soft btn-sm">Review evidence</button>
+          <button class="btn-base btn-neutral btn-sm">Override</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="subhead" style="margin-top:40px">Committed Card</div>
+    <div style="max-width:520px">
+      <div class="card committed-card">
+        <div class="committed-header">
+          <div class="committed-icon">✓</div>
+          <div>
+            <div class="committed-title">Why This Person Made Sense</div>
+            <div style="font-size:11px; color:var(--doc-dim); margin-top:2px">Committed Apr 15 · evidence-based decision</div>
+          </div>
+        </div>
+        <ul class="committed-reason-list">
+          <li>Planned 4 of 6 dates himself — initiative was consistent, not performed.</li>
+          <li>No missed commitments across 4 weeks. Words matched actions every time.</li>
+          <li>Emotional depth increased steadily. By date 4, conversations went somewhere real.</li>
+        </ul>
+        <div style="margin-top:14px; padding:12px 14px; background:rgba(16,185,129,0.07); border-radius:var(--r-md); border:1px solid rgba(16,185,129,0.15); font-size:12px; color:#6ee7b7; line-height:1.6">
+          You did not commit out of excitement. You committed because the evidence stayed healthy across 6 dates and 4 weeks.
+        </div>
+      </div>
+    </div>
+
+    <div class="subhead" style="margin-top:40px">Conflicting Signal Card</div>
+    <div style="max-width:520px">
+      <div class="card conflict-card">
+        <div style="font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#f87171; margin-bottom:14px">Conflicting Signals Detected</div>
+        <div class="conflict-pair">
+          <div class="conflict-side conflict-side-a">
+            <div class="conflict-label a">Signal A</div>
+            "I really want to see you again" — said in person, Mar 25
+          </div>
+          <div class="conflict-side conflict-side-b">
+            <div class="conflict-label b">Signal B</div>
+            Has not proposed a specific date in the 8 days since.
+          </div>
+        </div>
+        <div class="conflict-read">
+          <strong style="color:var(--dk-text-1)">AI read:</strong> Words suggest interest. Behavior suggests low initiative. The conflict is between stated intent and actual follow-through.
+          <div style="margin-top:8px; font-size:11px; color:var(--doc-dim)">What would resolve this: If he sets a specific plan within 3 days without prompting, upgrade. If not, this is a pattern, not a delay.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subhead" style="margin-top:40px">Exit Criteria Card</div>
+    <div style="max-width:520px">
+      <div class="card exit-card">
+        <div style="font-size:10px; font-weight:700; letter-spacing:2px; text-transform:uppercase; color:#fbbf24; margin-bottom:4px">Your Exit Criteria</div>
+        <div style="font-size:11px; color:var(--doc-dim); margin-bottom:16px">Set Mar 22 · after first date</div>
+        <div class="exit-item">
+          <div class="exit-number">1</div>
+          <div class="flex-col" style="flex:1; gap:2px">
+            <div class="exit-text">If he does not propose a specific plan within 5 days after a date.</div>
+          </div>
+          <div class="exit-status">Not triggered</div>
+        </div>
+        <div class="exit-item">
+          <div class="exit-number">2</div>
+          <div class="flex-col" style="flex:1; gap:2px">
+            <div class="exit-text">If he cancels or reschedules more than twice.</div>
+          </div>
+          <div class="exit-status">Not triggered</div>
+        </div>
+        <div class="exit-item">
+          <div class="exit-number">3</div>
+          <div class="flex-col" style="flex:1; gap:2px">
+            <div class="exit-text">If his words and actions stay inconsistent after 3 interactions.</div>
+          </div>
+          <div class="exit-status approaching">Approaching — 2 of 3</div>
+        </div>
+        <div class="flex gap-sm" style="margin-top:16px">
+          <button class="btn-base btn-ghost btn-sm">Edit criteria</button>
+          <button class="btn-base btn-danger btn-sm">This was met — end it</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="subhead" style="margin-top:40px">Energy Check Card (Dashboard — conditional)</div>
+    <div style="max-width:520px">
+      <div class="card energy-card">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px">
+          <div style="font-size:13px; font-weight:600; color:#fbbf24">Energy Check</div>
+          <button class="btn-base btn-neutral btn-sm" style="font-size:10px; padding:4px 10px">Dismiss</button>
+        </div>
+        <div style="font-size:13px; color:var(--dk-text-2); line-height:1.6">You are tracking <strong style="color:var(--dk-text-1)">6 active people</strong>. Your decision quality tends to drop above 4. Consider pausing 1–2.</div>
+        <div class="energy-bar-wrap">
+          <div class="energy-bar" style="width:75%"></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:10px; color:var(--doc-dim); margin-bottom:14px">
+          <span>Best range: 3–4</span>
+          <span>Current: 6</span>
+        </div>
+        <div class="flex gap-sm">
+          <button class="btn-base btn-soft-purple btn-sm">Review pipeline</button>
+          <button class="btn-base btn-neutral btn-sm">Pause lowest priority</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       8. TIMELINE
+       ============================================================ -->
+  <section id="timeline">
+    <div class="section-label">08 — Timeline</div>
+    <h2 class="section-title">Timeline Component</h2>
+    <p class="section-desc">Vertical timeline on Object Detail. Most recent at top. Active dot pulses on mobile.</p>
+    <div class="divider"></div>
+
+    <div style="max-width:400px">
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-left">
+            <div class="timeline-dot committed"></div>
+            <div class="timeline-line"></div>
+          </div>
+          <div class="timeline-content">
+            <div class="timeline-date">Apr 15</div>
+            <div class="timeline-event"><strong>Marked as Committed</strong> — decision card generated</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-left">
+            <div class="timeline-dot active"></div>
+            <div class="timeline-line"></div>
+          </div>
+          <div class="timeline-content">
+            <div class="timeline-date">Apr 8</div>
+            <div class="timeline-event"><strong>5th date</strong> — logged debrief · Continue decision confirmed</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-left">
+            <div class="timeline-dot"></div>
+            <div class="timeline-line"></div>
+          </div>
+          <div class="timeline-content">
+            <div class="timeline-date">Apr 3</div>
+            <div class="timeline-event"><strong>4th date</strong> — emotional depth increasing, Continue</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-left">
+            <div class="timeline-dot"></div>
+            <div class="timeline-line"></div>
+          </div>
+          <div class="timeline-content">
+            <div class="timeline-date">Mar 28</div>
+            <div class="timeline-event"><strong>3rd date</strong> — him planning consistently, Continue</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-left">
+            <div class="timeline-dot"></div>
+            <div class="timeline-line"></div>
+          </div>
+          <div class="timeline-content">
+            <div class="timeline-date">Mar 21</div>
+            <div class="timeline-event"><strong>1st date</strong> — added to Signal Trace</div>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-left">
+            <div class="timeline-dot" style="border-color:var(--dk-border)"></div>
+          </div>
+          <div class="timeline-content">
+            <div class="timeline-date">Mar 18</div>
+            <div class="timeline-event">Matched on Hinge</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       9. DARK / LIGHT MODE SPLIT
+       ============================================================ -->
+  <section id="modes">
+    <div class="section-label">09 — Surface Modes</div>
+    <h2 class="section-title">Dark &amp; Light</h2>
+    <p class="section-desc">
+      Dark is the primary mode — it reduces cognitive load and protects emotional privacy. Light mode is available for users who prefer it in bright contexts. Both share the same color tokens; only surface and text values swap.
+    </p>
+    <div class="divider"></div>
+
+    <div class="mode-split">
+      <div class="mode-panel dark">
+        <div class="mode-label">Dark Mode — Primary</div>
+        <div class="card person-card">
+          <div class="person-header">
+            <div class="flex gap-md align-center">
+              <div class="person-avatar" style="background:linear-gradient(135deg,rgba(108,92,231,0.2),rgba(233,69,96,0.15));">A</div>
+              <div>
+                <div class="person-name">Alex</div>
+                <div class="person-meta">Hinge · 4 dates · added Mar 18</div>
+              </div>
+            </div>
+            <div class="badge status-continue"><span class="badge-dot"></span>Continue</div>
+          </div>
+          <div class="person-ai-line">Consistent initiative and follow-through. Evidence supports continuing.</div>
+          <div class="card-footer">
+            <span class="platform">Hinge</span>
+            <button class="btn-base btn-soft btn-sm">View</button>
+          </div>
+        </div>
+        <div class="evidence-item words" style="margin-top:12px">
+          <span class="tag tag-words">Words said</span>
+          <div class="evidence-text">"I really want to see you again soon."</div>
+          <div class="evidence-footer">
+            <div class="evidence-time">Mar 25 · 8 days ago</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mode-panel light">
+        <div class="mode-label">Light Mode — Secondary</div>
+        <div class="card person-card">
+          <div class="person-header">
+            <div class="flex gap-md align-center">
+              <div class="person-avatar">A</div>
+              <div>
+                <div class="person-name">Alex</div>
+                <div class="person-meta">Hinge · 4 dates · added Mar 18</div>
+              </div>
+            </div>
+            <div class="badge status-continue"><span class="badge-dot"></span>Continue</div>
+          </div>
+          <div class="person-ai-line">Consistent initiative and follow-through. Evidence supports continuing.</div>
+          <div class="card-footer">
+            <span class="platform" style="background:var(--lt-secondary);border-color:var(--lt-border);color:var(--lt-text-2)">Hinge</span>
+            <button class="btn-base btn-soft btn-sm">View</button>
+          </div>
+        </div>
+        <div class="evidence-item words" style="margin-top:12px; background:var(--lt-secondary); border-color:var(--lt-border)">
+          <span class="tag tag-words">Words said</span>
+          <div class="evidence-text" style="color:var(--lt-text-1)">"I really want to see you again soon."</div>
+          <div class="evidence-footer">
+            <div class="evidence-time" style="color:var(--lt-text-3)">Mar 25 · 8 days ago</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       10. ICON STYLE
+       ============================================================ -->
+  <section id="icons">
+    <div class="section-label">10 — Icon Style</div>
+    <h2 class="section-title">Icon Language</h2>
+    <p class="section-desc">
+      Icons use a 1.5px stroke weight, rounded caps and joins, 22×22 viewBox. No filled icons except status indicators (dots) and the checkmark in the Committed state.
+      Never use heart, eye, or magnifying glass icons — these are explicitly excluded from the brand.
+    </p>
+    <div class="divider"></div>
+
+    <div class="icon-grid">
+      <div class="icon-item">
+        <div class="icon-preview">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="8" r="3"/>
+            <path d="M4 19c0-3.866 3.134-7 7-7h.5c3.866 0 7 3.134 7 7"/>
+          </svg>
+        </div>
+        <div class="icon-name">Person</div>
+      </div>
+      <div class="icon-item">
+        <div class="icon-preview">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11 L7 7 L11 13 L15 9 L19 11"/>
+            <circle cx="19" cy="11" r="2" fill="currentColor" stroke="none" opacity="0.6"/>
+          </svg>
+        </div>
+        <div class="icon-name">Signal trace</div>
+      </div>
+      <div class="icon-item">
+        <div class="icon-preview">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="4" width="16" height="15" rx="2"/>
+            <path d="M8 2v4M14 2v4M3 9h16"/>
+          </svg>
+        </div>
+        <div class="icon-name">Date / event</div>
+      </div>
+      <div class="icon-item">
+        <div class="icon-preview">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 11l2 2 4-4"/>
+            <path d="M4 6h14a1 1 0 011 1v10a1 1 0 01-1 1H4a1 1 0 01-1-1V7a1 1 0 011-1z"/>
+          </svg>
+        </div>
+        <div class="icon-name">Decision</div>
+      </div>
+      <div class="icon-item">
+        <div class="icon-preview">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M11 7v4l3 2"/>
+          </svg>
+        </div>
+        <div class="icon-name">Deadline</div>
+      </div>
+      <div class="icon-item">
+        <div class="icon-preview">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 6h16M3 11h10M3 16h7"/>
+          </svg>
+        </div>
+        <div class="icon-name">Evidence list</div>
+      </div>
+      <div class="icon-item">
+        <div class="icon-preview">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2L9 9H2l6 4.5-2.5 7L11 17l5.5 3.5-2.5-7L20 9h-7z"/>
+          </svg>
+        </div>
+        <div class="icon-name">AI / insight</div>
+      </div>
+      <div class="icon-item">
+        <div class="icon-preview">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 2v3M11 17v3M2 11h3M17 11h3M4.9 4.9l2.1 2.1M14.9 14.9l2.1 2.1M4.9 17.1l2.1-2.1M14.9 7.1l2.1-2.1"/>
+            <circle cx="11" cy="11" r="3"/>
+          </svg>
+        </div>
+        <div class="icon-name">Pattern</div>
+      </div>
+      <div class="icon-item">
+        <div class="icon-preview">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 8v4M11 15h.01"/>
+            <path d="M2 19l9-16 9 16H2z"/>
+          </svg>
+        </div>
+        <div class="icon-name">Conflict / alert</div>
+      </div>
+      <div class="icon-item">
+        <div class="icon-preview">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"/>
+            <path d="M9 11l2 2 4-4" stroke-width="1.5"/>
+          </svg>
+        </div>
+        <div class="icon-name">Committed</div>
+      </div>
+      <div class="icon-item">
+        <div class="icon-preview">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 3l7.5 7.5M19 3l-7.5 7.5M11 10.5V19"/>
+          </svg>
+        </div>
+        <div class="icon-name">End / exit</div>
+      </div>
+      <div class="icon-item">
+        <div class="icon-preview">
+          <svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 7H2a1 1 0 00-1 1v8a1 1 0 001 1h18a1 1 0 001-1V8a1 1 0 00-1-1zM1 11h20"/>
+          </svg>
+        </div>
+        <div class="icon-name">Energy budget</div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       11. VISUAL TONE
+       ============================================================ -->
+  <section id="tone">
+    <div class="section-label">11 — Visual Tone</div>
+    <h2 class="section-title">Copy &amp; Visual Tone</h2>
+    <p class="section-desc">
+      The visual system and the copy are inseparable. The AI voice should sound like the most clear-headed version of the user — not a therapist, not a cheerleader, not a warning label.
+    </p>
+    <div class="divider"></div>
+
+    <div class="tone-row">
+      <div class="tone-block good">
+        <div class="tone-header">Use</div>
+        <div class="tone-line">Your pre-set exit criteria has been met. This is you, from two weeks ago, reminding yourself.</div>
+        <div class="tone-line">You are tracking 6 active people. Your best decisions usually happen with 3–4.</div>
+        <div class="tone-line">His words say interest. His actions say delay. The conflict is between stated intent and actual follow-through.</div>
+        <div class="tone-line">You did not commit out of excitement. You committed because the evidence stayed healthy.</div>
+        <div class="tone-line">You have postponed 3 decisions this week. This may not be about them.</div>
+      </div>
+      <div class="tone-block bad">
+        <div class="tone-header">Avoid</div>
+        <div class="tone-line">You're burning out! Take a break NOW.</div>
+        <div class="tone-line">He's clearly lying to you.</div>
+        <div class="tone-line">You should definitely commit to this person.</div>
+        <div class="tone-line">You're doing amazing! Keep going! 🌟</div>
+        <div class="tone-line">Based on our analysis, it seems like your emotional state may be affecting your judgment at this time.</div>
+      </div>
+    </div>
+
+    <div class="subhead" style="margin-top:40px">Tone Attributes</div>
+    <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-top:0">
+      <div style="padding:20px; background:var(--dk-card); border:1px solid var(--dk-border); border-radius:var(--r-lg)">
+        <div style="font-size:13px; font-weight:600; color:var(--dk-text-1); margin-bottom:8px">Clear</div>
+        <div style="font-size:12px; color:var(--dk-text-2); line-height:1.6">Every piece of text has one job. No hedging. No filler. If you're uncertain, say so directly — don't soften with vague language.</div>
+      </div>
+      <div style="padding:20px; background:var(--dk-card); border:1px solid var(--dk-border); border-radius:var(--r-lg)">
+        <div style="font-size:13px; font-weight:600; color:var(--dk-text-1); margin-bottom:8px">Grounded</div>
+        <div style="font-size:12px; color:var(--dk-text-2); line-height:1.6">AI statements cite evidence. Recommendations name the specific pattern driving them. The user can always trace why the AI said what it said.</div>
+      </div>
+      <div style="padding:20px; background:var(--dk-card); border:1px solid var(--dk-border); border-radius:var(--r-lg)">
+        <div style="font-size:13px; font-weight:600; color:var(--dk-text-1); margin-bottom:8px">Calm confidence</div>
+        <div style="font-size:12px; color:var(--dk-text-2); line-height:1.6">No exclamation marks. No emoji in functional UI. No urgency language unless the situation genuinely requires it. The product doesn't escalate the user's anxiety.</div>
+      </div>
+      <div style="padding:20px; background:var(--dk-card); border:1px solid var(--dk-border); border-radius:var(--r-lg)">
+        <div style="font-size:13px; font-weight:600; color:var(--dk-text-1); margin-bottom:8px">Precise</div>
+        <div style="font-size:12px; color:var(--dk-text-2); line-height:1.6">Named dates, specific counts, real quotes. "He texted 12 hours later" not "he followed up quickly." Specificity is the product's core value.</div>
+      </div>
+      <div style="padding:20px; background:var(--dk-card); border:1px solid var(--dk-border); border-radius:var(--r-lg)">
+        <div style="font-size:13px; font-weight:600; color:var(--dk-text-1); margin-bottom:8px">Non-directive</div>
+        <div style="font-size:12px; color:var(--dk-text-2); line-height:1.6">The AI presents evidence and analysis. It does not tell the user what to feel or what to do. The user is always in control. The product is a tool, not a verdict.</div>
+      </div>
+      <div style="padding:20px; background:var(--dk-card); border:1px solid var(--dk-border); border-radius:var(--r-lg)">
+        <div style="font-size:13px; font-weight:600; color:var(--dk-text-1); margin-bottom:8px">Slightly premium</div>
+        <div style="font-size:12px; color:var(--dk-text-2); line-height:1.6">Restrained type. Generous white space. No rounded-bubbly UI. This is a decision tool, not a social app. The visual restraint signals that the product takes the user seriously.</div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer style="text-align:center; padding-top:48px; border-top:1px solid var(--dk-border); color:var(--doc-dim); font-size:11px; letter-spacing:1px">
+    Signal Trace · Visual System v1.0 · April 2026
+  </footer>
+
+</div>
+</body>
+</html>

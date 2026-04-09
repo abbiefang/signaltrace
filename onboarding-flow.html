@@ -1,0 +1,1382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signal Trace — Onboarding Flow Prototype</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #12101c;
+      --surface:     #1c1a2e;
+      --surface2:    #231f38;
+      --border:      rgba(255,255,255,0.07);
+      --border-mid:  rgba(255,255,255,0.12);
+      --accent:      #e94560;
+      --accent2:     #f093fb;
+      --grad:        linear-gradient(135deg, #e94560 0%, #f093fb 100%);
+      --grad-soft:   linear-gradient(135deg, rgba(233,69,96,0.15) 0%, rgba(240,147,251,0.15) 100%);
+      --text:        #f0eeff;
+      --text-mid:    rgba(240,238,255,0.6);
+      --text-dim:    rgba(240,238,255,0.35);
+      --green:       #4ade80;
+      --amber:       #fbbf24;
+      --radius:      16px;
+      --radius-sm:   10px;
+      --radius-chip: 24px;
+    }
+
+    body {
+      background: #0c0b14;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    /* ── Phone frame ── */
+    .device {
+      width: 390px;
+      min-width: 390px;
+      background: var(--bg);
+      border-radius: 48px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.06),
+        0 32px 80px rgba(0,0,0,0.7),
+        0 0 120px rgba(233,69,96,0.08);
+      position: relative;
+    }
+
+    /* Status bar */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 28px 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-mid);
+    }
+    .status-bar .time { font-size: 15px; font-weight: 700; color: var(--text); }
+    .status-icons { display: flex; gap: 6px; align-items: center; }
+    .status-icons span { font-size: 11px; }
+
+    /* Progress bar */
+    .progress-bar {
+      height: 2px;
+      background: var(--border);
+      margin: 0 28px;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--grad);
+      border-radius: 2px;
+      transition: width 0.4s ease;
+    }
+
+    /* Screen container */
+    .screens {
+      position: relative;
+      overflow: hidden;
+      height: 780px;
+    }
+
+    .screen {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 24px 28px 32px;
+      display: flex;
+      flex-direction: column;
+      transform: translateX(100%);
+      transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-y: auto;
+    }
+
+    .screen.active  { transform: translateX(0); }
+    .screen.leaving { transform: translateX(-100%); }
+
+    /* ── Nav header ── */
+    .nav-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 32px;
+      min-height: 36px;
+    }
+
+    .btn-back {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-mid);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      padding: 4px 0;
+      transition: color 0.2s;
+    }
+    .btn-back:hover { color: var(--text); }
+    .btn-back svg { width: 18px; height: 18px; }
+
+    .step-label {
+      font-size: 12px;
+      color: var(--text-dim);
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Typography ── */
+    .screen-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: var(--text);
+      margin-bottom: 14px;
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--text);
+      margin-bottom: 12px;
+    }
+
+    p {
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--text-mid);
+    }
+
+    p + p { margin-top: 10px; }
+
+    /* ── Logo ── */
+    .logo-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 40px;
+    }
+
+    .logo-icon {
+      width: 72px;
+      height: 72px;
+      margin-bottom: 12px;
+    }
+
+    .logo-name {
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+    }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      display: block;
+      width: 100%;
+      padding: 16px;
+      border-radius: var(--radius);
+      background: var(--grad);
+      color: #fff;
+      font-size: 16px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      letter-spacing: 0.2px;
+      transition: opacity 0.2s, transform 0.15s;
+      text-align: center;
+    }
+    .btn-primary:hover  { opacity: 0.9; }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-ghost {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border-radius: var(--radius);
+      background: var(--border);
+      color: var(--text-mid);
+      font-size: 15px;
+      font-weight: 500;
+      border: 1px solid var(--border-mid);
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+
+    .link-btn {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 13px;
+      cursor: pointer;
+      text-align: center;
+      display: block;
+      width: 100%;
+      padding: 12px;
+      transition: color 0.2s;
+    }
+    .link-btn:hover { color: var(--text-mid); }
+
+    /* ── Spacers ── */
+    .spacer { flex: 1; }
+    .mt-8  { margin-top: 8px; }
+    .mt-12 { margin-top: 12px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-20 { margin-top: 20px; }
+    .mt-24 { margin-top: 24px; }
+    .mt-28 { margin-top: 28px; }
+    .mt-32 { margin-top: 32px; }
+
+    /* ── How it works steps ── */
+    .steps-list { display: flex; flex-direction: column; gap: 16px; }
+
+    .step-item {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      border-radius: 50%;
+      background: var(--grad);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      margin-top: 2px;
+    }
+
+    .step-text h3 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .step-text p {
+      font-size: 14px;
+      line-height: 1.55;
+      color: var(--text-mid);
+    }
+
+    /* ── Divider ── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 20px 0;
+    }
+
+    /* ── Form elements ── */
+    .field-label {
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .text-input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border-mid);
+      border-radius: var(--radius-sm);
+      padding: 13px 16px;
+      font-size: 16px;
+      color: var(--text);
+      font-family: inherit;
+      transition: border-color 0.2s;
+      outline: none;
+    }
+    .text-input::placeholder { color: var(--text-dim); }
+    .text-input:focus { border-color: rgba(233,69,96,0.5); }
+
+    textarea.text-input {
+      resize: none;
+      height: 88px;
+      line-height: 1.5;
+    }
+
+    /* ── Chip selectors ── */
+    .chip-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .chip {
+      padding: 8px 14px;
+      border-radius: var(--radius-chip);
+      border: 1px solid var(--border-mid);
+      background: var(--surface);
+      color: var(--text-mid);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.18s;
+      user-select: none;
+    }
+
+    .chip:hover { border-color: rgba(233,69,96,0.4); color: var(--text); }
+
+    .chip.selected {
+      background: var(--grad-soft);
+      border-color: var(--accent);
+      color: var(--text);
+    }
+
+    /* ── Read indicator ── */
+    .read-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+
+    .read-chip {
+      padding: 11px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-mid);
+      background: var(--surface);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.18s;
+      color: var(--text-mid);
+    }
+
+    .read-chip .icon { display: block; font-size: 16px; margin-bottom: 4px; }
+
+    .read-chip.selected.positive  { background: rgba(74,222,128,0.12); border-color: #4ade80; color: #4ade80; }
+    .read-chip.selected.neutral   { background: rgba(251,191,36,0.12);  border-color: #fbbf24; color: #fbbf24; }
+    .read-chip.selected.mixed     { background: rgba(251,146,60,0.12);  border-color: #fb923c; color: #fb923c; }
+    .read-chip.selected.concerning { background: rgba(239,68,68,0.12); border-color: #ef4444; color: #ef4444; }
+
+    /* ── Exit criteria ── */
+    .criteria-template {
+      padding: 13px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-mid);
+      background: var(--surface);
+      cursor: pointer;
+      transition: all 0.18s;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .criteria-template:hover { border-color: rgba(233,69,96,0.3); }
+
+    .criteria-template.selected {
+      background: var(--grad-soft);
+      border-color: var(--accent);
+    }
+
+    .criteria-check {
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      border-radius: 50%;
+      border: 1.5px solid var(--border-mid);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1px;
+      transition: all 0.18s;
+    }
+
+    .criteria-template.selected .criteria-check {
+      background: var(--grad);
+      border-color: transparent;
+    }
+
+    .criteria-check svg { width: 11px; height: 11px; opacity: 0; transition: opacity 0.18s; }
+    .criteria-template.selected .criteria-check svg { opacity: 1; }
+
+    .criteria-text { font-size: 14px; color: var(--text-mid); line-height: 1.5; }
+    .criteria-template.selected .criteria-text { color: var(--text); }
+
+    .criteria-text em {
+      font-style: normal;
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    /* ── Summary card ── */
+    .summary-card {
+      background: var(--surface);
+      border: 1px solid var(--border-mid);
+      border-radius: var(--radius);
+      padding: 18px;
+      margin-bottom: 20px;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .card-name {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .status-badge {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      background: rgba(233,69,96,0.15);
+      color: var(--accent);
+      border: 1px solid rgba(233,69,96,0.25);
+    }
+
+    .card-meta {
+      font-size: 12px;
+      color: var(--text-dim);
+      margin-bottom: 14px;
+    }
+
+    .card-section {
+      margin-bottom: 12px;
+    }
+
+    .card-section-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: var(--text-dim);
+      margin-bottom: 5px;
+    }
+
+    .card-section-value {
+      font-size: 13px;
+      color: var(--text-mid);
+      line-height: 1.5;
+    }
+
+    .card-divider {
+      height: 1px;
+      background: var(--border);
+      margin: 12px 0;
+    }
+
+    .exit-criteria-mini {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .exit-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--text-mid);
+    }
+
+    .exit-dot {
+      width: 6px;
+      height: 6px;
+      min-width: 6px;
+      border-radius: 50%;
+      background: var(--text-dim);
+    }
+
+    /* ── Confirmation items ── */
+    .confirm-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .confirm-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .confirm-icon {
+      width: 28px;
+      height: 28px;
+      min-width: 28px;
+      border-radius: 50%;
+      background: rgba(74,222,128,0.15);
+      border: 1px solid rgba(74,222,128,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .confirm-icon svg { width: 13px; height: 13px; color: #4ade80; }
+
+    .confirm-text {
+      font-size: 14px;
+      color: var(--text-mid);
+    }
+
+    .confirm-text strong { color: var(--text); font-weight: 600; }
+
+    /* ── What-this-is list ── */
+    .contrast-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .contrast-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .contrast-icon {
+      width: 22px;
+      height: 22px;
+      min-width: 22px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      margin-top: 1px;
+    }
+
+    .contrast-icon.no  { background: rgba(239,68,68,0.12); }
+    .contrast-icon.yes { background: rgba(74,222,128,0.12); }
+
+    .contrast-content { flex: 1; }
+    .contrast-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+    .contrast-sub {
+      font-size: 13px;
+      color: var(--text-mid);
+      line-height: 1.5;
+    }
+
+    /* ── Welcome screen special ── */
+    .welcome-tagline {
+      font-size: 26px;
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--text);
+      text-align: center;
+      margin-bottom: 16px;
+    }
+
+    .welcome-sub {
+      font-size: 15px;
+      line-height: 1.65;
+      color: var(--text-mid);
+      text-align: center;
+    }
+
+    /* Gradient text */
+    .grad-text {
+      background: var(--grad);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── Annotation bar (prototype note) ── */
+    .annotation {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 390px;
+      background: rgba(12,11,20,0.95);
+      border-top: 1px solid rgba(233,69,96,0.2);
+      padding: 10px 20px;
+      font-size: 11px;
+      color: rgba(240,147,251,0.6);
+      text-align: center;
+      letter-spacing: 0.3px;
+      backdrop-filter: blur(10px);
+    }
+
+    /* ── Scrollbar ── */
+    .screen::-webkit-scrollbar { width: 0; }
+
+    /* ── Subtle glow accent on welcome ── */
+    .glow-dot {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(233,69,96,0.25) 0%, transparent 70%);
+      position: absolute;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+
+    /* ── Field group ── */
+    .field-group { margin-bottom: 20px; }
+
+    /* ── Insight pill ── */
+    .insight-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      background: rgba(240,147,251,0.1);
+      border: 1px solid rgba(240,147,251,0.2);
+      font-size: 12px;
+      color: var(--accent2);
+      margin-bottom: 20px;
+    }
+
+    .insight-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--accent2);
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="device">
+  <!-- Status bar -->
+  <div class="status-bar">
+    <span class="time">9:41</span>
+    <div class="status-icons">
+      <span>●●●</span>
+      <span>WiFi</span>
+      <span>🔋</span>
+    </div>
+  </div>
+
+  <!-- Progress bar -->
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+  </div>
+
+  <!-- Screens -->
+  <div class="screens">
+
+    <!-- ═══════════════════════════════════════════
+         SCREEN 0 — WELCOME
+    ═══════════════════════════════════════════ -->
+    <div class="screen active" id="screen-0">
+      <div class="glow-dot"></div>
+      <div class="spacer"></div>
+
+      <div class="logo-wrap">
+        <svg class="logo-icon" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#0f0f1a"/>
+              <stop offset="100%" style="stop-color:#1a1a30"/>
+            </linearGradient>
+            <linearGradient id="acc" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" style="stop-color:#e94560"/>
+              <stop offset="100%" style="stop-color:#f093fb"/>
+            </linearGradient>
+          </defs>
+          <rect x="16" y="16" width="480" height="480" rx="96" ry="96" fill="url(#bg)"/>
+          <path d="M 310 205 A 80 80 0 0 1 310 315" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.15"/>
+          <path d="M 340 180 A 115 115 0 0 1 340 340" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" opacity="0.09"/>
+          <path d="M 370 155 A 150 150 0 0 1 370 365" fill="none" stroke="#ffffff" stroke-width="4" stroke-linecap="round" opacity="0.05"/>
+          <circle cx="220" cy="260" r="18" fill="url(#acc)"/>
+          <circle cx="220" cy="260" r="30" fill="url(#acc)" opacity="0.15"/>
+          <circle cx="220" cy="260" r="44" fill="url(#acc)" opacity="0.06"/>
+          <path d="M 100 260 L 140 260 L 155 240 L 170 280 L 185 250 L 202 260"
+                fill="none" stroke="url(#acc)" stroke-width="5"
+                stroke-linecap="round" stroke-linejoin="round" opacity="0.7"/>
+        </svg>
+        <span class="logo-name">Signal Trace</span>
+      </div>
+
+      <div class="welcome-tagline">
+        You already notice<br>the patterns.
+      </div>
+
+      <p class="welcome-sub">
+        Signal Trace helps you trust them.
+        <br><br>
+        Log what actually happens. See what it means over time. Make decisions from evidence, not confusion.
+      </p>
+
+      <div class="spacer"></div>
+
+      <button class="btn-primary" onclick="goTo(1)">Get started</button>
+      <p style="text-align:center; font-size:12px; color:var(--text-dim); margin-top:12px;">
+        Takes about 3 minutes
+      </p>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════════
+         SCREEN 1 — WHAT THIS IS (NOT)
+    ═══════════════════════════════════════════ -->
+    <div class="screen" id="screen-1">
+      <div class="nav-header">
+        <button class="btn-back" onclick="goBack()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
+        <span class="step-label">1 of 6</span>
+      </div>
+
+      <div class="screen-label">What this is</div>
+      <h1>Not a feelings journal.</h1>
+
+      <p>
+        Signal Trace is a <strong style="color:var(--text)">behavioral tracking system</strong>. It records what he actually does — not what you hope or fear — and surfaces patterns over time.
+      </p>
+
+      <div class="divider mt-24" style="margin-bottom:24px"></div>
+
+      <div class="contrast-list">
+        <div class="contrast-row">
+          <div class="contrast-icon no">❌</div>
+          <div class="contrast-content">
+            <div class="contrast-title">Not a diary for venting</div>
+            <div class="contrast-sub">You don't write how you feel. You log what happened — his words, his actions, the timeline.</div>
+          </div>
+        </div>
+        <div class="contrast-row">
+          <div class="contrast-icon no">❌</div>
+          <div class="contrast-content">
+            <div class="contrast-title">Not advice</div>
+            <div class="contrast-sub">Signal Trace doesn't tell you what to do. It gives you a clearer view of what you're actually dealing with.</div>
+          </div>
+        </div>
+        <div class="contrast-row">
+          <div class="contrast-icon no">❌</div>
+          <div class="contrast-content">
+            <div class="contrast-title">Not hope management</div>
+            <div class="contrast-sub">It won't validate what you want to believe. It tracks what the evidence actually shows.</div>
+          </div>
+        </div>
+        <div class="contrast-row">
+          <div class="contrast-icon yes">✓</div>
+          <div class="contrast-content">
+            <div class="contrast-title" style="color:var(--green)">Pattern recognition, on your terms</div>
+            <div class="contrast-sub">You log facts. The system spots patterns. You make the call.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+      <button class="btn-primary" onclick="goTo(2)">That's what I need →</button>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════════
+         SCREEN 2 — HOW IT WORKS
+    ═══════════════════════════════════════════ -->
+    <div class="screen" id="screen-2">
+      <div class="nav-header">
+        <button class="btn-back" onclick="goBack()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
+        <span class="step-label">2 of 6</span>
+      </div>
+
+      <div class="screen-label">How it works</div>
+      <h1>Three steps. Ongoing clarity.</h1>
+
+      <p>Signal Trace runs quietly in the background of your dating decisions. Here's the loop:</p>
+
+      <div class="steps-list mt-24">
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-text">
+            <h3>You log what actually happened</h3>
+            <p>His exact words. What he did or didn't do. When. No editorializing — just the facts as you observed them.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-text">
+            <h3>AI reads patterns across time</h3>
+            <p>Does his behavior match what he says? Is follow-through consistent? Are signals contradicting each other? The system surfaces what individual moments can miss.</p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-text">
+            <h3>You decide from a clearer position</h3>
+            <p>With an evidence trail instead of impressions, your decisions get sharper — and harder to second-guess later.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="divider mt-24" style="margin-bottom:16px"></div>
+
+      <p style="font-size:13px; color:var(--text-dim);">
+        💡 Signal Trace also lets you set <strong style="color:var(--text-mid)">exit criteria in advance</strong> — conditions you define before emotions cloud the picture.
+      </p>
+
+      <div class="spacer"></div>
+      <button class="btn-primary" onclick="goTo(3)">Set it up →</button>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════════
+         SCREEN 3 — ADD YOUR FIRST PERSON
+    ═══════════════════════════════════════════ -->
+    <div class="screen" id="screen-3">
+      <div class="nav-header">
+        <button class="btn-back" onclick="goBack()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
+        <span class="step-label">3 of 6</span>
+      </div>
+
+      <div class="screen-label">First person</div>
+      <h2>Who are you thinking about right now?</h2>
+      <p style="margin-bottom:24px">A first name or nickname is enough. This stays on your device.</p>
+
+      <div class="field-group">
+        <label class="field-label">Name or nickname</label>
+        <input class="text-input" type="text" id="personName" placeholder="e.g. Marcus, Hinge guy, The architect" oninput="updateNameInUI()">
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Where you met</label>
+        <div class="chip-group" id="platformChips">
+          <div class="chip" onclick="selectChip(this, 'platform')">Hinge</div>
+          <div class="chip" onclick="selectChip(this, 'platform')">Bumble</div>
+          <div class="chip" onclick="selectChip(this, 'platform')">Tinder</div>
+          <div class="chip" onclick="selectChip(this, 'platform')">In person</div>
+          <div class="chip" onclick="selectChip(this, 'platform')">Through friends</div>
+          <div class="chip" onclick="selectChip(this, 'platform')">Other</div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">How long has this been going on?</label>
+        <div class="chip-group" id="durationChips">
+          <div class="chip" onclick="selectChip(this, 'duration')">This week</div>
+          <div class="chip" onclick="selectChip(this, 'duration')">2–3 weeks</div>
+          <div class="chip" onclick="selectChip(this, 'duration')">About a month</div>
+          <div class="chip" onclick="selectChip(this, 'duration')">1–3 months</div>
+          <div class="chip" onclick="selectChip(this, 'duration')">Longer</div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Where things stand</label>
+        <div class="chip-group" id="stageChips">
+          <div class="chip" onclick="selectChip(this, 'stage')">Just texting / matched</div>
+          <div class="chip" onclick="selectChip(this, 'stage')">One date in</div>
+          <div class="chip" onclick="selectChip(this, 'stage')">Multiple dates</div>
+          <div class="chip" onclick="selectChip(this, 'stage')">At a crossroads</div>
+          <div class="chip" onclick="selectChip(this, 'stage')">Observing / paused</div>
+        </div>
+      </div>
+
+      <div class="spacer"></div>
+      <button class="btn-primary" id="addPersonBtn" onclick="goTo(4)" style="opacity:0.5">
+        Add <span id="btnNameDisplay">this person</span> →
+      </button>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════════
+         SCREEN 4 — FIRST INTERACTION LOG
+    ═══════════════════════════════════════════ -->
+    <div class="screen" id="screen-4">
+      <div class="nav-header">
+        <button class="btn-back" onclick="goBack()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
+        <span class="step-label">4 of 6</span>
+      </div>
+
+      <div class="screen-label">First log</div>
+      <h2>What's the most recent thing that happened?</h2>
+      <p style="margin-bottom:20px">Log the latest interaction with <strong style="color:var(--text)" id="logPersonName">this person</strong>. Stick to what actually occurred.</p>
+
+      <div class="field-group">
+        <label class="field-label">What type of interaction?</label>
+        <div class="chip-group" id="interactionChips">
+          <div class="chip" onclick="selectChip(this, 'interaction')">He reached out</div>
+          <div class="chip" onclick="selectChip(this, 'interaction')">You reached out</div>
+          <div class="chip" onclick="selectChip(this, 'interaction')">We went on a date</div>
+          <div class="chip" onclick="selectChip(this, 'interaction')">He went quiet</div>
+          <div class="chip" onclick="selectChip(this, 'interaction')">He made plans</div>
+          <div class="chip" onclick="selectChip(this, 'interaction')">He cancelled / rescheduled</div>
+          <div class="chip" onclick="selectChip(this, 'interaction')">Something else</div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">What specifically happened?</label>
+        <textarea class="text-input" id="interactionDetail" placeholder="e.g. He texted out of nowhere after 4 days of silence. Said he'd been busy. No mention of plans."></textarea>
+        <p style="font-size:11px; color:var(--text-dim); margin-top:6px;">Exact words if you remember them. Actions if not. Avoid interpreting — just describe.</p>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">When did this happen?</label>
+        <div class="chip-group" id="whenChips">
+          <div class="chip" onclick="selectChip(this, 'when')">Today</div>
+          <div class="chip" onclick="selectChip(this, 'when')">Yesterday</div>
+          <div class="chip" onclick="selectChip(this, 'when')">This week</div>
+          <div class="chip" onclick="selectChip(this, 'when')">Last week</div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Your initial read</label>
+        <div class="read-group">
+          <div class="read-chip positive" onclick="selectRead(this, 'positive')">
+            <span class="icon">↑</span> Positive
+          </div>
+          <div class="read-chip neutral" onclick="selectRead(this, 'neutral')">
+            <span class="icon">→</span> Neutral
+          </div>
+          <div class="read-chip mixed" onclick="selectRead(this, 'mixed')">
+            <span class="icon">⇅</span> Mixed
+          </div>
+          <div class="read-chip concerning" onclick="selectRead(this, 'concerning')">
+            <span class="icon">↓</span> Concerning
+          </div>
+        </div>
+        <p style="font-size:11px; color:var(--text-dim); margin-top:8px;">Your gut read, not a verdict. Signal Trace will cross-reference this with the pattern over time.</p>
+      </div>
+
+      <div class="spacer"></div>
+      <button class="btn-primary" onclick="goTo(5)">Log it →</button>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════════
+         SCREEN 5 — EXIT CRITERIA (PRE-MORTEM)
+    ═══════════════════════════════════════════ -->
+    <div class="screen" id="screen-5">
+      <div class="nav-header">
+        <button class="btn-back" onclick="goBack()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
+        <span class="step-label">5 of 6</span>
+      </div>
+
+      <div class="screen-label">Exit criteria</div>
+      <h2>Before you invest more.</h2>
+
+      <p>
+        Set your exit signals <em style="font-style:normal;font-weight:600;color:var(--text)">now</em>, while you're thinking clearly.
+      </p>
+
+      <p class="mt-8" style="font-size:14px; color:var(--text-dim);">
+        If any of these happen, Signal Trace will flag it. This is you, from today, reminding yourself.
+      </p>
+
+      <div class="divider mt-20" style="margin-bottom:20px"></div>
+
+      <div style="display:flex; flex-direction:column; gap:10px; margin-bottom:20px">
+        <div class="criteria-template" id="criteria-0" onclick="toggleCriteria(0)">
+          <div class="criteria-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="criteria-text">
+            Doesn't suggest a <em>concrete plan</em> within <em>5 days</em> after our next interaction
+          </div>
+        </div>
+
+        <div class="criteria-template" id="criteria-1" onclick="toggleCriteria(1)">
+          <div class="criteria-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="criteria-text">
+            Cancels or reschedules <em>more than twice</em>
+          </div>
+        </div>
+
+        <div class="criteria-template" id="criteria-2" onclick="toggleCriteria(2)">
+          <div class="criteria-check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="criteria-text">
+            Words and actions stay <em>inconsistent</em> after 3 more interactions
+          </div>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Or write your own</label>
+        <input class="text-input" type="text" id="customCriteria" placeholder="If he ___">
+      </div>
+
+      <p style="font-size:12px; color:var(--text-dim); line-height:1.6;">
+        You can change these later, but any changes will be recorded. This prevents standards drift from going unnoticed.
+      </p>
+
+      <div class="spacer"></div>
+      <button class="btn-primary" onclick="goTo(6)">Set this →</button>
+      <button class="link-btn" onclick="goTo(6)">Skip for now</button>
+    </div>
+
+
+    <!-- ═══════════════════════════════════════════
+         SCREEN 6 — YOU'RE SET UP
+    ═══════════════════════════════════════════ -->
+    <div class="screen" id="screen-6">
+      <div class="nav-header">
+        <div></div>
+        <span class="step-label">Done</span>
+      </div>
+
+      <div class="insight-pill">
+        <div class="insight-dot"></div>
+        Tracking active
+      </div>
+
+      <h2>You're set up.</h2>
+      <p style="margin-bottom:20px">Signal Trace is now watching for patterns. Here's what was just created:</p>
+
+      <div class="confirm-list">
+        <div class="confirm-item">
+          <div class="confirm-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="confirm-text">
+            Person added — <strong id="summaryName">your person</strong>
+          </div>
+        </div>
+        <div class="confirm-item">
+          <div class="confirm-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="confirm-text">
+            <strong>First interaction logged</strong> — timeline started
+          </div>
+        </div>
+        <div class="confirm-item" id="criteriaConfirmItem">
+          <div class="confirm-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div class="confirm-text">
+            <strong>Exit criteria set</strong> — Signal Trace will alert you if met
+          </div>
+        </div>
+      </div>
+
+      <!-- Preview card -->
+      <div class="summary-card">
+        <div class="card-header">
+          <div class="card-name" id="cardName">—</div>
+          <div class="status-badge">Observing</div>
+        </div>
+        <div class="card-meta" id="cardMeta">Hinge · added today</div>
+
+        <div class="card-section">
+          <div class="card-section-label">Latest log</div>
+          <div class="card-section-value" id="cardLog">—</div>
+        </div>
+
+        <div class="card-divider"></div>
+
+        <div class="card-section">
+          <div class="card-section-label">Exit criteria</div>
+          <div class="exit-criteria-mini" id="exitCriteriaMini">
+            <div class="exit-item">
+              <div class="exit-dot"></div>
+              <span>Not set yet</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-divider"></div>
+
+        <div class="card-section">
+          <div class="card-section-label">Pattern watch</div>
+          <div class="card-section-value" style="color:var(--text-dim); font-style:italic; font-size:12px;">
+            Waiting for more data. Log 2–3 more interactions to surface patterns.
+          </div>
+        </div>
+      </div>
+
+      <p style="font-size:13px; color:var(--text-dim); line-height:1.65;">
+        Each log you add sharpens the picture. The more consistent you are, the more reliable Signal Trace's reads will be.
+      </p>
+
+      <div class="spacer"></div>
+      <button class="btn-primary" onclick="goToDashboard()">Open my dashboard →</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Prototype annotation -->
+<div class="annotation">
+  ◉ Interactive prototype — Signal Trace onboarding flow · 7 screens · All inputs functional
+</div>
+
+
+<script>
+  // ── State ──
+  const state = {
+    current: 0,
+    history: [0],
+    data: {
+      name: '',
+      platform: '',
+      duration: '',
+      stage: '',
+      interaction: '',
+      interactionDetail: '',
+      when: '',
+      read: '',
+      criteria: []
+    }
+  };
+
+  const TOTAL_SCREENS = 7;
+
+  // ── Navigation ──
+  function goTo(n) {
+    // Validate required field on screen 3
+    if (state.current === 3) {
+      const name = document.getElementById('personName').value.trim();
+      if (!name) {
+        document.getElementById('personName').focus();
+        document.getElementById('personName').style.borderColor = 'rgba(233,69,96,0.8)';
+        return;
+      }
+      state.data.name = name;
+    }
+
+    const from = document.getElementById('screen-' + state.current);
+    const to   = document.getElementById('screen-' + n);
+
+    from.classList.remove('active');
+    from.classList.add('leaving');
+    to.classList.add('active');
+
+    setTimeout(() => from.classList.remove('leaving'), 400);
+
+    state.history.push(n);
+    state.current = n;
+
+    updateProgress();
+    if (n === 4) refreshScreen4();
+    if (n === 6) refreshScreen6();
+  }
+
+  function goBack() {
+    if (state.history.length <= 1) return;
+    state.history.pop();
+    const prev = state.history[state.history.length - 1];
+
+    const from = document.getElementById('screen-' + state.current);
+    const to   = document.getElementById('screen-' + prev);
+
+    // Reverse animation
+    to.style.transform = 'translateX(-100%)';
+    from.classList.remove('active');
+    to.classList.add('active');
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        to.style.transform = '';
+        from.style.transform = 'translateX(100%)';
+      });
+    });
+
+    setTimeout(() => {
+      from.style.transform = '';
+    }, 400);
+
+    state.current = prev;
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const pct = (state.current / (TOTAL_SCREENS - 1)) * 100;
+    document.getElementById('progressFill').style.width = pct + '%';
+  }
+
+  // ── Chip selectors ──
+  function selectChip(el, group) {
+    const container = el.closest('.chip-group');
+    container.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    state.data[group] = el.textContent.trim();
+
+    if (group === 'platform' || group === 'stage') {
+      checkScreen3Ready();
+    }
+  }
+
+  function selectRead(el, type) {
+    document.querySelectorAll('.read-chip').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    state.data.read = type;
+  }
+
+  // ── Screen 3 readiness ──
+  function checkScreen3Ready() {
+    const name = document.getElementById('personName').value.trim();
+    const btn  = document.getElementById('addPersonBtn');
+    btn.style.opacity = name ? '1' : '0.5';
+  }
+
+  function updateNameInUI() {
+    const name = document.getElementById('personName').value.trim();
+    state.data.name = name;
+    document.getElementById('personName').style.borderColor = '';
+    const display = name || 'this person';
+    document.getElementById('btnNameDisplay').textContent = display;
+    checkScreen3Ready();
+  }
+
+  // ── Screen 4 ──
+  function refreshScreen4() {
+    const name = state.data.name || 'this person';
+    document.getElementById('logPersonName').textContent = name;
+  }
+
+  // ── Exit criteria ──
+  const criteriaSelected = [false, false, false];
+  const criteriaText = [
+    "Doesn't suggest a concrete plan within 5 days",
+    "Cancels or reschedules more than twice",
+    "Words and actions stay inconsistent after 3 interactions"
+  ];
+
+  function toggleCriteria(i) {
+    criteriaSelected[i] = !criteriaSelected[i];
+    const el = document.getElementById('criteria-' + i);
+    if (criteriaSelected[i]) {
+      el.classList.add('selected');
+    } else {
+      el.classList.remove('selected');
+    }
+    state.data.criteria = criteriaText.filter((_, idx) => criteriaSelected[idx]);
+  }
+
+  // ── Screen 6 ──
+  function refreshScreen6() {
+    const name = state.data.name || 'your person';
+    document.getElementById('summaryName').textContent = name;
+    document.getElementById('cardName').textContent = name;
+
+    const platform = state.data.platform || 'Unknown';
+    document.getElementById('cardMeta').textContent = platform + ' · added today';
+
+    // Log
+    const interaction = state.data.interaction || '';
+    const detail = document.getElementById('interactionDetail').value.trim();
+    const logText = detail
+      ? (detail.length > 70 ? detail.substring(0, 70) + '…' : detail)
+      : (interaction || 'Interaction logged');
+    document.getElementById('cardLog').textContent = logText || '—';
+
+    // Criteria
+    const selected = criteriaText.filter((_, idx) => criteriaSelected[idx]);
+    const custom = document.getElementById('customCriteria').value.trim();
+    if (custom) selected.push(custom);
+
+    const mini = document.getElementById('exitCriteriaMini');
+    const confirmItem = document.getElementById('criteriaConfirmItem');
+
+    if (selected.length === 0) {
+      mini.innerHTML = '<div class="exit-item"><div class="exit-dot" style="background:var(--text-dim)"></div><span style="color:var(--text-dim)">Not set</span></div>';
+      confirmItem.style.opacity = '0.35';
+    } else {
+      mini.innerHTML = selected.map(s =>
+        `<div class="exit-item"><div class="exit-dot"></div><span>${s}</span></div>`
+      ).join('');
+      confirmItem.style.opacity = '1';
+    }
+  }
+
+  function goToDashboard() {
+    // In prototype: show a flash message
+    const btn = document.querySelector('#screen-6 .btn-primary');
+    btn.textContent = '✓ Dashboard loading…';
+    btn.style.opacity = '0.7';
+    setTimeout(() => {
+      btn.textContent = '← Back to start (prototype)';
+      btn.style.opacity = '1';
+      btn.onclick = resetPrototype;
+    }, 1200);
+  }
+
+  function resetPrototype() {
+    // Reset to screen 0
+    document.querySelectorAll('.screen').forEach(s => {
+      s.classList.remove('active', 'leaving');
+      s.style.transform = '';
+    });
+    document.getElementById('screen-0').classList.add('active');
+    state.current = 0;
+    state.history = [0];
+    updateProgress();
+    // Reset form
+    document.getElementById('personName').value = '';
+    document.getElementById('btnNameDisplay').textContent = 'this person';
+    document.getElementById('addPersonBtn').style.opacity = '0.5';
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('.read-chip').forEach(c => c.classList.remove('selected'));
+    document.querySelectorAll('.criteria-template').forEach(c => c.classList.remove('selected'));
+    document.getElementById('interactionDetail').value = '';
+    document.getElementById('customCriteria').value = '';
+    criteriaSelected.fill(false);
+    state.data = { name:'', platform:'', duration:'', stage:'', interaction:'', interactionDetail:'', when:'', read:'', criteria:[] };
+
+    const btn = document.querySelector('#screen-6 .btn-primary');
+    btn.textContent = 'Open my dashboard →';
+    btn.onclick = goToDashboard;
+    btn.style.opacity = '1';
+  }
+
+  // Init
+  updateProgress();
+</script>
+
+</body>
+</html>

@@ -34,16 +34,16 @@
    CONSTANTS
 ───────────────────────────────────────────────────────────────────────────── */
 
-/** Avatar background colours — deterministic per name (same muted palette as dashboard). */
+/** Avatar background colours — warm neutral palette. */
 const PRF_AVATAR_PALETTE = [
-  '#8B6B4A',   // deep brown
-  '#4A6B5A',   // moss green
-  '#6B4A6B',   // deep plum
-  '#6B5A3A',   // tobacco brown
-  '#3A5A6B',   // steel blue
-  '#6B3A4A',   // deep rose
-  '#4A5A3A',   // olive
-  '#5A3A6B',   // dark violet
+  '#C8A882',   // taupe
+  '#8FA89F',   // forest green
+  '#B8867A',   // rust
+  '#7C98B6',   // slate blue
+  '#A89B8F',   // warm grey
+  '#9BA882',   // sage
+  '#A882A8',   // mauve
+  '#82A8A4',   // dusty teal
 ];
 
 /** Platform display map: value → { emoji, label }. */
@@ -78,9 +78,9 @@ const PRF_TYPE_LABEL = {
 
 /** Mood → colour dot class suffix. */
 const PRF_MOOD_COLOR = {
-  positive: '#34d399',   // green
-  neutral:  '#94a3b8',   // grey
-  negative: '#f87171',   // red
+  positive: '#7BA89C',   // soft success green (from palette)
+  neutral:  '#8FA89F',   // forest green (from palette)
+  negative: '#C17C7C',   // soft danger (from palette)
 };
 
 /** Response time label map. */
@@ -133,7 +133,8 @@ function renderProfile(personId) {
   // Reset module state for a clean render
   _prf = { personId: id, expanded: new Set() };
 
-  _ensureStyles();
+  // Styles now in styles.css (mobile app redesign)
+  // _ensureStyles();
 
   const container = document.getElementById('screen-profile');
   if (!container) return;
@@ -335,12 +336,12 @@ function _buildSignalsSection(signals, totalInteractions) {
 
 function _buildSignalCard(signal) {
   const borderColor = signal.type === 'consistent_effort'
-    ? '#34d399'   // green
+    ? '#7BA89C'   // soft success
     : signal.severity === 'high'
-      ? '#f87171'   // red
+      ? '#C17C7C'   // soft danger
       : signal.severity === 'medium'
-        ? '#fbbf24'   // amber
-        : '#94a3b8';  // grey (low)
+        ? '#D4A574'   // warning
+        : '#8FA89F';  // forest green (neutral)
 
   const severityLabel = signal.type === 'consistent_effort'
     ? 'Positive'
@@ -879,7 +880,8 @@ function renderPerson(personId) {
 
   // Reset module state for a clean render
   _prf = { personId: id, expanded: new Set() };
-  _ensureStyles();
+  // Styles now in styles.css (mobile app redesign)
+  // _ensureStyles();
 
   const container = document.getElementById('screen-person');
   if (!container) return;
@@ -927,99 +929,103 @@ function _renderInsightsHome() {
   const themInitPct = totalInteractions > 0 ? Math.round(themInit / totalInteractions * 100) : null;
 
   container.innerHTML = `
-    <div class="prf-root" style="overflow:hidden; display:flex; flex-direction:column; height:100%;">
-      <div class="prf-header-top" style="border-bottom:1px solid rgba(255,255,255,0.06);">
-        <div style="font-size:20px; font-weight:800; color:#f0eef8; letter-spacing:-0.5px;">Insights</div>
-      </div>
-      <div style="flex:1; overflow-y:auto; -webkit-overflow-scrolling:touch; padding-bottom:80px;">
+    <div class="prf-root insights-root">
+      <header class="insights-header">
+        <h1 class="insights-title">Insights</h1>
+      </header>
+      <div class="insights-content">
 
         ${persons.length === 0 ? `
-          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 32px;gap:16px;text-align:center;">
-            <div style="font-size:40px;color:rgba(240,238,248,0.15);">◎</div>
-            <p style="font-size:15px;color:rgba(240,238,248,0.45);line-height:1.6;">No data yet.<br>Add someone and start logging.</p>
-            <button onclick="navigate('dashboard')" style="padding:12px 24px;border-radius:12px;background:linear-gradient(135deg,#e94560,#f093fb);color:#fff;font-size:14px;font-weight:700;border:none;cursor:pointer;font-family:inherit;">Go to Home</button>
+          <div class="insights-empty">
+            <div class="insights-empty-icon">◎</div>
+            <p class="insights-empty-text">No data yet. Add someone and start logging.</p>
+            <button class="btn btn--primary" onclick="navigate('dashboard')">Go to Home</button>
           </div>
         ` : `
 
-          <div style="padding:16px 20px 0;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:rgba(240,238,248,0.35);margin-bottom:12px;">Overview</div>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <section class="insights-section">
+            <h2 class="insights-section-title">Overview</h2>
+            <div class="insights-grid">
               ${[
                 [persons.length, persons.length === 1 ? 'Person tracked' : 'People tracked'],
                 [totalInteractions, 'Total interactions'],
                 ...(meInitPct !== null ? [[meInitPct + '%', 'Me-initiated'], [themInitPct + '%', 'Them-initiated']] : [])
               ].map(([val, label]) => `
-                <div style="display:flex;flex-direction:column;align-items:center;gap:4px;background:rgba(255,255,255,0.04);border-radius:12px;padding:16px 8px;border:1px solid rgba(255,255,255,0.07);">
-                  <span style="font-size:24px;font-weight:800;color:#f0eef8;">${_esc(String(val))}</span>
-                  <span style="font-size:11px;color:rgba(240,238,248,0.4);text-align:center;">${_esc(label)}</span>
+                <div class="insights-stat-card">
+                  <div class="insights-stat-value">${_esc(String(val))}</div>
+                  <div class="insights-stat-label">${_esc(label)}</div>
                 </div>`
               ).join('')}
             </div>
-          </div>
+          </section>
 
           ${alertPersons.length > 0 ? `
-          <div style="padding:20px 20px 0;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:rgba(240,238,248,0.35);margin-bottom:12px;">Active alerts</div>
-            <div style="display:flex;flex-direction:column;gap:8px;">
+          <section class="insights-section">
+            <h2 class="insights-section-title">Active alerts</h2>
+            <div class="insights-alert-list">
               ${alertPersons.map(({ person, topSignal }) => `
-                <button onclick="navigate('person',{personId:'${_esc(person.id)}'})"
-                        style="display:flex;align-items:center;gap:12px;background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.18);border-radius:14px;padding:12px 14px;cursor:pointer;width:100%;font-family:inherit;text-align:left;color:inherit;">
-                  <div style="width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:rgba(255,255,255,0.9);background:${_avatarColor(person.name)};">
+                <button class="insights-person-btn" onclick="navigate('person',{personId:'${_esc(person.id)}'})">
+                  <div class="insights-avatar" style="background:${_avatarColor(person.name)}">
                     ${_esc((person.name || '?').charAt(0).toUpperCase())}
                   </div>
-                  <div style="flex:1;">
-                    <div style="font-size:14px;font-weight:600;color:#f0eef8;">${_esc(person.name)}</div>
-                    ${topSignal ? `<div style="font-size:12px;color:rgba(240,238,248,0.5);">${_esc(topSignal)}</div>` : ''}
+                  <div class="insights-person-info">
+                    <div class="insights-person-name">${_esc(person.name)}</div>
+                    ${topSignal ? `<div class="insights-person-signal">${_esc(topSignal)}</div>` : ''}
                   </div>
-                  <span style="font-size:20px;color:rgba(240,238,248,0.3);">›</span>
+                  <span class="insights-chevron">›</span>
                 </button>`
               ).join('')}
             </div>
-          </div>` : ''}
+          </section>` : ''}
 
           ${topRed.length > 0 ? `
-          <div style="padding:20px 20px 0;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:rgba(240,238,248,0.35);margin-bottom:12px;">Common red flags</div>
-            ${topRed.map(([flag, count]) => `
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                <span style="font-size:13px;padding:4px 10px;border-radius:20px;font-weight:500;background:rgba(239,68,68,0.15);color:#fca5a5;">${_esc(flag)}</span>
-                <span style="font-size:12px;color:rgba(240,238,248,0.35);">${count}×</span>
-              </div>`
-            ).join('')}
-          </div>` : ''}
+          <section class="insights-section">
+            <h2 class="insights-section-title">Common red flags</h2>
+            <div class="insights-flags">
+              ${topRed.map(([flag, count]) => `
+                <div class="insights-flag-row">
+                  <span class="insights-flag insights-flag--danger">${_esc(flag)}</span>
+                  <span class="insights-flag-count">${count}×</span>
+                </div>`
+              ).join('')}
+            </div>
+          </section>` : ''}
 
           ${topGreen.length > 0 ? `
-          <div style="padding:20px 20px 0;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:rgba(240,238,248,0.35);margin-bottom:12px;">Common green flags</div>
-            ${topGreen.map(([flag, count]) => `
-              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-                <span style="font-size:13px;padding:4px 10px;border-radius:20px;font-weight:500;background:rgba(74,222,128,0.12);color:#86efac;">${_esc(flag)}</span>
-                <span style="font-size:12px;color:rgba(240,238,248,0.35);">${count}×</span>
-              </div>`
-            ).join('')}
-          </div>` : ''}
+          <section class="insights-section">
+            <h2 class="insights-section-title">Common green flags</h2>
+            <div class="insights-flags">
+              ${topGreen.map(([flag, count]) => `
+                <div class="insights-flag-row">
+                  <span class="insights-flag insights-flag--success">${_esc(flag)}</span>
+                  <span class="insights-flag-count">${count}×</span>
+                </div>`
+              ).join('')}
+            </div>
+          </section>` : ''}
 
-          <div style="padding:20px 20px 0;">
-            <div style="font-size:11px;font-weight:700;letter-spacing:0.8px;text-transform:uppercase;color:rgba(240,238,248,0.35);margin-bottom:12px;">By person</div>
-            ${persons.map(p => {
-              const sm = (typeof getPersonSignalSummary === 'function') ? getPersonSignalSummary(p.id) : { level: 'none' };
-              const dotColor = { high:'#f87171', medium:'#fb923c', low:'#facc15', none:'rgba(255,255,255,0.2)' }[sm.level] || 'rgba(255,255,255,0.2)';
-              const s = (typeof getStats === 'function') ? getStats(p.id) : {};
-              return `
-                <button onclick="navigate('person',{personId:'${_esc(p.id)}'})"
-                        style="display:flex;align-items:center;gap:12px;padding:12px 0;background:none;border:none;border-bottom:1px solid rgba(255,255,255,0.05);color:inherit;cursor:pointer;font-family:inherit;width:100%;">
-                  <div style="width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:rgba(255,255,255,0.9);background:${_avatarColor(p.name)};">
-                    ${_esc((p.name || '?').charAt(0).toUpperCase())}
-                  </div>
-                  <div style="flex:1;text-align:left;">
-                    <div style="font-size:14px;font-weight:600;color:#f0eef8;">${_esc(p.name)}</div>
-                    <div style="font-size:12px;color:rgba(240,238,248,0.4);margin-top:2px;">${(s.totalInteractions || 0)} interactions · ${_esc(p.platform || 'Unknown')}</div>
-                  </div>
-                  <span style="width:8px;height:8px;border-radius:50%;flex-shrink:0;background:${dotColor};display:inline-block;"></span>
-                  <span style="font-size:18px;color:rgba(240,238,248,0.25);">›</span>
-                </button>`;
-            }).join('')}
-          </div>
+          <section class="insights-section">
+            <h2 class="insights-section-title">By person</h2>
+            <div class="insights-person-list">
+              ${persons.map(p => {
+                const sm = (typeof getPersonSignalSummary === 'function') ? getPersonSignalSummary(p.id) : { level: 'none' };
+                const dotColor = { high: '#C17C7C', medium: '#D4A574', low: '#7BA89C', none: '#989898' }[sm.level] || '#989898';
+                const s = (typeof getStats === 'function') ? getStats(p.id) : {};
+                return `
+                  <button class="insights-person-list-item" onclick="navigate('person',{personId:'${_esc(p.id)}'})">
+                    <div class="insights-avatar" style="background:${_avatarColor(p.name)}">
+                      ${_esc((p.name || '?').charAt(0).toUpperCase())}
+                    </div>
+                    <div class="insights-person-info">
+                      <div class="insights-person-name">${_esc(p.name)}</div>
+                      <div class="insights-person-meta">${(s.totalInteractions || 0)} interactions · ${_esc(p.platform || 'Unknown')}</div>
+                    </div>
+                    <span class="insights-signal-dot" style="background:${dotColor};"></span>
+                    <span class="insights-chevron">›</span>
+                  </button>`;
+              }).join('')}
+            </div>
+          </section>
         `}
       </div>
     </div>
