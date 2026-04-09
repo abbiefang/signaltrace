@@ -573,7 +573,7 @@ function _buildHTML({ person, allPersons, isFirstLog, editMode = false }) {
     <div class="log-footer">
       <p class="log-validation-error" id="log-error" role="alert" hidden aria-hidden="true"></p>
       <button type="submit" class="btn btn--primary btn--full" id="log-submit">
-        ${editMode ? 'Save changes' : 'Save interaction'}
+        ${editMode ? 'Save changes' : 'Log it →'}
       </button>
     </div>
 

@@ -1226,7 +1226,7 @@ function renderPerson(personId) {
       <div class="pd-action-bar">
         <button class="pd-log-btn" type="button"
                 onclick="navigate('log', { logContext: { personId: '${_escHtml(personId)}' } })">
-          + Log interaction
+          + Log what happened
         </button>
       </div>
 
