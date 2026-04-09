@@ -436,6 +436,11 @@ function _pfHandleSubmit() {
     } else {
       // ── Add mode ──
       const newPerson = addPerson(data);
+      if (!newPerson) {
+        _pfShowNameError('Could not save — your storage may be full. Try clearing some data in Settings.');
+        _pfResetSubmitBtn();
+        return;
+      }
       // Persist staged photo (if any)
       if (_pf.photoDataUrl && typeof Photos !== 'undefined') {
         Photos.savePersonPhotoDataUrl(newPerson.id, _pf.photoDataUrl);
@@ -1088,7 +1093,7 @@ function renderPerson(personId) {
   } else if (totalInteractions === 0) {
     signalCardsHtml = `<p class="pd-empty-hint">Log some interactions to start seeing patterns.</p>`;
   } else {
-    signalCardsHtml = `<p class="pd-empty-hint">Not enough data yet — keep logging.</p>`;
+    signalCardsHtml = `<p class="pd-empty-hint">Not enough data yet — log a few more interactions to reveal patterns.</p>`;
   }
 
   // ── Build interaction list HTML ──
@@ -1100,7 +1105,7 @@ function renderPerson(personId) {
   if (recentInteractions.length === 0) {
     interactionListHtml = `
       <div class="pd-empty-interactions">
-        <p class="pd-empty-hint">Nothing logged yet.</p>
+        <p class="pd-empty-hint">Nothing logged yet — tap the button below to start.</p>
         <p class="pd-empty-hint-sub">Tap the button below to record your first interaction.</p>
       </div>`;
   } else {

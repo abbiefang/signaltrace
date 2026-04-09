@@ -65,7 +65,7 @@ function _buildSettingsHTML() {
           <span class="st-row-icon" aria-hidden="true">📥</span>
           <div class="st-row-text">
             <div class="st-row-title">Export my data</div>
-            <div class="st-row-desc">Download all people &amp; interactions as JSON</div>
+            <div class="st-row-desc">Download everything you've logged</div>
           </div>
         </div>
         <svg class="st-row-chevron" viewBox="0 0 20 20" fill="none" stroke="currentColor"

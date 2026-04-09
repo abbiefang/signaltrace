@@ -70,7 +70,7 @@ function signalLevelMeta(level) {
     case 'medium': return { label: '👀 Pay attention', cls: 'signal-pill--medium' };
     case 'low':    return { label: '✅ Looking good',  cls: 'signal-pill--low'    };
     case 'none':
-    default:       return { label: 'No data yet',      cls: 'signal-pill--none'   };
+    default:       return { label: 'Keep logging',      cls: 'signal-pill--none'   };
   }
 }
 
@@ -131,12 +131,12 @@ function renderEmptyState() {
   wrapper.innerHTML = `
     <div class="empty-state">
       <div class="empty-state__icon" aria-hidden="true">🔍</div>
-      <h2 class="empty-state__heading">Who are you watching?</h2>
+      <h2 class="empty-state__heading">Who are you tracking?</h2>
       <p class="empty-state__body">
-        Add someone you're dating, talking to, or curious about. Log your interactions and let the patterns speak for themselves.
+        Add someone you're dating, texting, or just noticing. Log what happens between you — patterns will tell you what words can't.
       </p>
       <button class="btn btn--primary btn--full" id="empty-add-btn" type="button">
-        + Add your first person
+        + Add someone
       </button>
     </div>
   `;
@@ -248,7 +248,7 @@ function renderDashboard() {
   } else if (alertCount > 0) {
     insightMsg = `⚠️ ${alertCount} ${alertCount === 1 ? 'person needs' : 'people need'} your attention`;
   } else if (weeklyCount === 0) {
-    insightMsg = 'Nothing logged this week yet';
+    insightMsg = 'This week\'s quiet — log something when it happens';
   } else {
     insightMsg = weeklyCount >= 5 ? '🔥 Active week — patterns forming' : '✅ All signals looking good';
   }
@@ -291,8 +291,8 @@ function renderDashboard() {
           class="dashboard__search-input"
           type="search"
           id="dashboard-search"
-          placeholder="Search people…"
-          aria-label="Search people"
+          placeholder="Find someone…"
+          aria-label="Find someone"
           autocomplete="off"
           spellcheck="false"
         />
@@ -367,10 +367,12 @@ function renderDashboard() {
     _renderFilteredList('');
 
     // Wire up search input (deferred so listSection is in the DOM)
+    // Guard flag prevents listener accumulation if renderDashboard is called multiple times
     setTimeout(() => {
       const searchInput = document.getElementById('dashboard-search');
       const clearBtn    = document.getElementById('dashboard-search-clear');
-      if (!searchInput) return;
+      if (!searchInput || searchInput.dataset.wired) return;
+      searchInput.dataset.wired = 'true';
 
       searchInput.addEventListener('input', () => {
         const q = searchInput.value.trim();
@@ -412,11 +414,10 @@ function escapeHtml(str) {
     .replace(/'/g, '&#39;');
 }
 
-// ─── Search bar styles (injected once) ────────────────────────────────────────
-// NOTE: Styles now included in styles.css (mobile app redesign)
+// ─── Search bar styles ────────────────────────────────────────────────────────
+// NOTE: Styles are in styles.css — this block is intentionally disabled.
 (function _injectSearchStyles() {
-  if (document.getElementById('dashboard-search-styles')) return;
-  return; // Skip injection since styles are in CSS
+  return; // Styles already in styles.css
   const style = document.createElement('style');
   style.id = 'dashboard-search-styles';
   style.textContent = `

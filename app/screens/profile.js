@@ -294,7 +294,7 @@ function _buildSignalsSection(signals, totalInteractions) {
     bodyHTML = /* html */`
       <div class="prf-signal-empty">
         <div class="prf-signal-empty-icon">📊</div>
-        <div class="prf-signal-empty-text">Not enough data yet. Keep logging.</div>
+        <div class="prf-signal-empty-text">Not enough data yet — log a few more interactions and patterns will surface.</div>
         <div class="prf-signal-empty-sub">Signals appear after ${MIN_FOR_SIGNALS} interactions.</div>
       </div>`;
   } else if (allGreen && greenSignals.length > 0) {
@@ -379,7 +379,7 @@ function _buildTimeline(interactions) {
 
       <div class="prf-timeline" id="prf-timeline">
         ${isEmpty
-          ? '<div class="prf-timeline-empty">No interactions logged yet.</div>'
+          ? '<div class="prf-timeline-empty">Nothing logged yet — keep going, patterns show up around interaction 4.</div>'
           : interactions.map((ix, idx) => _buildInteractionRow(ix, idx, interactions.length)).join('')}
       </div>
 

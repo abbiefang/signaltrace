@@ -448,7 +448,7 @@
             type="text"
             id="ob-name"
             name="name"
-            placeholder="His name, her name, their name…"
+            placeholder="Name, nickname, whatever you call them…"
             autocomplete="off"
             autocorrect="off"
             spellcheck="false"

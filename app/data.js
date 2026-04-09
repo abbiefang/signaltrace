@@ -68,9 +68,11 @@ function readStore(key) {
 function writeStore(key, data) {
   try {
     localStorage.setItem(key, JSON.stringify(data));
+    return true;
   } catch (err) {
     // localStorage may be full (QuotaExceededError) or unavailable (private mode)
     console.error('[SignalTrace] writeStore failed for key "' + key + '":', err);
+    return false;
   }
 }
 
@@ -98,8 +100,8 @@ function addPerson(data) {
   };
 
   persons.push(person);
-  writeStore(PERSONS_KEY, persons);
-  return person;
+  var ok = writeStore(PERSONS_KEY, persons);
+  return ok ? person : null;
 }
 
 function getPerson(id) {
