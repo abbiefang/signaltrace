@@ -890,6 +890,7 @@ textarea:disabled {
   background-color: var(--color-bg-secondary);
   border: 1px solid var(--color-border-light);
   border-left: 3px solid var(--color-border);
+  animation: card-in 0.25s ease-out both;
   border-radius: var(--radius-lg);
   cursor: pointer;
   transition: var(--transition);
@@ -1222,6 +1223,17 @@ textarea:disabled {
 .ob-hero-icon {
   font-size: 48px;
   line-height: 1;
+  animation: hero-pulse 3s ease-in-out infinite;
+}
+
+@keyframes hero-pulse {
+  0%, 100% { transform: scale(1);   opacity: 1;    }
+  50%       { transform: scale(1.08); opacity: 0.85; }
+}
+
+@keyframes card-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0);   }
 }
 
 /* Input field in onboarding */
