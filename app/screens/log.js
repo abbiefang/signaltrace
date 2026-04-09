@@ -255,19 +255,21 @@ function _stopSVG(size) {
   </svg>`;
 }
 
-/** Voice Mode entry row + collapsible panel HTML (injected at top of the form). */
+/** Voice Mode hero section + collapsible panel HTML (injected at top of the form). */
 function _buildVoiceModeHTML() {
   return `
-  <!-- ── Voice Mode ─────────────────────────── -->
-  <div class="voice-mode-entry" id="voice-mode-entry">
-    <div class="voice-mode-entry__info">
-      <span class="voice-mode-entry__label">${_micSVG(13)} Voice Mode</span>
-      <span class="voice-mode-entry__desc">Describe what happened — I'll fill in the fields</span>
-    </div>
-    <button type="button" class="voice-mode-trigger" id="voice-mode-trigger"
+  <!-- ── Voice Mode Hero ─────────────────────── -->
+  <div class="voice-hero" id="voice-mode-entry">
+    <button type="button" class="voice-hero__btn" id="voice-mode-trigger"
             aria-label="Start Voice Mode" aria-pressed="false">
-      ${_micSVG(18)}
+      <span class="voice-hero__icon">${_micSVG(24)}</span>
+      <span class="voice-hero__text">
+        <span class="voice-hero__main">Just tell me what happened</span>
+        <span class="voice-hero__sub">Tap to talk — I'll fill in the details</span>
+      </span>
+      <span class="voice-hero__arrow">→</span>
     </button>
+    <div class="voice-hero__divider"><span>or fill in manually</span></div>
   </div>
 
   <!-- Voice Mode active panel (hidden until triggered) -->
@@ -329,7 +331,7 @@ function _buildHTML({ person, allPersons, isFirstLog, editMode = false }) {
   <!-- ── Form ───────────────────────────────────── -->
   <form class="log-form" id="log-form" novalidate>
 
-    \${_buildVoiceModeHTML()}
+    ${_buildVoiceModeHTML()}
 
     <!-- ────────────────────────────────────────────
          CARD 1 — Who & When
@@ -463,42 +465,49 @@ function _buildHTML({ person, allPersons, isFirstLog, editMode = false }) {
     </section>
 
     <!-- ────────────────────────────────────────────
-         CARD 4 — Red Flags
+         CARD 4/5 — Flags (collapsible)
     ─────────────────────────────────────────────── -->
-    <section class="log-card log-card--red-tint" aria-label="Red flags">
-      <h2 class="log-card__title">
-        <span aria-hidden="true">🚩</span> Red flags
-        <span class="log-field__optional">optional, multi-select</span>
-      </h2>
-      <div class="log-chips" role="group" aria-label="Red flag chips" id="chips-red">
-        ${RED_FLAGS.map(flag => `
-        <button
-          type="button"
-          class="log-chip log-chip--red"
-          data-flag-red="${_esc(flag)}"
-          aria-pressed="false"
-        >${_esc(flag)}</button>
-        `).join('')}
-      </div>
-    </section>
+    <section class="log-card" aria-label="Flags">
+      <button type="button" class="log-flags-toggle" id="log-flags-toggle"
+              aria-expanded="false" aria-controls="log-flags-body">
+        <span class="log-flags-toggle__label">
+          <span aria-hidden="true">🚩</span> Any flags to note?
+        </span>
+        <span class="log-flags-toggle__hint" id="log-flags-hint">tap to add</span>
+        <svg class="log-flags-toggle__chevron" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2" width="16" height="16" aria-hidden="true">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </button>
 
-    <!-- ────────────────────────────────────────────
-         CARD 5 — Green Flags
-    ─────────────────────────────────────────────── -->
-    <section class="log-card log-card--green-tint" aria-label="Green flags">
-      <h2 class="log-card__title">
-        <span aria-hidden="true">✅</span> Green flags
-        <span class="log-field__optional">optional, multi-select</span>
-      </h2>
-      <div class="log-chips" role="group" aria-label="Green flag chips" id="chips-green">
-        ${GREEN_FLAGS.map(flag => `
-        <button
-          type="button"
-          class="log-chip log-chip--green"
-          data-flag-green="${_esc(flag)}"
-          aria-pressed="false"
-        >${_esc(flag)}</button>
-        `).join('')}
+      <div class="log-flags-body" id="log-flags-body" hidden>
+        <div class="log-flags-sub">
+          <span class="log-flags-sub__label"><span aria-hidden="true">🚩</span> Red flags</span>
+          <div class="log-chips" role="group" aria-label="Red flag chips" id="chips-red">
+            ${RED_FLAGS.map(flag => `
+            <button
+              type="button"
+              class="log-chip log-chip--red"
+              data-flag-red="${_esc(flag)}"
+              aria-pressed="false"
+            >${_esc(flag)}</button>
+            `).join('')}
+          </div>
+        </div>
+
+        <div class="log-flags-sub">
+          <span class="log-flags-sub__label"><span aria-hidden="true">✅</span> Green flags</span>
+          <div class="log-chips" role="group" aria-label="Green flag chips" id="chips-green">
+            ${GREEN_FLAGS.map(flag => `
+            <button
+              type="button"
+              class="log-chip log-chip--green"
+              data-flag-green="${_esc(flag)}"
+              aria-pressed="false"
+            >${_esc(flag)}</button>
+            `).join('')}
+          </div>
+        </div>
       </div>
     </section>
 
@@ -661,6 +670,7 @@ function _bindEvents(screenEl) {
   form.querySelectorAll('[data-flag-red]').forEach(btn => {
     btn.addEventListener('click', () => {
       _toggleChip(btn, 'flagRed', _form.redFlags);
+      _updateFlagsHint(form);
     });
   });
 
@@ -668,8 +678,21 @@ function _bindEvents(screenEl) {
   form.querySelectorAll('[data-flag-green]').forEach(btn => {
     btn.addEventListener('click', () => {
       _toggleChip(btn, 'flagGreen', _form.greenFlags);
+      _updateFlagsHint(form);
     });
   });
+
+  // ── Flags section toggle (collapse/expand) ───────
+  const flagsToggle = form.querySelector('#log-flags-toggle');
+  const flagsBody   = form.querySelector('#log-flags-body');
+  if (flagsToggle && flagsBody) {
+    flagsToggle.addEventListener('click', () => {
+      const isOpen = !flagsBody.hidden;
+      flagsBody.hidden = isOpen;
+      flagsToggle.setAttribute('aria-expanded', String(!isOpen));
+      flagsToggle.classList.toggle('log-flags-toggle--open', !isOpen);
+    });
+  }
 
   // ── Notes textarea ───────────────────────────────
   const textarea = form.querySelector('#log-notes');
@@ -720,6 +743,20 @@ function _toggleChip(btn, dataKey, flagSet) {
     btn.classList.add('log-chip--active');
     btn.setAttribute('aria-pressed', 'true');
   }
+}
+
+
+/**
+ * Update the flags section hint text to show selected count.
+ * @param {HTMLElement} form
+ */
+function _updateFlagsHint(form) {
+  const hint = form.querySelector('#log-flags-hint');
+  if (!hint) return;
+  const total = _form.redFlags.size + _form.greenFlags.size;
+  hint.textContent = total > 0 ? `${total} selected` : 'tap to add';
+  if (total > 0) hint.classList.add('log-flags-hint--active');
+  else hint.classList.remove('log-flags-hint--active');
 }
 
 
@@ -1316,6 +1353,19 @@ function _restoreFormUI(screenEl) {
       btn.setAttribute('aria-pressed', 'true');
     }
   });
+
+  // Auto-open flags section if any flags are selected (edit mode)
+  const totalFlags = _form.redFlags.size + _form.greenFlags.size;
+  if (totalFlags > 0) {
+    const flagsBody   = form.querySelector('#log-flags-body');
+    const flagsToggle = form.querySelector('#log-flags-toggle');
+    if (flagsBody)   flagsBody.hidden = false;
+    if (flagsToggle) {
+      flagsToggle.setAttribute('aria-expanded', 'true');
+      flagsToggle.classList.add('log-flags-toggle--open');
+    }
+    _updateFlagsHint(form);
+  }
 
   // Notes
   const textarea  = form.querySelector('#log-notes');

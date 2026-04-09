@@ -1051,10 +1051,10 @@ function renderPerson(personId) {
 
   // ── Signal level pill ──
   const levelMeta = {
-    high:   { label: 'Strong signals',  cls: 'pd-pill--high'   },
-    medium: { label: 'Mixed signals',   cls: 'pd-pill--medium' },
-    low:    { label: 'Weak signals',    cls: 'pd-pill--low'    },
-    none:   { label: 'No signals yet',  cls: 'pd-pill--none'   },
+    high:   { label: '⚠️ Watch out',     cls: 'pd-pill--high'   },
+    medium: { label: '👀 Pay attention', cls: 'pd-pill--medium' },
+    low:    { label: '✅ Looking good',  cls: 'pd-pill--low'    },
+    none:   { label: 'No signals yet',   cls: 'pd-pill--none'   },
   };
   const lvl = levelMeta[signalSummary.level] || levelMeta.none;
 
@@ -1077,7 +1077,7 @@ function renderPerson(personId) {
         medium: 'pd-signal-card--medium',
         low:    'pd-signal-card--low',
       }[sig.severity] || 'pd-signal-card--low';
-      const icon = sig.severity === 'high' ? '⚠' : (sig.severity === 'medium' ? '◈' : '◉');
+      const icon = sig.severity === 'high' ? '🚩' : (sig.severity === 'medium' ? '👀' : '✅');
       return `
         <div class="pd-signal-card ${severityCls}">
           <span class="pd-signal-icon" aria-hidden="true">${icon}</span>

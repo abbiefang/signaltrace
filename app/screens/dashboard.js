@@ -66,9 +66,9 @@ function avatarColour(name) {
  */
 function signalLevelMeta(level) {
   switch (level) {
-    case 'high':   return { label: 'Worth attention',  cls: 'signal-pill--high'   };
-    case 'medium': return { label: 'Something's there', cls: 'signal-pill--medium' };
-    case 'low':    return { label: 'Looking okay',     cls: 'signal-pill--low'    };
+    case 'high':   return { label: '⚠️ Watch out',     cls: 'signal-pill--high'   };
+    case 'medium': return { label: '👀 Pay attention', cls: 'signal-pill--medium' };
+    case 'low':    return { label: '✅ Looking good',  cls: 'signal-pill--low'    };
     case 'none':
     default:       return { label: 'No data yet',      cls: 'signal-pill--none'   };
   }
@@ -130,13 +130,13 @@ function renderEmptyState() {
 
   wrapper.innerHTML = `
     <div class="empty-state">
-      <div class="empty-state__icon" aria-hidden="true">👤</div>
-      <h2 class="empty-state__heading">No one yet</h2>
+      <div class="empty-state__icon" aria-hidden="true">🔍</div>
+      <h2 class="empty-state__heading">Who are you watching?</h2>
       <p class="empty-state__body">
-        Start tracking someone you care about. Add their communication patterns and stay aware of the signals.
+        Add someone you're dating, talking to, or curious about. Log your interactions and let the patterns speak for themselves.
       </p>
       <button class="btn btn--primary btn--full" id="empty-add-btn" type="button">
-        Add someone
+        + Add your first person
       </button>
     </div>
   `;
@@ -234,20 +234,44 @@ function renderDashboard() {
   screen.appendChild(header);
 
   // ── Summary bar ─────────────────────────────────────────────────────────────
+  // Count how many people have high-signal alerts
+  const alertCount = (personCount > 0 && typeof getPersonSignalSummary === 'function')
+    ? persons.filter(p => {
+        try { return getPersonSignalSummary(p.id).level === 'high'; } catch (_) { return false; }
+      }).length
+    : 0;
+
+  // Build contextual insight message
+  let insightMsg = '';
+  if (personCount === 0) {
+    insightMsg = 'Add someone to start spotting patterns';
+  } else if (alertCount > 0) {
+    insightMsg = `⚠️ ${alertCount} ${alertCount === 1 ? 'person needs' : 'people need'} your attention`;
+  } else if (weeklyCount === 0) {
+    insightMsg = 'Nothing logged this week yet';
+  } else {
+    insightMsg = weeklyCount >= 5 ? '🔥 Active week — patterns forming' : '✅ All signals looking good';
+  }
+
   const summaryBar = document.createElement('div');
   summaryBar.className = 'dashboard__summary-bar';
   summaryBar.setAttribute('role', 'status');
   summaryBar.setAttribute('aria-live', 'polite');
   summaryBar.innerHTML = `
-    <div class="summary-stat">
-      <span class="summary-stat__value">${personCount}</span>
-      <span class="summary-stat__label">${personCount === 1 ? 'person' : 'people'} tracked</span>
+    <div class="summary-stats-row">
+      <div class="summary-stat">
+        <span class="summary-stat__value">${personCount}</span>
+        <span class="summary-stat__label">${personCount === 1 ? 'person' : 'people'} tracked</span>
+      </div>
+      <div class="summary-bar__divider" aria-hidden="true"></div>
+      <div class="summary-stat">
+        <span class="summary-stat__value">${weeklyCount}</span>
+        <span class="summary-stat__label">${weeklyCount === 1 ? 'interaction' : 'interactions'} this week</span>
+      </div>
     </div>
-    <div class="summary-bar__divider" aria-hidden="true"></div>
-    <div class="summary-stat">
-      <span class="summary-stat__value">${weeklyCount}</span>
-      <span class="summary-stat__label">${weeklyCount === 1 ? 'interaction' : 'interactions'} this week</span>
-    </div>
+    ${insightMsg ? `
+    <div class="summary-bar__insight">${insightMsg}</div>
+    ` : ''}
   `;
   screen.appendChild(summaryBar);
 
@@ -411,12 +435,12 @@ function escapeHtml(str) {
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 .dashboard__search-inner:focus-within {
-  border-color: #D4607A;
-  box-shadow: 0 0 0 3px rgba(212,96,122,0.10);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px rgba(200, 168, 130, 0.15);
 }
 .dashboard__search-icon {
   flex-shrink: 0;
-  color: #B0A89E;
+  color: var(--color-text-tertiary);
 }
 .dashboard__search-input {
   flex: 1;
@@ -424,33 +448,46 @@ function escapeHtml(str) {
   border: none;
   outline: none;
   font-size: 15px;
-  color: #1C1410;
+  color: var(--color-text-primary);
   font-family: inherit;
   line-height: 1;
   -webkit-appearance: none;
 }
 .dashboard__search-input::placeholder {
-  color: #C8BDB4;
+  color: var(--color-text-tertiary);
 }
 .dashboard__search-input::-webkit-search-cancel-button { display: none; }
 .dashboard__search-clear {
   background: none;
   border: none;
-  color: #C8BDB4;
+  color: var(--color-text-tertiary);
   cursor: pointer;
-  padding: 2px;
+  padding: 8px;
   display: flex;
   align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   transition: color 0.15s;
+  min-width: 44px;
+  min-height: 44px;
+  margin: -8px;
 }
-.dashboard__search-clear:hover { color: #7A6E68; }
+.dashboard__search-clear:hover { color: var(--color-text-secondary); }
+.dashboard__search-clear:active { color: var(--color-text-primary); }
 .dashboard__no-results {
   padding: 40px 20px;
   text-align: center;
 }
-.empty-state--compact .empty-state__icon { font-size: 24px; opacity: 0.35; margin-bottom: 8px; }
-.empty-state--compact .empty-state__body { font-size: 14px; }
+.empty-state--compact .empty-state__icon {
+  font-size: 24px;
+  opacity: 0.4;
+  margin-bottom: 8px;
+  color: var(--color-text-tertiary);
+}
+.empty-state--compact .empty-state__body {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
   `;
   document.head.appendChild(style);
 })();
