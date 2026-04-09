@@ -937,9 +937,9 @@ function _renderInsightsHome() {
 
         ${persons.length === 0 ? `
           <div class="insights-empty">
-            <div class="insights-empty-icon">◎</div>
-            <p class="insights-empty-text">No data yet. Add someone and start logging.</p>
-            <button class="btn btn--primary" onclick="navigate('dashboard')">Go to Home</button>
+            <div class="insights-empty-icon">🔍</div>
+            <p class="insights-empty-text">Patterns only emerge with data. Start tracking someone and your insights will build here.</p>
+            <button class="btn btn--primary" onclick="navigate('dashboard')">Start tracking →</button>
           </div>
         ` : `
 
@@ -961,7 +961,7 @@ function _renderInsightsHome() {
 
           ${alertPersons.length > 0 ? `
           <section class="insights-section">
-            <h2 class="insights-section-title">Active alerts</h2>
+            <h2 class="insights-section-title">⚠️ Watch out for</h2>
             <div class="insights-alert-list">
               ${alertPersons.map(({ person, topSignal }) => `
                 <button class="insights-person-btn" onclick="navigate('person',{personId:'${_esc(person.id)}'})">

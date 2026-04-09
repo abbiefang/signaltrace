@@ -859,7 +859,7 @@ textarea:disabled {
   padding: 16px;
   background-color: var(--color-bg-secondary);
   border: 1px solid var(--color-border-light);
-  border-left: 3px solid var(--color-accent);
+  border-left: 3px solid var(--color-border);
   border-radius: var(--radius-lg);
   cursor: pointer;
   transition: var(--transition);
@@ -870,6 +870,17 @@ textarea:disabled {
   min-height: 76px;
   margin: 0 0 8px 0;
   box-shadow: var(--shadow-light);
+}
+
+/* Signal-level accent stripe on left border */
+.person-card:has(.signal-pill--high) {
+  border-left-color: #C17C7C;
+}
+.person-card:has(.signal-pill--medium) {
+  border-left-color: #C8A882;
+}
+.person-card:has(.signal-pill--low) {
+  border-left-color: #7BA89C;
 }
 
 .person-card:active {
