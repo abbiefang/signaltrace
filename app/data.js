@@ -93,6 +93,7 @@ function addPerson(data) {
       ? data.avatar_initial
       : (data.name ? data.name.trim()[0].toUpperCase() : '?'),
     notes: data.notes != null ? data.notes : '',
+    vibeTags: Array.isArray(data.vibeTags) ? data.vibeTags : [],
     createdAt: new Date().toISOString(),
   };
 

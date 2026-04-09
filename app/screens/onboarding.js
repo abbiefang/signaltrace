@@ -81,7 +81,7 @@
       }
 
       .ob-progress-seg.done {
-        background: linear-gradient(135deg, #D4607A, #E8855A);
+        background: var(--gradient-primary);
         width: 24px;
         border-radius: 4px;
       }
@@ -89,7 +89,7 @@
       .ob-skip {
         background: none;
         border: none;
-        color: #B0A89E;
+        color: var(--color-text-tertiary);
         font-size: 14px;
         font-family: inherit;
         cursor: pointer;
@@ -99,13 +99,13 @@
         transition: color 0.2s;
       }
 
-      .ob-skip:hover { color: #7A6E68; }
+      .ob-skip:hover { color: var(--color-text-secondary); }
 
       /* ── Slide 1 hero area ───────────────────────── */
       .ob-hero {
         width: 100%;
         height: 160px;
-        border-radius: 20px;
+        border-radius: var(--radius-xl);
         background: linear-gradient(135deg, #FCEEF1 0%, #FEF3EC 50%, #EEF2FC 100%);
         display: flex;
         align-items: center;
@@ -119,15 +119,15 @@
       .ob-hero-icon {
         font-size: 52px;
         line-height: 1;
-        filter: drop-shadow(0 4px 12px rgba(212,96,122,0.20));
+        filter: drop-shadow(0 4px 12px rgba(212, 96, 122, 0.15));
       }
 
       .ob-hero::before {
         content: '';
         position: absolute;
         inset: 0;
-        background: radial-gradient(circle at 30% 50%, rgba(212,96,122,0.12) 0%, transparent 60%),
-                    radial-gradient(circle at 70% 50%, rgba(232,133,90,0.10) 0%, transparent 60%);
+        background: radial-gradient(circle at 30% 50%, rgba(200, 168, 130, 0.1) 0%, transparent 60%),
+                    radial-gradient(circle at 70% 50%, rgba(232, 133, 90, 0.08) 0%, transparent 60%);
       }
 
       /* ── Viewport + slides ───────────────────────── */
@@ -163,27 +163,34 @@
         font-weight: 600;
         letter-spacing: 0.12em;
         text-transform: uppercase;
-        color: #D4607A;
+        color: var(--color-accent);
         margin: 0 0 14px;
       }
 
       .ob-title {
-        font-size: 30px;
-        font-weight: 400;
-        font-family: 'Instrument Serif', Georgia, serif;
-        color: #1C1410;
-        line-height: 1.15;
+        font-size: 22px;
+        font-weight: 600;
+        font-family: var(--font-serif);
+        color: var(--color-text-primary);
+        line-height: 1.2;
         margin: 0 0 12px;
         letter-spacing: -0.02em;
       }
 
+      /* Ensure serif font loads properly */
+      @supports (font-family: var(--font-serif)) {
+        .ob-title {
+          font-family: var(--font-serif);
+        }
+      }
+
       .ob-subtitle {
         font-size: 16px;
-        color: #7A6E68;
+        color: var(--color-text-secondary);
         line-height: 1.6;
         margin: 0 0 28px;
         font-weight: 400;
-        font-family: 'Inter', -apple-system, sans-serif;
+        font-family: var(--font-family);
       }
 
       /* ── Value props (step 1) ────────────────────── */
@@ -198,10 +205,10 @@
         display: flex;
         align-items: flex-start;
         gap: 14px;
-        background: #FFFFFF;
-        border: 1px solid #EDE6DF;
-        border-radius: 14px;
-        padding: 14px 16px;
+        background: var(--color-bg-secondary);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: 12px 16px;
       }
 
       .ob-prop-icon {
@@ -215,7 +222,7 @@
 
       .ob-prop-text {
         font-size: 14px;
-        color: #4A3E38;
+        color: var(--color-text-secondary);
         line-height: 1.55;
       }
 
@@ -230,30 +237,30 @@
         font-weight: 600;
         letter-spacing: 0.07em;
         text-transform: uppercase;
-        color: #B0A89E;
+        color: var(--color-text-tertiary);
         margin-bottom: 8px;
       }
 
       .ob-input {
         width: 100%;
         box-sizing: border-box;
-        background: #FFFFFF;
-        border: 1px solid #EDE6DF;
-        border-radius: 12px;
-        color: #1C1410;
+        background: var(--color-bg-secondary);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        color: var(--color-text-primary);
         font-size: 16px;
         font-family: inherit;
-        padding: 14px 16px;
+        padding: 12px 16px;
         outline: none;
         transition: border-color 0.2s, box-shadow 0.2s;
         -webkit-appearance: none;
       }
 
-      .ob-input::placeholder { color: #C8BDB4; }
+      .ob-input::placeholder { color: var(--color-text-tertiary); }
 
       .ob-input:focus {
-        border-color: #D4607A;
-        box-shadow: 0 0 0 3px rgba(212,96,122,0.12);
+        border-color: var(--color-accent);
+        box-shadow: 0 0 0 3px rgba(200, 168, 130, 0.15);
       }
 
       /* ── Chip selectors ──────────────────────────── */
@@ -264,13 +271,13 @@
       }
 
       .ob-chip {
-        background: #FFFFFF;
-        border: 1px solid #EDE6DF;
-        border-radius: 999px;
-        color: #7A6E68;
+        background: var(--color-bg-secondary);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-full);
+        color: var(--color-text-secondary);
         font-size: 14px;
         font-family: inherit;
-        padding: 8px 18px;
+        padding: 8px 16px;
         cursor: pointer;
         transition: all 0.18s ease;
         white-space: nowrap;
@@ -278,12 +285,12 @@
       }
 
       .ob-chip:hover {
-        border-color: #C8BDB4;
-        color: #1C1410;
+        border-color: var(--color-accent);
+        color: var(--color-text-primary);
       }
 
       .ob-chip.selected {
-        background: linear-gradient(135deg, #D4607A, #E8855A);
+        background: var(--gradient-primary);
         border-color: transparent;
         color: #fff;
         font-weight: 600;
@@ -297,13 +304,13 @@
       }
 
       .ob-mood-btn {
-        background: #FFFFFF;
-        border: 1px solid #EDE6DF;
-        border-radius: 14px;
-        color: #7A6E68;
+        background: var(--color-bg-secondary);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        color: var(--color-text-secondary);
         font-size: 13px;
         font-family: inherit;
-        padding: 14px 8px;
+        padding: 12px 8px;
         cursor: pointer;
         transition: all 0.18s ease;
         display: flex;
@@ -313,24 +320,24 @@
         -webkit-appearance: none;
       }
 
-      .ob-mood-btn .mood-icon { font-size: 26px; }
+      .ob-mood-btn .mood-icon { font-size: 24px; }
 
       .ob-mood-btn:hover {
-        border-color: #C8BDB4;
-        color: #1C1410;
+        border-color: var(--color-accent);
+        color: var(--color-text-primary);
       }
 
       .ob-mood-btn.selected {
-        background: rgba(212,96,122,0.08);
-        border-color: #D4607A;
-        color: #D4607A;
+        background: rgba(200, 168, 130, 0.1);
+        border-color: var(--color-accent);
+        color: var(--color-accent);
         font-weight: 600;
       }
 
       /* ── Optional label ──────────────────────────── */
       .ob-optional {
         font-size: 11px;
-        color: #C8BDB4;
+        color: var(--color-text-tertiary);
         font-weight: 400;
         letter-spacing: 0;
         text-transform: none;
@@ -345,35 +352,38 @@
       .ob-cta {
         display: block;
         width: 100%;
-        background: linear-gradient(135deg, #D4607A 0%, #E8855A 100%);
+        background: var(--gradient-primary);
         color: #fff;
         border: none;
-        border-radius: 16px;
+        border-radius: var(--radius-lg);
         font-size: 16px;
         font-weight: 600;
         font-family: inherit;
-        padding: 17px 24px;
+        padding: 14px 24px;
         cursor: pointer;
         transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
         letter-spacing: 0.01em;
-        box-shadow: 0 4px 16px rgba(212,96,122,0.30);
+        box-shadow: var(--shadow-cta);
         -webkit-appearance: none;
       }
 
-      .ob-cta:hover { box-shadow: 0 6px 22px rgba(212,96,122,0.40); opacity: 0.95; }
+      .ob-cta:hover {
+        box-shadow: 0 6px 20px rgba(212, 96, 122, 0.35);
+        opacity: 0.95;
+      }
       .ob-cta:active { transform: scale(0.98); }
 
       .ob-cta-secondary {
         background: transparent;
-        border: 1px solid #EDE6DF;
-        color: #B0A89E;
+        border: 1px solid var(--color-border);
+        color: var(--color-text-tertiary);
         margin-top: 10px;
         box-shadow: none;
       }
 
       .ob-cta-secondary:hover {
-        border-color: #C8BDB4;
-        color: #7A6E68;
+        border-color: var(--color-accent);
+        color: var(--color-text-secondary);
         opacity: 1;
         box-shadow: none;
       }
