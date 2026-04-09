@@ -324,9 +324,25 @@ function _buildSignalsSection(signals, totalInteractions) {
     bodyHTML = sorted.map(s => _buildSignalCard(s)).join('');
   }
 
+  // Build signal count summary for the section header
+  let signalSummary = '';
+  if (!notEnough && signals.length > 0) {
+    const highCount = concernSignals.filter(s => s.severity === 'high').length;
+    if (highCount > 0) {
+      signalSummary = `<span class="prf-signal-count prf-signal-count--alert">${highCount} concern${highCount === 1 ? '' : 's'} flagged</span>`;
+    } else if (concernSignals.length > 0) {
+      signalSummary = `<span class="prf-signal-count prf-signal-count--warn">${concernSignals.length} pattern${concernSignals.length === 1 ? '' : 's'} detected</span>`;
+    } else {
+      signalSummary = `<span class="prf-signal-count prf-signal-count--ok">All clear</span>`;
+    }
+  }
+
   return /* html */`
     <section class="prf-section">
-      <h2 class="prf-section-title">What the data says</h2>
+      <div class="prf-section-header">
+        <h2 class="prf-section-title">What the data says</h2>
+        ${signalSummary}
+      </div>
       <div class="prf-signals-list">
         ${bodyHTML}
       </div>
@@ -1350,6 +1366,18 @@ function _ensureStyles() {
 .prf-severity--medium { background: rgba(192,128,48,0.10);  color: #C08030; border: 1px solid rgba(192,128,48,0.22); }
 .prf-severity--low    { background: rgba(158,152,144,0.12); color: #7A6E68; border: 1px solid rgba(158,152,144,0.25); }
 .prf-severity--green  { background: rgba(58,148,104,0.10);  color: #2A8050; border: 1px solid rgba(58,148,104,0.22); }
+
+/* Signal count badge in section header */
+.prf-signal-count {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  margin-left: auto;
+}
+.prf-signal-count--alert { background: rgba(196,64,64,0.10); color: #C44040; border: 1px solid rgba(196,64,64,0.22); }
+.prf-signal-count--warn  { background: rgba(192,128,48,0.10); color: #C08030; border: 1px solid rgba(192,128,48,0.22); }
+.prf-signal-count--ok    { background: rgba(58,148,104,0.10); color: #2A8050; border: 1px solid rgba(58,148,104,0.22); }
 
 .prf-signal-desc {
   font-size: 12px;

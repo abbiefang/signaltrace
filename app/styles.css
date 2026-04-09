@@ -2591,3 +2591,34 @@ input[type="date"].ob-input::-webkit-calendar-picker-indicator {
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
+
+/* ─────────────────────────────────────────────────────────────────────────
+   ACCESSIBILITY — Focus visible & Touch targets
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Keyboard focus ring — only visible when navigating by keyboard/tab */
+:focus-visible {
+  outline: 2px solid var(--color-accent, #8FA89F);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Remove focus ring for mouse/touch interactions */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Ensure minimum 44×44px touch targets on interactive elements that aren't already sized */
+.nav-tab,
+.ob-step__btn,
+.btn,
+button:not(.pf-avatar-btn):not([class*="nav-"]) {
+  min-height: 44px;
+}
+
+/* Prevent accidental text selection on tap */
+button {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}

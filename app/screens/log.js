@@ -1217,6 +1217,14 @@ function _handleSubmit(e) {
   } else {
     if (typeof addInteraction === 'function') {
       const saved = addInteraction(interactionData);
+      if (saved === null) {
+        // Storage failed (quota exceeded or unavailable)
+        _showError('Could not save — your storage may be full. Try clearing some data in Settings.');
+        // Re-enable save button so user can try again
+        const saveBtn = document.getElementById('log-save-btn');
+        if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = 'Save'; }
+        return;
+      }
       savedId = saved?.id ?? null;
     } else {
       console.warn('[SignalTrace/log] addInteraction() not found — check data.js load order.');

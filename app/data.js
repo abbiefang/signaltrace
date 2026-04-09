@@ -84,6 +84,9 @@ var INTERACTIONS_KEY = 'signaltrace_interactions';
 // ---------------------------------------------------------------------------
 
 function addPerson(data) {
+  // Guard: name is required and must be non-empty
+  if (!data || !data.name || !data.name.trim()) return null;
+
   var persons = readStore(PERSONS_KEY);
 
   var person = {
@@ -150,7 +153,9 @@ function deletePerson(id) {
   var filtered = persons.filter(function(p) { return p.id !== id; });
   if (filtered.length === persons.length) return false;
 
-  writeStore(PERSONS_KEY, filtered);
+  // Guard: only delete interactions if person write succeeds
+  var ok = writeStore(PERSONS_KEY, filtered);
+  if (!ok) return false;
 
   var interactions = readStore(INTERACTIONS_KEY);
   writeStore(INTERACTIONS_KEY, interactions.filter(function(i) { return i.personId !== id; }));
@@ -163,11 +168,14 @@ function deletePerson(id) {
 // ---------------------------------------------------------------------------
 
 function addInteraction(data) {
+  // Guard: personId is required
+  if (!data || !data.personId) return null;
+
   var interactions = readStore(INTERACTIONS_KEY);
 
   var interaction = {
     id: generateId(),
-    personId: data.personId != null ? data.personId : '',
+    personId: data.personId,
     date: data.date != null ? data.date : new Date().toISOString().slice(0, 10),
     type: data.type != null ? data.type : 'text',
     initiatedBy: data.initiatedBy != null ? data.initiatedBy : 'mutual',
@@ -181,15 +189,20 @@ function addInteraction(data) {
   };
 
   interactions.push(interaction);
-  writeStore(INTERACTIONS_KEY, interactions);
-  return interaction;
+  var ok = writeStore(INTERACTIONS_KEY, interactions);
+  return ok ? interaction : null;
 }
 
 function getInteractions(personId) {
   var interactions = readStore(INTERACTIONS_KEY);
   return interactions
     .filter(function(i) { return i.personId === personId; })
-    .sort(function(a, b) { return b.date.localeCompare(a.date); });
+    .sort(function(a, b) {
+      // Guard against null/undefined date fields
+      var da = b.date || b.createdAt || '';
+      var db = a.date || a.createdAt || '';
+      return da.localeCompare(db);
+    });
 }
 
 function getInteraction(id) {
@@ -304,23 +317,25 @@ function detectSignals(personId) {
     });
   }
 
-  // Initiation imbalance
-  if (stats.initiatedByMePct > 80) {
-    signals.push({
-      personId: personId,
-      type: 'initiation_imbalance',
-      severity: 'high',
-      message: 'You initiated ' + stats.initiatedByMePct + '% of interactions. They are not meeting you halfway.',
-      detectedAt: now,
-    });
-  } else if (stats.initiatedByMePct > 60) {
-    signals.push({
-      personId: personId,
-      type: 'initiation_imbalance',
-      severity: 'medium',
-      message: 'You initiated ' + stats.initiatedByMePct + '% of interactions. Watch whether this balances out.',
-      detectedAt: now,
-    });
+  // Initiation imbalance — only flag with enough data and higher thresholds
+  if (stats.totalInteractions >= 4) {
+    if (stats.initiatedByMePct > 80) {
+      signals.push({
+        personId: personId,
+        type: 'initiation_imbalance',
+        severity: 'high',
+        message: 'You initiated ' + stats.initiatedByMePct + '% of interactions. They are not meeting you halfway.',
+        detectedAt: now,
+      });
+    } else if (stats.initiatedByMePct > 70) {
+      signals.push({
+        personId: personId,
+        type: 'initiation_imbalance',
+        severity: 'medium',
+        message: 'You initiated ' + stats.initiatedByMePct + '% of interactions. Watch whether this balances out.',
+        detectedAt: now,
+      });
+    }
   }
 
   // Response time pattern
@@ -342,17 +357,32 @@ function detectSignals(personId) {
     });
   }
 
-  // Red flag accumulation
+  // Red flag accumulation — temporal weighting: recent red flags (30 days) trigger high severity
   var totalRedFlags = interactions.reduce(function(sum, i) {
     return sum + (i.redFlags ? i.redFlags.length : 0);
   }, 0);
 
-  if (totalRedFlags >= 3) {
+  var thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  var recentRedFlags = interactions.reduce(function(sum, i) {
+    var isRecent = i.date && new Date(i.date) >= thirtyDaysAgo;
+    return sum + (isRecent && i.redFlags ? i.redFlags.length : 0);
+  }, 0);
+
+  if (recentRedFlags >= 3) {
     signals.push({
       personId: personId,
       type: 'red_flag_accumulation',
       severity: 'high',
-      message: totalRedFlags + ' red flags logged across ' + stats.totalInteractions + ' interactions. Review before proceeding.',
+      message: recentRedFlags + ' red flags in the last 30 days. Take a step back.',
+      detectedAt: now,
+    });
+  } else if (totalRedFlags >= 3) {
+    signals.push({
+      personId: personId,
+      type: 'red_flag_accumulation',
+      severity: 'medium',
+      message: totalRedFlags + ' total red flags logged. Worth reviewing the pattern.',
       detectedAt: now,
     });
   }

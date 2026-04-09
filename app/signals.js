@@ -167,9 +167,10 @@
       }
     }
 
-    if (cv < 0.7 && !burstThenGapThenBurst) return null;
+    // Raised threshold from 0.7 → 1.0 to reduce false positives on natural scheduling variation
+    if (cv < 1.0 && !burstThenGapThenBurst) return null;
 
-    const severity = cv > 1.2 || burstThenGapThenBurst ? 'high' : 'medium';
+    const severity = cv > 1.5 || burstThenGapThenBurst ? 'high' : 'medium';
     const maxGap = Math.max(...gaps).toFixed(1);
     const minGap = Math.min(...gaps).toFixed(1);
 
@@ -200,9 +201,10 @@
     const myInitiations = tagged.filter((i) => i.initiatedBy === 'me').length;
     const myRatio = myInitiations / tagged.length;
 
-    if (myRatio < 0.75) return null;
+    // Raised minimum from 0.75 → 0.80 and medium threshold from 0.82 → 0.85 to reduce noise
+    if (myRatio < 0.80) return null;
 
-    const severity = myRatio >= 0.9 ? 'high' : myRatio >= 0.82 ? 'medium' : 'low';
+    const severity = myRatio >= 0.9 ? 'high' : myRatio >= 0.85 ? 'medium' : 'low';
     const pct = Math.round(myRatio * 100);
 
     return makeSignal(
@@ -319,10 +321,11 @@
     }
     const oscRatio = oscillations / (scores.length - 2 || 1);
 
-    if (explicitCount < 2 && oscRatio < 0.4) return null;
+    // Raised thresholds: require more explicit evidence before flagging
+    if (explicitCount < 2 && oscRatio < 0.5) return null;
 
     const severity =
-      explicitCount >= 3 || oscRatio >= 0.6 ? 'high' : 'medium';
+      explicitCount >= 3 || oscRatio >= 0.7 ? 'high' : 'medium';
 
     let desc;
     if (explicitCount >= 2) {
@@ -435,7 +438,7 @@
     const avgRT = withRT.length >= 3 ? mean(withRT.map((i) => i._rtNum)) : null;
 
     // Requires high initiation imbalance AND evidence of low effort from them
-    const highInitiation = myRatio >= 0.75;
+    const highInitiation = myRatio >= 0.80;
     const slowResponse = avgRT !== null && avgRT > 180; // > 3 hours average
 
     if (!highInitiation) return null;
