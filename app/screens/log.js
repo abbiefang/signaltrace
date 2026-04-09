@@ -1451,7 +1451,7 @@ function _ensureScreenshotStyles() {
       justify-content: center;
       gap: 6px;
       padding: 18px 16px;
-      border: 1.5px dashed rgba(255,255,255,0.15);
+      border: 1.5px dashed rgba(0,0,0,0.15);
       border-radius: 12px;
       cursor: pointer;
       transition: border-color 0.2s, background 0.2s;
@@ -1460,25 +1460,25 @@ function _ensureScreenshotStyles() {
 
     .log-ss-dropzone:hover,
     .log-ss-dropzone--dragover {
-      border-color: rgba(233,69,96,0.5);
-      background: rgba(233,69,96,0.04);
+      border-color: rgba(200,168,130,0.6);
+      background: rgba(200,168,130,0.06);
     }
 
     .log-ss-dropzone svg {
       width: 22px;
       height: 22px;
-      color: rgba(240,238,255,0.3);
+      color: #BBBBBB;
     }
 
     .log-ss-dropzone__label {
       font-size: 13px;
       font-weight: 600;
-      color: rgba(240,238,255,0.5);
+      color: #888888;
     }
 
     .log-ss-dropzone__hint {
       font-size: 11px;
-      color: rgba(240,238,255,0.25);
+      color: #AAAAAA;
     }
 
   `;

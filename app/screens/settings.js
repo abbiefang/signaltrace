@@ -232,11 +232,11 @@ function _showToast(message) {
   const toast = document.createElement('div');
   toast.style.cssText = `
     position: fixed; bottom: 96px; left: 50%; transform: translateX(-50%);
-    background: rgba(30,28,46,0.95); color: rgba(240,238,248,0.85);
+    background: rgba(43,43,43,0.92); color: rgba(255,255,255,0.92);
     font-size: 13px; font-family: inherit; font-weight: 500;
     padding: 10px 18px; border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.1);
-    box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.12);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.2);
     z-index: 2000; white-space: nowrap;
     animation: st-fadein 0.2s ease;
   `;
@@ -265,8 +265,8 @@ function _ensureSettingsStyles() {
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  background: var(--color-bg, #12101c);
-  color: var(--color-text, #f0eef8);
+  background: var(--color-bg, #FAFAF9);
+  color: var(--color-text, #2B2B2B);
   font-family: var(--font-base, 'Inter', -apple-system, 'Helvetica Neue', sans-serif);
   -webkit-font-smoothing: antialiased;
 }
@@ -276,13 +276,13 @@ function _ensureSettingsStyles() {
   display: flex;
   align-items: center;
   padding: 14px 16px 10px;
-  border-bottom: 1px solid rgba(255,255,255,0.06);
+  border-bottom: 1px solid #EEEEEE;
 }
 
 .st-header-title {
   font-size: 20px;
   font-weight: 800;
-  color: #f0eef8;
+  color: #2B2B2B;
   letter-spacing: -0.5px;
 }
 
@@ -304,7 +304,7 @@ function _ensureSettingsStyles() {
   font-weight: 700;
   letter-spacing: 0.8px;
   text-transform: uppercase;
-  color: rgba(240,238,248,0.32);
+  color: #AAAAAA;
   padding: 0 16px 8px;
 }
 
@@ -315,7 +315,7 @@ function _ensureSettingsStyles() {
   justify-content: space-between;
   padding: 14px 16px;
   gap: 12px;
-  border-bottom: 1px solid rgba(255,255,255,0.04);
+  border-bottom: 1px solid rgba(0,0,0,0.05);
   background: none;
   border-left: none;
   border-right: none;
@@ -333,11 +333,11 @@ function _ensureSettingsStyles() {
 }
 
 .st-row--btn:hover {
-  background: rgba(255,255,255,0.04);
+  background: rgba(0,0,0,0.03);
 }
 
 .st-row--btn:active {
-  background: rgba(255,255,255,0.07);
+  background: rgba(0,0,0,0.06);
 }
 
 .st-row-left {
@@ -363,28 +363,28 @@ function _ensureSettingsStyles() {
 .st-row-title {
   font-size: 14px;
   font-weight: 500;
-  color: #f0eef8;
+  color: #2B2B2B;
   line-height: 1.4;
 }
 
 .st-row--danger .st-row-title {
-  color: #f87171;
+  color: #C17C7C;
 }
 
 .st-row-desc {
   font-size: 12px;
-  color: rgba(240,238,248,0.4);
+  color: #888888;
   line-height: 1.5;
   margin-top: 2px;
 }
 
 .st-row-chevron {
   flex-shrink: 0;
-  color: rgba(240,238,248,0.22);
+  color: #CCCCCC;
 }
 
 .st-row-chevron--danger {
-  color: rgba(248,113,113,0.35);
+  color: rgba(193,124,124,0.5);
 }
 
 @keyframes st-fadein {
