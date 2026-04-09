@@ -34,10 +34,16 @@
    CONSTANTS
 ───────────────────────────────────────────────────────────────────────────── */
 
-/** Avatar background colours — deterministic per name (same palette as dashboard). */
+/** Avatar background colours — deterministic per name (same muted palette as dashboard). */
 const PRF_AVATAR_PALETTE = [
-  '#9E6B8A', '#6B7BA8', '#8A9B6B', '#A87B6B',
-  '#6B98A8', '#A8886B', '#7D6BA8', '#6BA89E',
+  '#8B6B4A',   // deep brown
+  '#4A6B5A',   // moss green
+  '#6B4A6B',   // deep plum
+  '#6B5A3A',   // tobacco brown
+  '#3A5A6B',   // steel blue
+  '#6B3A4A',   // deep rose
+  '#4A5A3A',   // olive
+  '#5A3A6B',   // dark violet
 ];
 
 /** Platform display map: value → { emoji, label }. */
@@ -1085,14 +1091,14 @@ function _ensureStyles() {
 .prf-avatar {
   width: 72px;
   height: 72px;
-  border-radius: 20px;
+  border-radius: 14px;   /* square-rounded, matches dashboard */
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 28px;
   font-weight: 700;
-  color: #fff;
-  text-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  color: #F5F0E8;   /* warm parchment — always legible on muted dark bg */
+  text-shadow: 0 1px 4px rgba(0,0,0,0.18);
   flex-shrink: 0;
   box-shadow: 0 4px 16px rgba(0,0,0,0.12);
 }
@@ -1807,13 +1813,13 @@ function _ensureStyles() {
 /* ── Photo avatar ── */
 .prf-avatar--photo {
   overflow: hidden;
-  border-radius: 20px;
+  border-radius: 14px;
 }
 .prf-avatar--photo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  border-radius: 20px;
+  border-radius: 14px;
   display: block;
 }
 

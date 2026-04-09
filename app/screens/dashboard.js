@@ -35,28 +35,28 @@ function formatRelativeTime(timestamp) {
 }
 
 /**
- * Derive a gradient background for a letter avatar from a name string.
- * Returns one of 8 warm gradient pairs — consistent per name.
+ * Derive a flat background colour for a letter avatar from a name string.
+ * Uses a restrained dark palette — text is always warm parchment (#F5F0E8).
  * @param {string} name
- * @returns {string} CSS gradient string
+ * @returns {string} CSS colour string
  */
 function avatarColour(name) {
-  const gradients = [
-    'linear-gradient(135deg, #E8907A, #D4607A)',   // rose-peach
-    'linear-gradient(135deg, #9B8EC4, #C4A0D4)',   // lavender-mauve
-    'linear-gradient(135deg, #7AB8A8, #4E9E8C)',   // teal-sage
-    'linear-gradient(135deg, #E8C07A, #D4905A)',   // golden-amber
-    'linear-gradient(135deg, #8EAAD4, #6B8EC8)',   // periwinkle
-    'linear-gradient(135deg, #D4907A, #C47060)',   // terracotta
-    'linear-gradient(135deg, #A8C47A, #7AAB60)',   // fresh green
-    'linear-gradient(135deg, #C490B8, #A870A0)',   // dusty orchid
+  const AVATAR_COLORS = [
+    '#8B6B4A',   // deep brown
+    '#4A6B5A',   // moss green
+    '#6B4A6B',   // deep plum
+    '#6B5A3A',   // tobacco brown
+    '#3A5A6B',   // steel blue
+    '#6B3A4A',   // deep rose
+    '#4A5A3A',   // olive
+    '#5A3A6B',   // dark violet
   ];
-  if (!name) return gradients[0];
+  if (!name) return AVATAR_COLORS[0];
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   }
-  return gradients[Math.abs(hash) % gradients.length];
+  return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
 }
 
 /**
@@ -66,11 +66,11 @@ function avatarColour(name) {
  */
 function signalLevelMeta(level) {
   switch (level) {
-    case 'high':   return { label: 'Strong signals',   cls: 'signal-pill--high'   };
-    case 'medium': return { label: 'Mixed signals',    cls: 'signal-pill--medium' };
-    case 'low':    return { label: 'Weak signals',     cls: 'signal-pill--low'    };
+    case 'high':   return { label: 'Worth attention',  cls: 'signal-pill--high'   };
+    case 'medium': return { label: 'Something's there', cls: 'signal-pill--medium' };
+    case 'low':    return { label: 'Looking okay',     cls: 'signal-pill--low'    };
     case 'none':
-    default:       return { label: 'No signals yet',   cls: 'signal-pill--none'   };
+    default:       return { label: 'No data yet',      cls: 'signal-pill--none'   };
   }
 }
 
@@ -95,22 +95,25 @@ function renderPersonCard(person) {
   card.setAttribute('aria-label', `View ${person.label}`);
 
   card.innerHTML = `
-    <div class="person-card__avatar" style="background:${colour};" aria-hidden="true">
+    <div class="person-card__avatar"
+         style="background:${colour}; border-radius:14px; color:#F5F0E8;"
+         aria-hidden="true">
       ${initial}
     </div>
 
     <div class="person-card__body">
-      <div class="person-card__name">${escapeHtml(person.label || person.name)}</div>
-      <div class="person-card__meta">
-        <span class="person-card__platform">${escapeHtml(person.platform || 'Unknown')}</span>
-        <span class="person-card__dot" aria-hidden="true">·</span>
+      <div class="person-card__name-row">
+        <span class="person-card__name">${escapeHtml(person.label || person.name)}</span>
+        <span class="person-card__platform-sub">${escapeHtml(person.platform || 'Unknown')}</span>
+      </div>
+      <div class="person-card__footer-row">
         <span class="person-card__time">${escapeHtml(relativeTime)}</span>
+        <span class="signal-pill ${signalCls}">${signalLabel}</span>
       </div>
     </div>
 
-    <div class="person-card__aside">
-      <span class="signal-pill ${signalCls}">${signalLabel}</span>
-    </div>
+    <div class="person-card__signal-stripe person-card__signal-stripe--${signalSummary.level}"
+         aria-hidden="true"></div>
   `;
 
   card.addEventListener('click', () => {
@@ -131,13 +134,12 @@ function renderEmptyState() {
   wrapper.innerHTML = `
     <div class="empty-state">
       <div class="empty-state__icon" aria-hidden="true">◎</div>
-      <h2 class="empty-state__heading">Nothing tracked yet</h2>
+      <h2 class="empty-state__heading">Your board is empty.</h2>
       <p class="empty-state__body">
-        Add someone you're seeing and start building a clear picture
-        of what's actually happening.
+        Add someone worth watching.
       </p>
       <button class="btn btn--primary" id="empty-add-btn" type="button">
-        Add your first person
+        Add someone
       </button>
     </div>
   `;
@@ -198,7 +200,7 @@ function renderDashboard() {
   const header = document.createElement('header');
   header.className = 'dashboard__header';
   header.innerHTML = `
-    <div class="dashboard__logo" style="font-family:'DM Serif Display',Georgia,serif;font-size:26px;font-weight:400;letter-spacing:-0.01em;color:#1C1410;">SignalTrace</div>
+    <div class="dashboard__logo" style="font-family:'Instrument Serif',Georgia,serif;font-size:28px;font-weight:400;letter-spacing:-0.04em;color:#1C1410;">SignalTrace</div>
     <button
       class="dashboard__settings-btn icon-btn"
       type="button"

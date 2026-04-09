@@ -169,7 +169,8 @@
 
       .ob-title {
         font-size: 30px;
-        font-weight: 700;
+        font-weight: 400;
+        font-family: 'Instrument Serif', Georgia, serif;
         color: #1C1410;
         line-height: 1.15;
         margin: 0 0 12px;
@@ -179,9 +180,10 @@
       .ob-subtitle {
         font-size: 16px;
         color: #7A6E68;
-        line-height: 1.55;
+        line-height: 1.6;
         margin: 0 0 28px;
         font-weight: 400;
+        font-family: 'Inter', -apple-system, sans-serif;
       }
 
       /* ── Value props (step 1) ────────────────────── */
@@ -401,21 +403,21 @@
         </div>
 
         <p class="ob-eyebrow">SignalTrace</p>
-        <h1 class="ob-title">Track what actually<br>happens.</h1>
-        <p class="ob-subtitle">See the patterns. Trust yourself.</p>
+        <h1 class="ob-title">You already know<br>something's off.</h1>
+        <p class="ob-subtitle">Let's figure out what.</p>
 
         <div class="ob-props">
           <div class="ob-prop">
             <span class="ob-prop-icon" aria-hidden="true">📝</span>
-            <span class="ob-prop-text">Log interactions as they happen — not after you've already made up your mind.</span>
+            <span class="ob-prop-text">Log it when it happens — before you've already talked yourself out of what you noticed.</span>
           </div>
           <div class="ob-prop">
             <span class="ob-prop-icon" aria-hidden="true">📊</span>
-            <span class="ob-prop-text">Spot patterns before they become problems. Initiation gaps. Response times. Consistency.</span>
+            <span class="ob-prop-text">Patterns show up over time. Who initiates. How often. Whether anything actually changed.</span>
           </div>
           <div class="ob-prop">
             <span class="ob-prop-icon" aria-hidden="true">🔍</span>
-            <span class="ob-prop-text">Data, not feelings. Clarity, not confusion. This is just for you.</span>
+            <span class="ob-prop-text">This is just for you. No one else sees it.</span>
           </div>
         </div>
       </div>
@@ -426,8 +428,8 @@
     const platforms = ['Hinge', 'Bumble', 'Tinder', 'IRL', 'Instagram', 'Other'];
     return `
       <div class="ob-slide" id="ob-slide-2" role="tabpanel" aria-label="Step 2 of 3">
-        <h2 class="ob-title">Who are you keeping<br>an eye on?</h2>
-        <p class="ob-subtitle">Start with one person. You can add more later.</p>
+        <h2 class="ob-title">Who's on<br>your radar?</h2>
+        <p class="ob-subtitle">One person to start. That's enough.</p>
 
         <div class="ob-field">
           <label class="ob-label" for="ob-name">Name or nickname</label>
@@ -486,7 +488,7 @@
     return `
       <div class="ob-slide" id="ob-slide-3" role="tabpanel" aria-label="Step 3 of 3">
         <h2 class="ob-title">What's the last thing<br>that happened?</h2>
-        <p class="ob-subtitle">Be honest. This is just for you.</p>
+        <p class="ob-subtitle">Just be honest. No one's watching.</p>
 
         <div class="ob-field">
           <label class="ob-label" for="ob-date">When</label>
