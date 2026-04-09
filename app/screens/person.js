@@ -737,7 +737,7 @@ function _ensureStyles() {
       color: #B0A89E;
     }
 
-    .pf-required { color: #D4607A; }
+    .pf-required { color: #C17C7C; }
 
     .pf-optional {
       font-weight: 400;
@@ -766,8 +766,8 @@ function _ensureStyles() {
     .pf-input::placeholder { color: #C8BDB4; }
 
     .pf-input:focus {
-      border-color: #D4607A;
-      box-shadow: 0 0 0 3px rgba(212,96,122,0.12);
+      border-color: #C8A882;
+      box-shadow: 0 0 0 3px rgba(200,168,130,0.15);
     }
 
     .pf-textarea {
@@ -843,16 +843,16 @@ function _ensureStyles() {
     }
 
     .pf-platform-chip:hover {
-      border-color: #D4607A;
-      box-shadow: 0 2px 8px rgba(212,96,122,0.12);
+      border-color: #C8A882;
+      box-shadow: 0 2px 8px rgba(200,168,130,0.15);
     }
 
     .pf-platform-chip:active { transform: scale(0.96); }
 
     .pf-platform-chip--selected {
-      background: #F3EDF8;
-      border-color: #B090C8;
-      box-shadow: 0 2px 8px rgba(176,144,200,0.18);
+      background: rgba(200,168,130,0.12);
+      border-color: #C8A882;
+      box-shadow: 0 2px 8px rgba(200,168,130,0.18);
     }
 
     .pf-platform-emoji {
@@ -869,7 +869,7 @@ function _ensureStyles() {
       white-space: nowrap;
     }
 
-    .pf-platform-chip--selected .pf-platform-label { color: #7050A0; }
+    .pf-platform-chip--selected .pf-platform-label { color: #8A7055; }
 
     /* ── Vibe tags — rounded gradient chips ── */
 
@@ -896,14 +896,14 @@ function _ensureStyles() {
     }
 
     .pf-vibe-chip:hover {
-      border-color: #B090C8;
-      color: #7050A0;
+      border-color: #C8A882;
+      color: #8A7055;
     }
 
     .pf-vibe-chip:active { transform: scale(0.97); }
 
     .pf-vibe-chip--selected {
-      background: linear-gradient(135deg, #D4607A, #E8855A);
+      background: linear-gradient(135deg, #C8A882, #B8946E);
       border-color: transparent;
       color: #fff;
       font-weight: 600;
@@ -956,7 +956,7 @@ function _ensureStyles() {
       width: 100%;
       padding: 16px;
       border-radius: 16px;
-      background: linear-gradient(135deg, #D4607A 0%, #E8855A 100%);
+      background: linear-gradient(135deg, #C8A882 0%, #B8946E 100%);
       color: #fff;
       font-size: 16px;
       font-weight: 700;
@@ -965,10 +965,10 @@ function _ensureStyles() {
       letter-spacing: 0.2px;
       transition: opacity 0.2s, transform 0.15s, box-shadow 0.2s;
       font-family: inherit;
-      box-shadow: 0 4px 16px rgba(212,96,122,0.30);
+      box-shadow: 0 4px 16px rgba(200,168,130,0.35);
     }
 
-    .pf-submit-btn:hover  { box-shadow: 0 6px 22px rgba(212,96,122,0.40); }
+    .pf-submit-btn:hover  { box-shadow: 0 6px 22px rgba(200,168,130,0.45); }
     .pf-submit-btn:active { transform: scale(0.98); }
 
     .pf-submit-btn:disabled {

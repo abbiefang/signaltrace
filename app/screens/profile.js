@@ -1278,14 +1278,14 @@ function _ensureStyles() {
 
 .prf-initiation-fill--them {
   height: 100%;
-  background: linear-gradient(90deg, #B090C8, #D4607A);
+  background: linear-gradient(90deg, #8FA89F, #C8A882);
   border-radius: 9999px 0 0 9999px;
   transition: width 0.4s ease;
 }
 
 .prf-initiation-fill--me {
   height: 100%;
-  background: linear-gradient(90deg, #E8855A, #D4607A);
+  background: linear-gradient(90deg, #C8A882, #B8946E);
   border-radius: 0 9999px 9999px 0;
   transition: width 0.4s ease;
 }
@@ -1670,9 +1670,9 @@ function _ensureStyles() {
   margin-top: 14px;
   padding: 12px;
   border-radius: 12px;
-  background: rgba(212,96,122,0.06);
-  border: 1.5px dashed rgba(212,96,122,0.30);
-  color: #D4607A;
+  background: rgba(200,168,130,0.06);
+  border: 1.5px dashed rgba(200,168,130,0.35);
+  color: #A07848;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -1681,8 +1681,8 @@ function _ensureStyles() {
 }
 
 .prf-log-btn:hover {
-  background: rgba(212,96,122,0.10);
-  border-color: rgba(212,96,122,0.50);
+  background: rgba(200,168,130,0.12);
+  border-color: rgba(200,168,130,0.55);
 }
 
 /* ── Danger zone ── */
