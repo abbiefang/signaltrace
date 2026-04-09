@@ -75,12 +75,10 @@ const SCREENS = {
     hideNav: false,
   },
 
-  // Settings — redirect to profile until a proper settings screen is built
+  // Settings
   settings: {
-    render: () => {
-      navigate('profile', { replace: true });
-    },
-    navTab: 'profile',
+    render: () => typeof renderSettings === 'function' && renderSettings(),
+    navTab: 'settings',
     hideNav: false,
   },
 };
@@ -110,10 +108,13 @@ function navigate(screenName, params = {}) {
 
   // Update state
   updateState({
-    currentScreen: screenName,
+    currentScreen:   screenName,
     currentPersonId: params.personId ?? (screenName === 'person' ? AppState.currentPersonId : null),
-    logContext: params.logContext ?? (screenName === 'log' ? AppState.logContext : null),
-    navVisible: !screenDef.hideNav,
+    // editPersonId is scoped to 'add-person': carried forward only when explicitly passed,
+    // cleared on every other screen transition so add-person always opens fresh.
+    editPersonId:    screenName === 'add-person' ? (params.editPersonId || null) : AppState.editPersonId,
+    logContext:      params.logContext ?? (screenName === 'log' ? AppState.logContext : null),
+    navVisible:      !screenDef.hideNav,
   });
 
   // Update History API
@@ -330,6 +331,9 @@ document.addEventListener('click', (e) => {
       break;
     case 'profile':
       navigate('profile');
+      break;
+    case 'settings':
+      navigate('settings');
       break;
   }
 });

@@ -66,7 +66,12 @@ function readStore(key) {
 }
 
 function writeStore(key, data) {
-  localStorage.setItem(key, JSON.stringify(data));
+  try {
+    localStorage.setItem(key, JSON.stringify(data));
+  } catch (err) {
+    // localStorage may be full (QuotaExceededError) or unavailable (private mode)
+    console.error('[SignalTrace] writeStore failed for key "' + key + '":', err);
+  }
 }
 
 var PERSONS_KEY = 'signaltrace_persons';

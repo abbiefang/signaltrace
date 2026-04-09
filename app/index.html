@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-  <meta name="theme-color" content="#12101c" />
+  <meta name="theme-color" content="#FBF8F5" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
   <meta name="apple-mobile-web-app-title" content="SignalTrace" />
   <meta name="description" content="Turn messy dating signals into clear judgment." />
 
@@ -17,6 +17,11 @@
   <link rel="icon" type="image/png" href="icons/icon-192.png" />
 
   <title>SignalTrace</title>
+
+  <!-- Google Fonts: DM Sans (body) + DM Serif Display (headings) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="styles.css" />
 </head>
@@ -58,6 +63,11 @@
       <!-- Rendered by screens/person.js (renderAddPerson / renderEditPerson) -->
     </div>
 
+    <!-- ── SCREEN: Settings ──────────────────── -->
+    <div class="screen" id="screen-settings" data-screen="settings" aria-hidden="true">
+      <!-- Rendered by screens/settings.js -->
+    </div>
+
     <!-- ── BOTTOM NAVIGATION ──────────────────── -->
     <nav id="bottom-nav" aria-label="Main navigation">
 
@@ -68,13 +78,19 @@
         aria-current="false"
         type="button"
       >
-        <!-- Home icon -->
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-             aria-hidden="true">
-          <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/>
-          <polyline points="9 21 9 13 15 13 15 21"/>
-        </svg>
+        <span class="nav-tab__pill">
+          <!-- Home icon — filled when active -->
+          <svg class="nav-icon nav-icon--outline" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <path d="M3 9.5L12 3l9 6.5V20a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9.5z"/>
+            <polyline points="9 21 9 13 15 13 15 21"/>
+          </svg>
+          <svg class="nav-icon nav-icon--filled" viewBox="0 0 24 24" fill="currentColor" stroke="none"
+               aria-hidden="true">
+            <path d="M12 2.1L2.5 9.4V21a1 1 0 0 0 1 1h6v-7h5v7h6a1 1 0 0 0 1-1V9.4L12 2.1z"/>
+          </svg>
+        </span>
         <span class="nav-label">Home</span>
       </button>
 
@@ -84,13 +100,15 @@
         aria-label="Add entry"
         type="button"
       >
-        <!-- Plus icon -->
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-             aria-hidden="true">
-          <line x1="12" y1="5" x2="12" y2="19"/>
-          <line x1="5" y1="12" x2="19" y2="12"/>
-        </svg>
+        <span class="nav-tab__pill nav-tab__pill--add">
+          <!-- Plus icon -->
+          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+        </span>
         <span class="nav-label">Add</span>
       </button>
 
@@ -101,17 +119,51 @@
         aria-current="false"
         type="button"
       >
-        <!-- Signal / insights icon -->
-        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-             stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-             aria-hidden="true">
-          <circle cx="12" cy="12" r="2"/>
-          <path d="M6.3 6.3a8 8 0 0 0 0 11.4"/>
-          <path d="M17.7 6.3a8 8 0 0 1 0 11.4"/>
-          <path d="M3.5 3.5a13.5 13.5 0 0 0 0 17"/>
-          <path d="M20.5 3.5a13.5 13.5 0 0 1 0 17"/>
-        </svg>
+        <span class="nav-tab__pill">
+          <!-- Signal / insights icon — outline -->
+          <svg class="nav-icon nav-icon--outline" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <circle cx="12" cy="12" r="2"/>
+            <path d="M6.3 6.3a8 8 0 0 0 0 11.4"/>
+            <path d="M17.7 6.3a8 8 0 0 1 0 11.4"/>
+          </svg>
+          <!-- filled variant -->
+          <svg class="nav-icon nav-icon--filled" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <circle cx="12" cy="12" r="2.5" fill="currentColor" stroke="none"/>
+            <path d="M6.3 6.3a8 8 0 0 0 0 11.4"/>
+            <path d="M17.7 6.3a8 8 0 0 1 0 11.4"/>
+          </svg>
+        </span>
         <span class="nav-label">Insights</span>
+      </button>
+
+      <button
+        class="nav-tab"
+        data-nav="settings"
+        aria-label="Settings"
+        aria-current="false"
+        type="button"
+      >
+        <span class="nav-tab__pill">
+          <!-- Settings gear icon — outline -->
+          <svg class="nav-icon nav-icon--outline" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+          <!-- filled variant (slightly bolder) -->
+          <svg class="nav-icon nav-icon--filled" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+               stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"
+               aria-hidden="true">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+          </svg>
+        </span>
+        <span class="nav-label">Settings</span>
       </button>
 
     </nav>
@@ -124,11 +176,13 @@
   ────────────────────────────────────────────── -->
   <script src="data.js"></script>
   <script src="signals.js"></script>
+  <script src="voice.js"></script>
   <script src="screens/dashboard.js"></script>
   <script src="screens/person.js"></script>
   <script src="screens/log.js"></script>
   <script src="screens/profile.js"></script>
   <script src="screens/onboarding.js"></script>
+  <script src="screens/settings.js"></script>
   <script src="app.js"></script>
 
 </body>

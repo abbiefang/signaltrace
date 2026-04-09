@@ -35,22 +35,28 @@ function formatRelativeTime(timestamp) {
 }
 
 /**
- * Derive a single background colour for a letter avatar from a name string.
- * Returns one of 8 warm/muted palette colours — consistent per name.
+ * Derive a gradient background for a letter avatar from a name string.
+ * Returns one of 8 warm gradient pairs — consistent per name.
  * @param {string} name
- * @returns {string} hex colour
+ * @returns {string} CSS gradient string
  */
 function avatarColour(name) {
-  const palette = [
-    '#C4A882', '#9E8FA8', '#8FA89E', '#A88F8F',
-    '#8F9EA8', '#A89E8F', '#8FA898', '#A88FA0',
+  const gradients = [
+    'linear-gradient(135deg, #E8907A, #D4607A)',   // rose-peach
+    'linear-gradient(135deg, #9B8EC4, #C4A0D4)',   // lavender-mauve
+    'linear-gradient(135deg, #7AB8A8, #4E9E8C)',   // teal-sage
+    'linear-gradient(135deg, #E8C07A, #D4905A)',   // golden-amber
+    'linear-gradient(135deg, #8EAAD4, #6B8EC8)',   // periwinkle
+    'linear-gradient(135deg, #D4907A, #C47060)',   // terracotta
+    'linear-gradient(135deg, #A8C47A, #7AAB60)',   // fresh green
+    'linear-gradient(135deg, #C490B8, #A870A0)',   // dusty orchid
   ];
-  if (!name) return palette[0];
+  if (!name) return gradients[0];
   let hash = 0;
   for (let i = 0; i < name.length; i++) {
     hash = name.charCodeAt(i) + ((hash << 5) - hash);
   }
-  return palette[Math.abs(hash) % palette.length];
+  return gradients[Math.abs(hash) % gradients.length];
 }
 
 /**
@@ -89,7 +95,7 @@ function renderPersonCard(person) {
   card.setAttribute('aria-label', `View ${person.label}`);
 
   card.innerHTML = `
-    <div class="person-card__avatar" style="background-color: ${colour};" aria-hidden="true">
+    <div class="person-card__avatar" style="background:${colour};" aria-hidden="true">
       ${initial}
     </div>
 
@@ -100,16 +106,10 @@ function renderPersonCard(person) {
         <span class="person-card__dot" aria-hidden="true">·</span>
         <span class="person-card__time">${escapeHtml(relativeTime)}</span>
       </div>
-      ${
-        signalSummary.topSignal
-          ? `<div class="person-card__top-signal">${escapeHtml(signalSummary.topSignal)}</div>`
-          : ''
-      }
     </div>
 
     <div class="person-card__aside">
       <span class="signal-pill ${signalCls}">${signalLabel}</span>
-      <span class="person-card__chevron" aria-hidden="true">›</span>
     </div>
   `;
 
@@ -188,7 +188,7 @@ function renderDashboard() {
   const header = document.createElement('header');
   header.className = 'dashboard__header';
   header.innerHTML = `
-    <div class="dashboard__logo">SignalTrace</div>
+    <div class="dashboard__logo" style="font-family:'DM Serif Display',Georgia,serif;font-size:26px;font-weight:400;letter-spacing:-0.01em;color:#1C1410;">SignalTrace</div>
     <button
       class="dashboard__settings-btn icon-btn"
       type="button"
@@ -219,7 +219,7 @@ function renderDashboard() {
   `;
 
   header.querySelector('#settings-btn').addEventListener('click', () => {
-    navigate('profile');
+    navigate('settings');
   });
 
   screen.appendChild(header);
@@ -242,6 +242,40 @@ function renderDashboard() {
   `;
   screen.appendChild(summaryBar);
 
+  // ── Search bar (only when there are people to filter) ───────────────────────
+  if (personCount > 0) {
+    const searchWrap = document.createElement('div');
+    searchWrap.className = 'dashboard__search-wrap';
+    searchWrap.innerHTML = `
+      <div class="dashboard__search-inner">
+        <svg class="dashboard__search-icon" viewBox="0 0 20 20" fill="none"
+             stroke="currentColor" stroke-width="1.6" stroke-linecap="round"
+             stroke-linejoin="round" aria-hidden="true" width="16" height="16">
+          <circle cx="8.5" cy="8.5" r="5.5"/>
+          <line x1="13" y1="13" x2="18" y2="18"/>
+        </svg>
+        <input
+          class="dashboard__search-input"
+          type="search"
+          id="dashboard-search"
+          placeholder="Search people…"
+          aria-label="Search people"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button class="dashboard__search-clear" id="dashboard-search-clear"
+                type="button" aria-label="Clear search" hidden>
+          <svg viewBox="0 0 20 20" fill="none" stroke="currentColor"
+               stroke-width="1.8" stroke-linecap="round" width="14" height="14" aria-hidden="true">
+            <line x1="4" y1="4" x2="16" y2="16"/>
+            <line x1="16" y1="4" x2="4" y2="16"/>
+          </svg>
+        </button>
+      </div>
+    `;
+    screen.appendChild(searchWrap);
+  }
+
   // ── People list or empty state ───────────────────────────────────────────────
   const listSection = document.createElement('section');
   listSection.className = 'dashboard__list-section';
@@ -250,27 +284,76 @@ function renderDashboard() {
   if (personCount === 0) {
     listSection.appendChild(renderEmptyState());
   } else {
-    const list = document.createElement('ul');
-    list.className = 'person-list';
-    list.setAttribute('role', 'list');
-
-    persons.forEach((person) => {
-      // Augment person with fields expected by renderPersonCard:
-      //   label          — alias for name (dashboard renders person.label)
-      //   lastInteractionAt — ISO date string from stats (not stored on person directly)
+    // Build augmented person objects once
+    const augmentedPersons = persons.map((person) => {
       const stats = (typeof getStats === 'function') ? getStats(person.id) : {};
-      const augmented = Object.assign({}, person, {
+      return Object.assign({}, person, {
         label: person.name,
         lastInteractionAt: stats.lastInteractionDate || null,
       });
-      const li = document.createElement('li');
-      li.className = 'person-list__item';
-      li.setAttribute('role', 'listitem');
-      li.appendChild(renderPersonCard(augmented));
-      list.appendChild(li);
     });
 
-    listSection.appendChild(list);
+    /** Render (or re-render) the person list, optionally filtered by name. */
+    function _renderFilteredList(query) {
+      listSection.innerHTML = '';
+
+      const filtered = query
+        ? augmentedPersons.filter(p =>
+            (p.name || '').toLowerCase().includes(query.toLowerCase())
+          )
+        : augmentedPersons;
+
+      if (filtered.length === 0) {
+        const noResults = document.createElement('div');
+        noResults.className = 'dashboard__no-results';
+        noResults.innerHTML = `
+          <div class="empty-state empty-state--compact">
+            <div class="empty-state__icon" aria-hidden="true">◎</div>
+            <p class="empty-state__body">No one matches &ldquo;${escapeHtml(query)}&rdquo;</p>
+          </div>
+        `;
+        listSection.appendChild(noResults);
+        return;
+      }
+
+      const list = document.createElement('ul');
+      list.className = 'person-list';
+      list.setAttribute('role', 'list');
+
+      filtered.forEach((person) => {
+        const li = document.createElement('li');
+        li.className = 'person-list__item';
+        li.setAttribute('role', 'listitem');
+        li.appendChild(renderPersonCard(person));
+        list.appendChild(li);
+      });
+
+      listSection.appendChild(list);
+    }
+
+    _renderFilteredList('');
+
+    // Wire up search input (deferred so listSection is in the DOM)
+    setTimeout(() => {
+      const searchInput = document.getElementById('dashboard-search');
+      const clearBtn    = document.getElementById('dashboard-search-clear');
+      if (!searchInput) return;
+
+      searchInput.addEventListener('input', () => {
+        const q = searchInput.value.trim();
+        if (clearBtn) clearBtn.hidden = !q;
+        _renderFilteredList(q);
+      });
+
+      if (clearBtn) {
+        clearBtn.addEventListener('click', () => {
+          searchInput.value = '';
+          clearBtn.hidden = true;
+          searchInput.focus();
+          _renderFilteredList('');
+        });
+      }
+    }, 0);
   }
 
   screen.appendChild(listSection);
@@ -280,13 +363,21 @@ function renderDashboard() {
   fab.className  = 'fab';
   fab.type       = 'button';
   fab.setAttribute('aria-label', 'Add a new person');
+  fab.style.cssText = `
+    background: linear-gradient(135deg, #D4607A 0%, #E8855A 100%);
+    border-radius: 20px;
+    box-shadow: 0 6px 20px rgba(212,96,122,0.35), 0 2px 6px rgba(212,96,122,0.20);
+    color: #fff;
+    border: none;
+  `;
   fab.innerHTML  = `
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-         stroke="currentColor" stroke-width="2" stroke-linecap="round"
+         stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
          stroke-linejoin="round" aria-hidden="true">
       <line x1="12" y1="5" x2="12" y2="19"/>
       <line x1="5"  y1="12" x2="19" y2="12"/>
     </svg>
+    <span style="font-size:14px;font-weight:600;letter-spacing:0.01em;">Add person</span>
   `;
 
   fab.addEventListener('click', () => {
@@ -313,3 +404,68 @@ function escapeHtml(str) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
 }
+
+// ─── Search bar styles (injected once) ────────────────────────────────────────
+(function _injectSearchStyles() {
+  if (document.getElementById('dashboard-search-styles')) return;
+  const style = document.createElement('style');
+  style.id = 'dashboard-search-styles';
+  style.textContent = `
+.dashboard__search-wrap {
+  padding: 8px 16px 4px;
+}
+.dashboard__search-inner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #FFFFFF;
+  border: 1px solid #EDE6DF;
+  border-radius: 12px;
+  padding: 0 14px;
+  height: 42px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.dashboard__search-inner:focus-within {
+  border-color: #D4607A;
+  box-shadow: 0 0 0 3px rgba(212,96,122,0.10);
+}
+.dashboard__search-icon {
+  flex-shrink: 0;
+  color: #B0A89E;
+}
+.dashboard__search-input {
+  flex: 1;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  color: #1C1410;
+  font-family: inherit;
+  line-height: 1;
+  -webkit-appearance: none;
+}
+.dashboard__search-input::placeholder {
+  color: #C8BDB4;
+}
+.dashboard__search-input::-webkit-search-cancel-button { display: none; }
+.dashboard__search-clear {
+  background: none;
+  border: none;
+  color: #C8BDB4;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  transition: color 0.15s;
+}
+.dashboard__search-clear:hover { color: #7A6E68; }
+.dashboard__no-results {
+  padding: 40px 20px;
+  text-align: center;
+}
+.empty-state--compact .empty-state__icon { font-size: 24px; opacity: 0.35; margin-bottom: 8px; }
+.empty-state--compact .empty-state__body { font-size: 14px; }
+  `;
+  document.head.appendChild(style);
+})();
