@@ -1385,25 +1385,25 @@ function _ensurePdStyles() {
     /* Interactions */
     .pd-interactions-list { display: flex; flex-direction: column; gap: 1px; }
     .pd-interaction {
-      padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.05);
+      padding: 12px 0; border-bottom: 1px solid rgba(0,0,0,0.06);
     }
     .pd-interaction:last-child { border-bottom: none; }
     .pd-interaction-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-    .pd-interaction-date { font-size: 12px; color: rgba(240,238,255,0.4); min-width: 72px; }
-    .pd-interaction-type { font-size: 13px; font-weight: 600; color: rgba(240,238,255,0.7); }
-    .pd-interaction-init { font-size: 12px; color: rgba(240,238,255,0.4); margin-left: auto; }
+    .pd-interaction-date { font-size: 12px; color: #AAAAAA; min-width: 72px; }
+    .pd-interaction-type { font-size: 13px; font-weight: 600; color: #2B2B2B; }
+    .pd-interaction-init { font-size: 12px; color: #AAAAAA; margin-left: auto; }
     .pd-mood { font-size: 14px; font-weight: 700; }
-    .pd-mood--pos { color: #4ade80; }
-    .pd-mood--neu { color: rgba(240,238,255,0.4); }
-    .pd-mood--neg { color: #f87171; }
+    .pd-mood--pos { color: #6B9B7A; }
+    .pd-mood--neu { color: #BBBBBB; }
+    .pd-mood--neg { color: #C17C7C; }
     .pd-flags { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
     .pd-flag {
       font-size: 11px; padding: 3px 8px; border-radius: 20px; font-weight: 500;
     }
-    .pd-flag--red   { background: rgba(239,68,68,0.15);  color: #fca5a5; }
-    .pd-flag--green { background: rgba(74,222,128,0.12); color: #86efac; }
-    .pd-interaction-notes { font-size: 13px; color: rgba(240,238,255,0.45); margin-top: 4px; line-height: 1.4; }
-    .pd-show-more { font-size: 12px; color: rgba(240,238,255,0.3); text-align: center; padding: 8px 0; }
+    .pd-flag--red   { background: rgba(193,124,124,0.12); color: #9A5A5A; }
+    .pd-flag--green { background: rgba(107,155,122,0.12); color: #4A7A5A; }
+    .pd-interaction-notes { font-size: 13px; color: #666666; margin-top: 4px; line-height: 1.4; }
+    .pd-show-more { font-size: 12px; color: #AAAAAA; text-align: center; padding: 8px 0; }
 
     /* Danger */
     .pd-danger-section { padding-top: 24px; padding-bottom: 8px; }
@@ -1419,26 +1419,26 @@ function _ensurePdStyles() {
     .pd-action-bar {
       flex-shrink: 0; padding: 12px 20px;
       padding-bottom: max(12px, env(safe-area-inset-bottom));
-      background: linear-gradient(to top, #12101c 60%, rgba(18,16,28,0));
-      border-top: 1px solid rgba(255,255,255,0.05);
+      background: linear-gradient(to top, rgba(250,250,249,0.98) 70%, rgba(250,250,249,0));
+      border-top: 1px solid #EEEEEE;
     }
     .pd-log-btn {
       display: block; width: 100%; padding: 15px; border-radius: 14px;
-      background: linear-gradient(135deg, #e94560 0%, #f093fb 100%);
+      background: linear-gradient(135deg, #C8A882 0%, #B8946E 100%);
       color: #fff; font-size: 15px; font-weight: 700; border: none;
       cursor: pointer; font-family: inherit; letter-spacing: 0.2px;
-      transition: opacity 0.2s;
+      transition: opacity 0.2s; box-shadow: 0 4px 16px rgba(200,168,130,0.3);
     }
     .pd-log-btn:hover { opacity: 0.88; }
     .pd-error {
       display: flex; flex-direction: column; align-items: center;
       justify-content: center; height: 100%; gap: 16px; padding: 40px 24px;
-      color: rgba(240,238,255,0.5); font-size: 15px;
+      color: #989898; font-size: 15px;
     }
     .pd-btn--secondary {
       padding: 12px 24px; border-radius: 12px;
-      background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1);
-      color: rgba(240,238,255,0.7); font-size: 14px; cursor: pointer;
+      background: rgba(0,0,0,0.04); border: 1px solid rgba(0,0,0,0.1);
+      color: #555555; font-size: 14px; cursor: pointer;
       font-family: inherit;
     }
   `;
