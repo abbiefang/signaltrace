@@ -1100,7 +1100,11 @@ function renderPerson(personId) {
 
   let interactionListHtml = '';
   if (recentInteractions.length === 0) {
-    interactionListHtml = `<p class="pd-empty-hint">No interactions logged yet.</p>`;
+    interactionListHtml = `
+      <div class="pd-empty-interactions">
+        <p class="pd-empty-hint">Nothing logged yet.</p>
+        <p class="pd-empty-hint-sub">Tap the button below to record your first interaction.</p>
+      </div>`;
   } else {
     interactionListHtml = recentInteractions.map(intr => {
       const moodCls  = { positive: 'pd-mood--pos', neutral: 'pd-mood--neu', negative: 'pd-mood--neg' }[intr.mood] || 'pd-mood--neu';
@@ -1119,7 +1123,7 @@ function renderPerson(personId) {
           <div class="pd-interaction-row">
             <span class="pd-interaction-date">${_escHtml(_pdRelativeTime(intr.date))}</span>
             <span class="pd-interaction-type">${_escHtml(typeLabel)}</span>
-            <span class="pd-interaction-init">Init: ${_escHtml(initLabel)}</span>
+            <span class="pd-interaction-init">${_escHtml(initLabel)} initiated</span>
             <span class="pd-mood ${moodCls}" aria-label="Mood: ${intr.mood}">${moodIcon}</span>
           </div>
           ${flagsHtml ? `<div class="pd-flags">${flagsHtml}</div>` : ''}
@@ -1356,7 +1360,9 @@ function _ensurePdStyles() {
       font-size: 14px; color: rgba(240,238,255,0.6); line-height: 1.6;
       background: rgba(255,255,255,0.04); border-radius: 10px; padding: 12px 14px;
     }
-    .pd-empty-hint { font-size: 13px; color: rgba(240,238,255,0.3); padding: 4px 0; }
+    .pd-empty-hint { font-size: 13px; color: rgba(240,238,255,0.35); padding: 4px 0; }
+    .pd-empty-hint-sub { font-size: 12px; color: rgba(240,238,255,0.22); padding: 2px 0; }
+    .pd-empty-interactions { padding: 8px 0; }
 
     /* Signal cards */
     .pd-signals-list { display: flex; flex-direction: column; gap: 8px; }
