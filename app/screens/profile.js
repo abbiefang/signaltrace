@@ -179,10 +179,10 @@ function _buildHTML(person) {
 function _buildHeader(person, daysSinceMet) {
   const initial     = person.avatar_initial || (person.name ? person.name[0].toUpperCase() : '?');
   const avatarColor = _avatarColor(person.name || '');
-  const platform    = PRF_PLATFORMS[person.platform] || { emoji: '✨', label: person.platform || 'Unknown' };
+  const platform    = PRF_PLATFORMS[person.platform] || { emoji: '✨', label: person.platform || '' };
   const metLine     = daysSinceMet !== null
     ? `Met ${daysSinceMet} day${daysSinceMet === 1 ? '' : 's'} ago`
-    : 'Date unknown';
+    : 'Added recently';
 
   // Use real photo if available, fall back to initial
   const photoUrl   = (typeof Photos !== 'undefined') ? Photos.getPersonPhoto(person.id) : null;
@@ -1018,7 +1018,7 @@ function _renderInsightsHome() {
                     </div>
                     <div class="insights-person-info">
                       <div class="insights-person-name">${_esc(p.name)}</div>
-                      <div class="insights-person-meta">${(s.totalInteractions || 0)} interactions · ${_esc(p.platform || 'Unknown')}</div>
+                      <div class="insights-person-meta">${(s.totalInteractions || 0)} interaction${(s.totalInteractions || 0) === 1 ? '' : 's'} · ${_esc(p.platform || '—')}</div>
                     </div>
                     <span class="insights-signal-dot" style="background:${dotColor};"></span>
                     <span class="insights-chevron">›</span>

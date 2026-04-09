@@ -17,7 +17,7 @@ function formatRelativeTime(timestamp) {
   const then = new Date(timestamp).getTime();
   const diffMs = now - then;
 
-  if (isNaN(diffMs) || diffMs < 0) return 'Unknown';
+  if (isNaN(diffMs) || diffMs < 0) return 'Some time ago';
 
   const diffSec = Math.floor(diffMs / 1000);
   const diffMin = Math.floor(diffSec / 60);
@@ -104,7 +104,7 @@ function renderPersonCard(person) {
     <div class="person-card__body">
       <div class="person-card__name-row">
         <span class="person-card__name">${escapeHtml(person.label || person.name)}</span>
-        <span class="person-card__platform-sub">${escapeHtml(person.platform || 'Unknown')}</span>
+        <span class="person-card__platform-sub">${escapeHtml(person.platform || '—')}</span>
       </div>
       <div class="person-card__footer-row">
         <span class="person-card__time">${escapeHtml(relativeTime)}</span>
