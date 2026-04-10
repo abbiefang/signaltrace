@@ -12,7 +12,7 @@
  *   date:        string (ISO 8601, e.g. "2024-03-15"),
  *   initiatedBy: 'me' | 'them',
  *   responseTime: number | null,   // minutes until their reply; null if not tracked
- *   mood:        'positive' | 'neutral' | 'negative',
+ *   mood:        'great' | 'good' | 'meh' | 'off',
  *   redFlags:    string[],         // e.g. ["Hot & cold", "Cancelled last minute"]
  *   greenFlags:  string[],         // e.g. ["Planned ahead", "Asked follow-up questions"]
  *   status:      'responded' | 'left_on_read' | 'no_response' | null
@@ -34,7 +34,7 @@
 
   const MIN_INTERACTIONS = 3; // Minimum before any signal is evaluated
 
-  const MOOD_SCORE = { positive: 2, neutral: 1, negative: 0 };
+  const MOOD_SCORE = { great: 2, good: 1.5, meh: 1, off: 0 };
 
   /**
    * data.js stores responseTime as a string: "fast"|"normal"|"slow"|"no_response".
@@ -358,7 +358,7 @@
       (i) => (i.greenFlags || []).length > 0
     );
     const positiveMoods = recent.filter(
-      (i) => i.mood === 'positive'
+      (i) => i.mood === 'great' || i.mood === 'good'
     );
 
     // Require green flags in >= 3 of last 5, and majority positive mood
