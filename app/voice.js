@@ -178,8 +178,9 @@ const VoiceNLP = (() => {
     // Chinese
     if (/(发消息|微信|短信|发短信|发了条|聊天|信息)/.test(t))                           return 'text';
     if (/(打电话|电话|视频通话|语音通话|FaceTime|facetime|通话)/.test(t))               return 'call';
-    if (/(见面|约会|吃饭|喝咖啡|喝酒|见了|碰面|出去玩|约了)/.test(t))                  return 'date';
-    if (/(语音消息|语音留言|发了语音|录了个语音)/.test(t))                              return 'voice_note';
+    if (/(见面|约会|喝咖啡|喝酒|见了|碰面|出去玩|约了|线下|当面)/.test(t))              return 'date';
+    if (/(语音消息|语音留言|发了语音|录了个语音|发语音|发了个语音|发条语音|发了条语音)/.test(t)) return 'voice_note';
+    if (/语音/.test(t) && !/(语音通话|电话|FaceTime|facetime)/.test(t))               return 'voice_note';
     if (/(朋友圈|点赞|Instagram|小红书|抖音|TikTok|发帖|看了我)/.test(t))              return 'social';
     if (/(消失了|不回消息|拉黑|屏蔽|不理我|读了不回|消失|失联)/.test(t))               return 'ghosted';
     return null;
@@ -193,7 +194,7 @@ const VoiceNLP = (() => {
     if (/\bmutual\b/i.test(t)) return 'mutual';
     // Chinese
     if (/(我主动|我先|我发|我打|我约|我联系|我找他|我找她)/.test(t))                    return 'me';
-    if (/(他主动|她主动|对方先|他找我|她找我|他发|她发|他打|她打)/.test(t))             return 'them';
+    if (/(他主动|她主动|对方先|他找我|她找我|他发|她发|他打|她打|他约|她约|他先|她先|他联系|她联系)/.test(t)) return 'them';
     if (/(互相|双方|一起|同时)/.test(t))                                               return 'mutual';
     return null;
   }
@@ -223,6 +224,7 @@ const VoiceNLP = (() => {
     if (/(没回|不回|不理|读了不回|消息已读|已读不回|没有回复|不回复)/.test(t))          return 'no_response';
     if (/(马上回|秒回|立刻回|很快回|回得很快|即时回复)/.test(t))                        return 'fast';
     if (/(很久才回|好久才回|回得很慢|慢慢才回|隔了很久|拖了很久)/.test(t))              return 'slow';
+    if (/(只回了|就回了|只说了|就说了).{0,4}(嗯|哦|好|噢|哈|呵|唉|啊|嗯嗯|ok|OK|好的)/.test(t)) return 'minimal';
     return null;
   }
 
