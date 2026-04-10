@@ -193,8 +193,8 @@ const VoiceNLP = (() => {
     if (/\b(he|she|they|him|her) (texted|called|reached out|messaged|initiated|wrote|sent|dm[e']d|rang)\b/i.test(t)) return 'them';
     if (/\bmutual\b/i.test(t)) return 'mutual';
     // Chinese
-    if (/(我主动|我先|我发|我打|我约|我联系|我找他|我找她)/.test(t))                    return 'me';
-    if (/(他主动|她主动|对方先|他找我|她找我|他发|她发|他打|她打|他约|她约|他先|她先|他联系|她联系)/.test(t)) return 'them';
+    if (/(我主动|我先|我发|我打|我约|我联系|我找他|我找她|我回|我回复|我回了)/.test(t))   return 'me';
+    if (/(他主动|她主动|对方先|他找我|她找我|他发|她发|他打|她打|他约|她约|他先|她先|他联系|她联系|他回|她回|对方回|他回复|她回复|他回了|她回了|对方回了|回我了|回我)/.test(t)) return 'them';
     if (/(互相|双方|一起|同时)/.test(t))                                               return 'mutual';
     return null;
   }
