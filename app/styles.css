@@ -3127,6 +3127,39 @@ input[type="date"].ob-input::-webkit-calendar-picker-indicator {
   letter-spacing: 0.06em;
 }
 
+/* ── Voice language toggle ──────────────────────────────────── */
+.voice-lang-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-top: 10px;
+}
+
+.voice-lang-btn {
+  padding: 4px 14px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--color-border);
+  background: transparent;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: var(--transition-fast);
+  min-height: 28px;
+}
+
+.voice-lang-btn--active {
+  border-color: var(--color-accent);
+  background: rgba(200, 168, 130, 0.12);
+  color: var(--color-accent);
+}
+
+.voice-lang-btn:active {
+  transform: scale(0.95);
+  transition: none;
+}
+
 /* ── Flags collapsible section ────────────────────────────────── */
 .log-flags-toggle {
   display: flex;

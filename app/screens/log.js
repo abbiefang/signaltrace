@@ -257,6 +257,9 @@ function _stopSVG(size) {
 
 /** Voice Mode hero section + collapsible panel HTML (injected at top of the form). */
 function _buildVoiceModeHTML() {
+  const curLang = (typeof window.VoiceInput !== 'undefined' && window.VoiceInput.getLang)
+    ? window.VoiceInput.getLang() : 'zh-CN';
+  const isZH = curLang === 'zh-CN';
   return `
   <!-- ── Voice Mode Hero ─────────────────────── -->
   <div class="voice-hero" id="voice-mode-entry">
@@ -264,18 +267,25 @@ function _buildVoiceModeHTML() {
             aria-label="Start Voice Mode" aria-pressed="false">
       <span class="voice-hero__icon">${_micSVG(24)}</span>
       <span class="voice-hero__text">
-        <span class="voice-hero__main">Just tell me what happened</span>
-        <span class="voice-hero__sub">Tap to talk — I'll fill in the details</span>
+        <span class="voice-hero__main" id="voice-hero-main">${isZH ? '说说发生了什么' : 'Just tell me what happened'}</span>
+        <span class="voice-hero__sub" id="voice-hero-sub">${isZH ? '点击说话，我来填写细节' : 'Tap to talk — I\'ll fill in the details'}</span>
       </span>
       <span class="voice-hero__arrow">→</span>
     </button>
-    <div class="voice-hero__divider"><span>or fill in manually</span></div>
+    <!-- Language toggle -->
+    <div class="voice-lang-toggle" id="voice-lang-toggle">
+      <button type="button" class="voice-lang-btn${isZH ? '' : ' voice-lang-btn--active'}"
+              data-lang="en-US" aria-label="Switch to English">EN</button>
+      <button type="button" class="voice-lang-btn${isZH ? ' voice-lang-btn--active' : ''}"
+              data-lang="zh-CN" aria-label="切换到中文">中</button>
+    </div>
+    <div class="voice-hero__divider"><span id="voice-hero-divider">${isZH ? '或手动填写' : 'or fill in manually'}</span></div>
   </div>
 
   <!-- Voice Mode active panel (hidden until triggered) -->
   <div class="voice-mode-panel" id="voice-mode-panel" hidden aria-hidden="true">
     <div class="voice-mode-panel__header">
-      <span class="voice-mode-panel__status" id="voice-mode-status">Listening…</span>
+      <span class="voice-mode-panel__status" id="voice-mode-status">${isZH ? '正在听…' : 'Listening…'}</span>
       <button type="button"
               class="voice-mode-trigger voice-mode-trigger--sm voice-mode-trigger--recording"
               id="voice-mode-stop" aria-label="Stop recording">
@@ -284,12 +294,12 @@ function _buildVoiceModeHTML() {
     </div>
     <div class="voice-mode-panel__transcript" id="voice-mode-transcript"
          aria-live="polite" aria-atomic="false">
-      <span class="voice-mode-panel__placeholder">Start talking…</span>
+      <span class="voice-mode-panel__placeholder" id="voice-panel-placeholder">${isZH ? '开始说话…' : 'Start talking…'}</span>
     </div>
     <div class="voice-mode-panel__actions">
-      <button type="button" class="btn btn--ghost btn--sm" id="voice-mode-cancel">Cancel</button>
+      <button type="button" class="btn btn--ghost btn--sm" id="voice-mode-cancel">${isZH ? '取消' : 'Cancel'}</button>
       <button type="button" class="btn btn--primary btn--sm" id="voice-mode-apply" disabled>
-        Apply to form
+        ${isZH ? '应用到表单' : 'Apply to form'}
       </button>
     </div>
   </div>
@@ -1062,10 +1072,37 @@ function _bindVoiceEvents(screenEl) {
 
   if (!vmTrigger || !vmPanel) return;
 
+  // ── Language toggle ───────────────────────────
+  const langToggleEl = form.querySelector('#voice-lang-toggle');
+  if (langToggleEl) {
+    langToggleEl.addEventListener('click', (e) => {
+      const btn = e.target.closest('.voice-lang-btn');
+      if (!btn) return;
+      const lang = btn.dataset.lang;
+      window.VoiceInput.setLang(lang);
+      // Update active state
+      langToggleEl.querySelectorAll('.voice-lang-btn').forEach(b => {
+        b.classList.toggle('voice-lang-btn--active', b.dataset.lang === lang);
+      });
+      // Update hero text
+      const isZH = lang === 'zh-CN';
+      const heroMain = form.querySelector('#voice-hero-main');
+      const heroSub  = form.querySelector('#voice-hero-sub');
+      const heroDivider = form.querySelector('#voice-hero-divider');
+      if (heroMain)    heroMain.textContent    = isZH ? '说说发生了什么' : 'Just tell me what happened';
+      if (heroSub)     heroSub.textContent     = isZH ? '点击说话，我来填写细节' : 'Tap to talk — I\'ll fill in the details';
+      if (heroDivider) heroDivider.textContent = isZH ? '或手动填写' : 'or fill in manually';
+      // Update cancel/apply button text
+      if (vmCancel) vmCancel.textContent = isZH ? '取消' : 'Cancel';
+      if (vmApply && vmApply.disabled) vmApply.textContent = isZH ? '应用到表单' : 'Apply to form';
+    });
+  }
+
   let _vmFinalText   = '';
   let _vmInterimText = '';
 
   function _startVoiceMode() {
+    const isZH = window.VoiceInput.getLang() === 'zh-CN';
     _vmFinalText   = '';
     _vmInterimText = '';
     vmPanel.hidden = false;
@@ -1073,8 +1110,8 @@ function _bindVoiceEvents(screenEl) {
     vmTrigger.classList.add('voice-mode-trigger--recording');
     vmTrigger.setAttribute('aria-pressed', 'true');
     vmApply.disabled = true;
-    vmStatus.textContent = 'Listening…';
-    vmTranscript.innerHTML = '<span class="voice-mode-panel__placeholder">Start talking…</span>';
+    vmStatus.textContent = isZH ? '正在听…' : 'Listening…';
+    vmTranscript.innerHTML = `<span class="voice-mode-panel__placeholder">${isZH ? '开始说话…' : 'Start talking…'}</span>`;
 
     window.VoiceInput.start(
       ({ interim, final, isFinal }) => {
@@ -1137,7 +1174,8 @@ function _bindVoiceEvents(screenEl) {
   vmStop.addEventListener('click', () => {
     if (window.VoiceInput.isListening) {
       window.VoiceInput.stop();
-      vmStatus.textContent = 'Stopped — apply or cancel';
+      const isZH = window.VoiceInput.getLang() === 'zh-CN';
+      vmStatus.textContent = isZH ? '已停止 — 应用或取消' : 'Stopped — apply or cancel';
       vmTrigger.classList.remove('voice-mode-trigger--recording');
       vmTrigger.setAttribute('aria-pressed', 'false');
     }
