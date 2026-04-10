@@ -57,6 +57,18 @@ self.addEventListener('fetch', function(e) {
   const url = new URL(e.request.url);
   if (url.origin !== self.location.origin) return;
 
+  // Network-first for navigation requests — prevents serving stale HTML shell forever
+  if (e.request.mode === 'navigate' ||
+      (e.request.method === 'GET' && e.request.headers.get('accept') &&
+       e.request.headers.get('accept').includes('text/html'))) {
+    e.respondWith(
+      fetch(e.request).catch(function() {
+        return caches.match(e.request) || caches.match('./index.html');
+      })
+    );
+    return;
+  }
+
   e.respondWith(
     caches.match(e.request).then(function(cached) {
       if (cached) return cached;
