@@ -51,7 +51,10 @@
 // ---------------------------------------------------------------------------
 
 function generateId() {
-  return Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 9);
+  if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+    return crypto.randomUUID();
+  }
+  return Date.now().toString(36) + Math.random().toString(36).slice(2);
 }
 
 function readStore(key) {
@@ -179,7 +182,7 @@ function addInteraction(data) {
     date: data.date != null ? data.date : new Date().toISOString().slice(0, 10),
     type: data.type != null ? data.type : 'text',
     initiatedBy: data.initiatedBy != null ? data.initiatedBy : 'mutual',
-    mood: data.mood != null ? data.mood : 'neutral',
+    mood: data.mood != null ? data.mood : 'meh',
     moodRaw: data.moodRaw != null ? data.moodRaw : null,
     responseTime: data.responseTime != null ? data.responseTime : 'normal',
     redFlags: Array.isArray(data.redFlags) ? data.redFlags : [],
@@ -221,7 +224,8 @@ function updateInteraction(id, data) {
   delete safe.createdAt;
 
   interactions[index] = Object.assign({}, interactions[index], safe);
-  writeStore(INTERACTIONS_KEY, interactions);
+  var ok = writeStore(INTERACTIONS_KEY, interactions);
+  if (!ok) return null;
   return interactions[index];
 }
 
@@ -229,7 +233,8 @@ function deleteInteraction(id) {
   var interactions = readStore(INTERACTIONS_KEY);
   var filtered = interactions.filter(function(i) { return i.id !== id; });
   if (filtered.length === interactions.length) return false;
-  writeStore(INTERACTIONS_KEY, filtered);
+  var ok = writeStore(INTERACTIONS_KEY, filtered);
+  if (!ok) return false;
   return true;
 }
 
@@ -394,7 +399,7 @@ function detectSignals(personId) {
 // DB namespace — used by app.js for first-run detection
 // ---------------------------------------------------------------------------
 
-window.DB = {
+var dbAPI = {
   /**
    * Returns true if the user has completed onboarding OR if any people exist.
    * Used by app.js to decide whether to show onboarding.
@@ -404,3 +409,4 @@ window.DB = {
     return getAllPersons().length > 0;
   },
 };
+window.DB = window.SignalTraceDB = dbAPI;
