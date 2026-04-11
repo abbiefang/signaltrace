@@ -3,7 +3,7 @@
  * Provides offline support and installability (PWA).
  */
 
-const CACHE_NAME = 'signaltrace-v1';
+const CACHE_NAME = 'signaltrace-v2';
 
 const ASSETS = [
   './',
