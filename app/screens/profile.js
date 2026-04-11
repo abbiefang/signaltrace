@@ -102,6 +102,8 @@ let _prf = {
   expanded:   new Set(),   // Set<interactionId> — which cards are open
 };
 
+let _prfAbortController = null;
+
 /* ─────────────────────────────────────────────────────────────────────────────
    PUBLIC API
 ───────────────────────────────────────────────────────────────────────────── */
@@ -553,6 +555,11 @@ function _renderError(message) {
 ───────────────────────────────────────────────────────────────────────────── */
 
 function _attachEvents(container, person) {
+  // Abort any previous listener set before attaching new ones
+  if (_prfAbortController) _prfAbortController.abort();
+  _prfAbortController = new AbortController();
+  const { signal } = _prfAbortController;
+
   // Use delegation on the root container
   container.addEventListener('click', function (e) {
     const btn = e.target.closest('[data-action]');
@@ -597,7 +604,7 @@ function _attachEvents(container, person) {
         break;
       }
     }
-  });
+  }, { signal });
 }
 
 function _handleBack() {
