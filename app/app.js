@@ -327,6 +327,9 @@ document.addEventListener('click', (e) => {
     case 'dashboard':
       navigate('dashboard');
       break;
+    case 'add-person':
+      navigate('add-person');
+      break;
     case 'log':
       navigate('log', { logContext: { personId: null, type: 'general' } });
       break;
@@ -381,6 +384,16 @@ function initApp() {
 
   if (viewParam === 'profile') {
     navigate('profile', { replace: true });
+    return;
+  }
+
+  if (viewParam === 'settings') {
+    navigate('settings', { replace: true });
+    return;
+  }
+
+  if (viewParam === 'add-person') {
+    navigate('add-person', { replace: true });
     return;
   }
 
