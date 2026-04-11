@@ -101,10 +101,11 @@
     return Math.sqrt(variance);
   }
 
-  /** Gap in days between two ISO date strings. */
+  /** Gap in days between two ISO date strings. Returns null if either date is invalid. */
   function daysBetween(dateA, dateB) {
     const msA = new Date(dateA).getTime();
     const msB = new Date(dateB).getTime();
+    if (isNaN(msA) || isNaN(msB)) return null;
     return Math.abs(msB - msA) / (1000 * 60 * 60 * 24);
   }
 
@@ -120,10 +121,11 @@
    * @param {string} title
    * @param {string} description
    * @param {number} evidenceCount
+   * @param {string} actionTip — brief "what to consider" guidance
    * @returns {object}
    */
-  function makeSignal(type, severity, title, description, evidenceCount) {
-    return { type, severity, title, description, evidenceCount };
+  function makeSignal(type, severity, title, description, evidenceCount, actionTip) {
+    return { type, severity, title, description, evidenceCount, actionTip };
   }
 
   // ─── Signal Detectors ─────────────────────────────────────────────────────
@@ -141,10 +143,12 @@
     for (let i = 1; i < interactions.length; i++) {
       gaps.push(daysBetween(interactions[i - 1].date, interactions[i].date));
     }
+    const validGaps = gaps.filter((g) => g !== null);
 
-    const avg = mean(gaps);
-    const sd = stdDev(gaps);
+    const avg = mean(validGaps);
+    const sd = stdDev(validGaps);
     if (avg === null || sd === null) return null;
+    if (avg === 0) return null; // all same-day — divide-by-zero guard
 
     // Coefficient of variation: high variance relative to mean
     const cv = sd / avg;
@@ -153,10 +157,10 @@
     const longGapThreshold = avg + sd; // gaps more than 1 std dev above mean
     let burstThenGapThenBurst = false;
 
-    for (let i = 1; i < gaps.length - 1; i++) {
-      const before = gaps[i - 1];
-      const current = gaps[i];
-      const after = gaps[i + 1];
+    for (let i = 1; i < validGaps.length - 1; i++) {
+      const before = validGaps[i - 1];
+      const current = validGaps[i];
+      const after = validGaps[i + 1];
       if (
         before < avg &&
         current > longGapThreshold &&
@@ -171,15 +175,16 @@
     if (cv < 1.0 && !burstThenGapThenBurst) return null;
 
     const severity = cv > 1.5 || burstThenGapThenBurst ? 'high' : 'medium';
-    const maxGap = Math.max(...gaps).toFixed(1);
-    const minGap = Math.min(...gaps).toFixed(1);
+    const maxGap = Math.max(...validGaps).toFixed(1);
+    const minGap = Math.min(...validGaps).toFixed(1);
 
     return makeSignal(
       'breadcrumbing',
       severity,
       'Inconsistent Contact Pattern',
       `Contact frequency has varied significantly — gaps range from ${minGap} to ${maxGap} days (average: ${avg.toFixed(1)} days). Contact tends to cluster in bursts then go quiet, often resuming after silence.`,
-      gaps.length
+      gaps.length,
+      'This pattern often means you\'re being kept as a backup option. Notice if contact spikes when they need something from you.'
     );
   }
 
@@ -212,19 +217,16 @@
       severity,
       'Low Initiation',
       `You initiated ${myInitiations} of ${tagged.length} interactions (${pct}%). They initiated ${theirInitiations}.`,
-      tagged.length
+      tagged.length,
+      'If you\'re the only one reaching out, consider stepping back and seeing if they match your effort level.'
     );
   }
 
   /**
    * RESPONSE TIME DETERIORATION
    * Detects a trend where response times are getting slower over time.
-   * Compares average response time in the first half of interactions vs. the second half.
-   * Works with both numeric responseTime (legacy) and string values from data.js
-   * ("fast"|"normal"|"slow"|"no_response").
    */
   function detectResponseTimeDeterioration(interactions) {
-    // Convert string responseTime to numeric minutes; exclude no_response / null
     const withRT = interactions
       .map((i) => ({ ...i, _rtNum: _rtMinutes(i.responseTime) }))
       .filter((i) => i._rtNum !== null);
@@ -240,7 +242,7 @@
     if (avgEarly === null || avgRecent === null) return null;
 
     const ratio = avgRecent / avgEarly;
-    if (ratio < 1.5) return null; // Less than 50% slower — not notable
+    if (ratio < 1.5) return null;
 
     const severity = ratio >= 3 ? 'high' : ratio >= 2 ? 'medium' : 'low';
 
@@ -254,18 +256,13 @@
       severity,
       'Response Time Slowing',
       `Average response time has increased from ${fmt(avgEarly)} (first ${firstHalf.length} responses) to ${fmt(avgRecent)} (last ${secondHalf.length} responses).`,
-      withRT.length
+      withRT.length,
+      'Slower replies can mean they\'re losing interest or deprioritizing you. Ask yourself if the overall dynamic feels the same as before.'
     );
   }
 
-
   /**
    * GHOSTING PATTERN
-   * Detects repeated instances of being left on read or receiving no response.
-   * Threshold: 2 or more such instances.
-   *
-   * data.js has no `status` field — maps `responseTime === 'no_response'` as the
-   * ghosting indicator. Also accepts explicit `status` values for forward-compat.
    */
   function detectGhostingPattern(interactions) {
     if (interactions.length < MIN_INTERACTIONS) return null;
@@ -285,33 +282,29 @@
       severity,
       'Ghosting Pattern',
       `${ghosted.length} ${label} of no response or being left on read across ${interactions.length} logged interactions.`,
-      ghosted.length
+      ghosted.length,
+      'Being left on read repeatedly shows they\'re not prioritizing you. It might be time to redirect your energy elsewhere.'
     );
   }
 
   /**
    * HOT & COLD
-   * Detects oscillating engagement — either via explicit 'Hot & cold' red flags
-   * or by detecting alternating mood patterns in the interaction log.
    */
   function detectHotAndCold(interactions) {
-    if (interactions.length < MIN_INTERACTIONS) return null;
+    if (interactions.length < 5) return null;
 
-    // Method 1: Explicit red flags
     const explicitCount = interactions.filter((i) =>
       (i.redFlags || []).some(
         (f) => f.toLowerCase().includes('hot') && f.toLowerCase().includes('cold')
       )
     ).length;
 
-    // Method 2: Mood oscillation — alternating positive/negative scores
     const scores = interactions.map((i) => moodScore(i.mood));
     let oscillations = 0;
     for (let i = 1; i < scores.length - 1; i++) {
       const prev = scores[i - 1];
       const curr = scores[i];
       const next = scores[i + 1];
-      // A peak or valley surrounded by values on the other side
       if (
         (curr > prev && curr > next && Math.abs(curr - prev) >= 1) ||
         (curr < prev && curr < next && Math.abs(curr - prev) >= 1)
@@ -321,7 +314,6 @@
     }
     const oscRatio = oscillations / (scores.length - 2 || 1);
 
-    // Raised thresholds: require more explicit evidence before flagging
     if (explicitCount < 2 && oscRatio < 0.5) return null;
 
     const severity =
@@ -329,7 +321,7 @@
 
     let desc;
     if (explicitCount >= 2) {
-      desc = `"Hot & cold" behavior logged ${explicitCount} times across ${interactions.length} interactions. Engagement level oscillates rather than trending consistently.`;
+      desc = `"Hot & cold" behavior logged ${explicitCount} times across ${interactions.length} interactions.`;
     } else {
       desc = `Mood and engagement have alternated significantly across ${interactions.length} interactions — no stable baseline.`;
     }
@@ -339,50 +331,39 @@
       severity,
       'Hot & Cold Pattern',
       desc,
-      explicitCount >= 2 ? explicitCount : interactions.length
+      explicitCount >= 2 ? explicitCount : interactions.length,
+      'Oscillating behavior makes it hard to know where you stand.'
     );
   }
 
   /**
-   * CONSISTENT EFFORT (positive / green signal)
-   * Detects sustained positive engagement over recent interactions.
-   * Low severity because this is a green signal — here severity means "salience."
+   * CONSISTENT EFFORT (positive signal)
    */
   function detectConsistentEffort(interactions) {
     if (interactions.length < MIN_INTERACTIONS) return null;
 
-    // Look at the last 5 interactions, or all if fewer
     const recent = interactions.slice(-5);
+    const withGreenFlags = recent.filter((i) => (i.greenFlags || []).length > 0);
+    const positiveMoods = recent.filter((i) => i.mood === 'great' || i.mood === 'good');
 
-    const withGreenFlags = recent.filter(
-      (i) => (i.greenFlags || []).length > 0
-    );
-    const positiveMoods = recent.filter(
-      (i) => i.mood === 'great' || i.mood === 'good'
-    );
-
-    // Require green flags in >= 3 of last 5, and majority positive mood
     if (withGreenFlags.length < 3) return null;
     if (positiveMoods.length < Math.ceil(recent.length * 0.6)) return null;
 
     const streak = withGreenFlags.length;
-    const flags = recent
-      .flatMap((i) => i.greenFlags || [])
-      .slice(0, 5); // top 5 most recent green flags for description
+    const flags = recent.flatMap((i) => i.greenFlags || []).slice(0, 5);
 
     return makeSignal(
       'consistent_effort',
       'low',
       'Consistent Effort',
       `Green flags logged in ${streak} of the last ${recent.length} interactions. Positive patterns: ${flags.join(', ')}.`,
-      streak
+      streak,
+      'They\'re showing up consistently. This is a good sign — keep noticing and reciprocating this energy.'
     );
   }
 
   /**
    * FADING INTEREST
-   * Compares average mood score of the first 3 interactions vs. the most recent 3.
-   * Flags a meaningful decline in tone/energy over time.
    */
   function detectFadingInterest(interactions) {
     if (interactions.length < 6) return null;
@@ -396,7 +377,7 @@
     if (earlyAvg === null || recentAvg === null) return null;
 
     const delta = earlyAvg - recentAvg;
-    if (delta < 0.5) return null; // Less than half a mood tier — not notable
+    if (delta < 0.5) return null;
 
     const severity = delta >= 1.5 ? 'high' : delta >= 1.0 ? 'medium' : 'low';
 
@@ -410,15 +391,14 @@
       'fading_interest',
       severity,
       'Fading Interest',
-      `Interaction tone has shifted: first 3 interactions were ${moodLabel(earlyAvg)}, most recent 3 are ${moodLabel(recentAvg)}. Mood score dropped from ${earlyAvg.toFixed(1)} to ${recentAvg.toFixed(1)} (scale 0–2).`,
-      6
+      `Interaction tone has shifted: first 3 were ${moodLabel(earlyAvg)}, most recent 3 are ${moodLabel(recentAvg)}. Score dropped from ${earlyAvg.toFixed(1)} to ${recentAvg.toFixed(1)}.`,
+      6,
+      'The energy is fading. Reflect on whether something changed or if they\'re gradually losing interest.'
     );
   }
 
   /**
-   * YOU'RE DOING ALL THE WORK
-   * Combined signal: high initiation rate AND slow / deteriorating response times.
-   * More severe than either signal alone — indicates asymmetric investment overall.
+   * ALL THE WORK
    */
   function detectAllTheWork(interactions) {
     if (interactions.length < MIN_INTERACTIONS) return null;
@@ -431,18 +411,16 @@
     const myInitiations = tagged.filter((i) => i.initiatedBy === 'me').length;
     const myRatio = myInitiations / tagged.length;
 
-    // Convert string responseTime to numeric minutes; exclude no_response / null
     const withRT = interactions
       .map((i) => ({ ...i, _rtNum: _rtMinutes(i.responseTime) }))
       .filter((i) => i._rtNum !== null);
     const avgRT = withRT.length >= 3 ? mean(withRT.map((i) => i._rtNum)) : null;
 
-    // Requires high initiation imbalance AND evidence of low effort from them
     const highInitiation = myRatio >= 0.80;
-    const slowResponse = avgRT !== null && avgRT > 180; // > 3 hours average
+    const slowResponse = avgRT !== null && avgRT > 180;
 
     if (!highInitiation) return null;
-    if (!slowResponse && myRatio < 0.85) return null; // Only flag solo if initiation is very high
+    if (!slowResponse && myRatio < 0.85) return null;
 
     const severity = highInitiation && slowResponse ? 'high' : 'medium';
 
@@ -459,110 +437,50 @@
       severity,
       'Asymmetric Effort',
       parts.join('; ') + '.',
-      tagged.length
+      tagged.length,
+      'You\'re carrying the relationship. Real connections have mutual effort.'
     );
   }
 
   // ─── Main Exports ─────────────────────────────────────────────────────────
 
-  /**
-   * Analyzes all signals for a person.
-   *
-   * @param {string} personId
-   * @returns {Signal[]} Array of signal objects. Empty array if insufficient data.
-   *
-   * Signal shape:
-   *   { type: string, severity: 'high'|'medium'|'low', title: string,
-   *     description: string, evidenceCount: number }
-   */
   function analyzeSignals(personId) {
     const interactions = getInteractions(personId);
-
-    if (interactions.length < MIN_INTERACTIONS) {
-      return [];
-    }
+    if (interactions.length < MIN_INTERACTIONS) return [];
 
     const detectors = [
-      detectBreadcrumbing,
-      detectLowInitiation,
-      detectResponseTimeDeterioration,
-      detectGhostingPattern,
-      detectHotAndCold,
-      detectConsistentEffort,
-      detectFadingInterest,
-      detectAllTheWork,
+      detectBreadcrumbing, detectLowInitiation, detectResponseTimeDeterioration,
+      detectGhostingPattern, detectHotAndCold, detectConsistentEffort,
+      detectFadingInterest, detectAllTheWork,
     ];
 
-    const signals = detectors
-      .map((fn) => {
-        try {
-          return fn(interactions);
-        } catch (e) {
-          // Silently skip any detector that errors on partial data
-          return null;
-        }
-      })
-      .filter(Boolean);
+    const signals = detectors.map((fn) => { try { return fn(interactions); } catch (e) { return null; } }).filter(Boolean);
 
-    // Deduplicate: if both low_initiation AND all_the_work are present,
-    // suppress low_initiation (all_the_work is the stronger composite signal)
     const hasAllWork = signals.some((s) => s.type === 'all_the_work');
-    return signals.filter(
-      (s) => !(hasAllWork && s.type === 'low_initiation')
-    );
+    return signals.filter((s) => !(hasAllWork && s.type === 'low_initiation'));
   }
 
-  /**
-   * Returns a summary of signal status for a person.
-   * Useful for Dashboard cards and list views.
-   *
-   * @param {string} personId
-   * @returns {{ level: 'high'|'medium'|'low'|'none', topSignal: string|null, count: number }}
-   */
   function getPersonSignalSummary(personId) {
     const signals = analyzeSignals(personId);
+    if (!signals.length) return { level: 'none', topSignal: null, count: 0 };
 
-    if (!signals.length) {
-      return { level: 'none', topSignal: null, count: 0 };
-    }
-
-    // Exclude green signals from severity assessment
     const concern = signals.filter((s) => s.type !== 'consistent_effort');
+    if (!concern.length) return { level: 'none', topSignal: signals[0].title, count: signals.length };
 
-    if (!concern.length) {
-      return { level: 'none', topSignal: signals[0].title, count: signals.length };
-    }
-
-    // Severity priority: high > medium > low
     const SEVERITY_RANK = { high: 3, medium: 2, low: 1 };
-    const sorted = [...concern].sort(
-      (a, b) => SEVERITY_RANK[b.severity] - SEVERITY_RANK[a.severity]
-    );
-
+    const sorted = [...concern].sort((a, b) => SEVERITY_RANK[b.severity] - SEVERITY_RANK[a.severity]);
     const topSignal = sorted[0];
-    const level = topSignal.severity;
 
-    return {
-      level,
-      topSignal: topSignal.title,
-      count: concern.length,
-    };
+    return { level: topSignal.severity, topSignal: topSignal.title, count: concern.length };
   }
 
-  // ─── Expose to environment ─────────────────────────────────────────────────
-
-  // Browser: mount on window
   if (typeof root !== 'undefined') {
     root.analyzeSignals = analyzeSignals;
     root.getPersonSignalSummary = getPersonSignalSummary;
   }
-
-  // CommonJS / Node
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = { analyzeSignals, getPersonSignalSummary };
   }
-
-  // ESM
   if (typeof exports !== 'undefined') {
     exports.analyzeSignals = analyzeSignals;
     exports.getPersonSignalSummary = getPersonSignalSummary;
