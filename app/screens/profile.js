@@ -192,6 +192,12 @@ function _buildHeader(person, daysSinceMet) {
     ? `<div class="prf-avatar prf-avatar--photo"><img src="${photoUrl}" alt="${_esc(person.name || '')}"></div>`
     : `<div class="prf-avatar" style="background:${avatarColor}">${_esc(initial)}</div>`;
 
+  const vibeTags = Array.isArray(person.vibeTags) && person.vibeTags.length > 0 ? person.vibeTags : [];
+  const vibeTagsHTML = vibeTags.length > 0
+    ? `<div class="prf-vibe-tags">${vibeTags.map(v => `<span class="prf-vibe-tag">${_esc(v)}</span>`).join('')}</div>`
+    : '';
+  const notesHTML = person.notes ? `<p class="prf-header-notes">${_esc(person.notes)}</p>` : '';
+
   return /* html */`
     <header class="prf-header">
       <div class="prf-header-top">
@@ -223,6 +229,8 @@ function _buildHeader(person, daysSinceMet) {
           <span class="prf-meta-dot">·</span>
           <span class="prf-met-line">${_esc(metLine)}</span>
         </div>
+        ${vibeTagsHTML}
+        ${notesHTML}
       </div>
     </header>
   `;
@@ -244,6 +252,8 @@ function _buildStatsBar(stats, avgInterval) {
   // Bar widths: them is left (ideally > 50%), me is right
   const themWidth = themPct;
   const meWidth   = mePct;
+  const mutualPct = Math.max(0, 100 - themPct - mePct);
+  const mutualLabel = mutualPct > 0 ? `<span class="prf-initiation-label-mutual">Mutual ${mutualPct}%</span>` : '';
 
   return /* html */`
     <section class="prf-section prf-stats-bar">
@@ -257,11 +267,13 @@ function _buildStatsBar(stats, avgInterval) {
         <div class="prf-stat prf-stat--wide">
           <div class="prf-initiation-label-row">
             <span class="prf-initiation-label-them">Them ${themPct}%</span>
+            ${mutualLabel}
             <span class="prf-initiation-label-me">You ${mePct}%</span>
           </div>
           <div class="prf-initiation-bar" aria-label="Initiation split: them ${themPct}%, you ${mePct}%">
-            <div class="prf-initiation-fill--them" style="width:${themWidth}%"></div>
-            <div class="prf-initiation-fill--me"   style="width:${meWidth}%"></div>
+            <div class="prf-initiation-fill--them"   style="width:${themWidth}%"></div>
+            <div class="prf-initiation-fill--mutual" style="width:${mutualPct}%"></div>
+            <div class="prf-initiation-fill--me"     style="width:${meWidth}%"></div>
           </div>
           <div class="prf-stat-label">Who reaches out</div>
         </div>
@@ -1177,6 +1189,11 @@ function _ensureStyles() {
   color: #B0A89E;
   letter-spacing: 0.1px;
 }
+.prf-vibe-tags { display:flex; flex-wrap:wrap; gap:6px; justify-content:center; margin-top:10px; }
+.prf-vibe-tag { font-size:11px; font-weight:600; padding:3px 10px; border-radius:9999px; background:#F5EFE8; color:#8A7060; border:1px solid #E8DDD4; }
+.prf-header-notes { margin:10px 0 0; font-size:13px; color:#8A7060; line-height:1.5; font-style:italic; text-align:center; }
+.prf-initiation-fill--mutual { height:100%; background:#E8DDD4; transition:width 0.4s ease; }
+.prf-initiation-label-mutual { font-size:10px; color:#B0A89E; font-weight:500; }
 
 /* ── Icon buttons ── */
 .prf-btn-icon {
@@ -1726,6 +1743,7 @@ function _ensureStyles() {
 /* ── Danger zone ── */
 .prf-danger-zone {
   padding-top: 32px;
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid #EDE6DF;
 }
 

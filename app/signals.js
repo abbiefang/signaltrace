@@ -448,7 +448,7 @@
   function detectSilenceFading(interactions) {
     if (!interactions.length) return null;
 
-    const lastDate = interactions[interactions.length - 1].date;
+    const lastDate = interactions[0].date; // newest-first, index 0 = most recent
     if (!lastDate) return null;
 
     const daysSince = daysBetween(lastDate, new Date().toISOString().slice(0, 10));
