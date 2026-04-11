@@ -175,7 +175,7 @@ function _renderIntoContainer(person) {
                  style="display:none; position:absolute; pointer-events:none;"
                  onchange="_pfHandlePhotoSelect(this.files[0])">
           <span class="pf-avatar-hint">
-            ${_pf.photoDataUrl ? 'Tap to change photo' : 'Tap to add photo · updates as you type'}
+            ${_pf.photoDataUrl ? '📷 Tap to change' : '📷 Tap to add photo'}
           </span>
         </div>
 
@@ -355,6 +355,14 @@ async function _pfHandlePhotoSelect(file) {
     return;
   }
 
+  // Disable upload button and show processing state
+  const uploadBtn = document.querySelector('.pf-avatar-upload-btn');
+  if (uploadBtn) uploadBtn.disabled = true;
+
+  const hint = document.querySelector('.pf-avatar-hint');
+  const originalHint = hint?.textContent;
+  if (hint) hint.textContent = '⏳ Processing...';
+
   try {
     const dataUrl = await Photos.processImage(file, 400, 0.72);
     _pf.photoDataUrl = dataUrl;
@@ -366,11 +374,21 @@ async function _pfHandlePhotoSelect(file) {
     }
 
     // Update hint text
-    const hint = document.querySelector('.pf-avatar-hint');
-    if (hint) hint.textContent = 'Tap to change photo';
+    if (hint) hint.textContent = '📷 Tap to change';
 
   } catch (err) {
     console.warn('[person.js] Photo processing failed:', err);
+
+    // Check for quota exceeded error
+    if (err.message && err.message.includes('quota')) {
+      alert('Photo couldn\'t be saved — storage full. Try a smaller image.');
+    }
+
+    // Restore hint text
+    if (hint) hint.textContent = _pf.photoDataUrl ? '📷 Tap to change' : '📷 Tap to add photo';
+  } finally {
+    // Re-enable upload button
+    if (uploadBtn) uploadBtn.disabled = false;
   }
 }
 
@@ -445,8 +463,7 @@ function _pfHandleSubmit() {
       if (_pf.photoDataUrl && typeof Photos !== 'undefined') {
         Photos.savePersonPhotoDataUrl(newPerson.id, _pf.photoDataUrl);
       }
-      // Use logContext format so renderLog receives personId correctly
-      navigate('log', { logContext: { personId: newPerson.id } });
+      navigate('person', { personId: newPerson.id });
     }
 
   } catch (err) {
@@ -1051,6 +1068,7 @@ function renderPerson(personId) {
 
   const initial = (person.name || '?').charAt(0).toUpperCase();
   const avatarBg = _avatarColour(person.name);
+  const photoUrl = (window.Photos && Photos.getPersonPhoto(personId)) || null;
 
   // ── Signal level pill ──
   const levelMeta = {
@@ -1163,8 +1181,8 @@ function renderPerson(personId) {
 
         <!-- Profile hero -->
         <div class="pd-hero">
-          <div class="pd-avatar" style="background:${avatarBg}" aria-hidden="true">
-            ${_escHtml(initial)}
+          <div class="pd-avatar" style="background:${avatarBg}${photoUrl ? `;background-image:url('${photoUrl}');background-size:cover;background-position:center;color:transparent` : ''}" aria-hidden="true">
+            ${photoUrl ? '' : _escHtml(initial)}
           </div>
           <div class="pd-hero-info">
             <div class="pd-name">${_escHtml(person.name)}</div>
