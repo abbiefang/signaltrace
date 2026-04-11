@@ -374,6 +374,9 @@ function _buildSignalCard(signal) {
         <span class="prf-severity ${severityCls}">${severityLabel}</span>
       </div>
       <p class="prf-signal-desc">${_esc(signal.description)}</p>
+      ${signal.actionTip
+        ? `<p class="prf-signal-tip">${_esc(signal.actionTip)}</p>`
+        : ''}
       ${signal.evidenceCount > 0
         ? `<div class="prf-signal-evidence">Based on ${signal.evidenceCount} interaction${signal.evidenceCount === 1 ? '' : 's'}</div>`
         : ''}
