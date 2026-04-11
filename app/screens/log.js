@@ -1003,10 +1003,20 @@ function _bindVoiceEvents(screenEl) {
     typeof window.VoiceInput !== 'undefined' && window.VoiceInput.isSupported();
 
   if (!voiceSupported) {
-    // Hide all voice UI — unsupported browser (e.g. some iOS Safari versions)
-    screenEl.querySelectorAll(
-      '.voice-mic-btn, .voice-mode-entry, .voice-mode-panel'
-    ).forEach(el => { el.style.display = 'none'; });
+    // Hide voice mode entry and panel, show fallback message instead
+    screenEl.querySelectorAll('.voice-mode-entry, .voice-mode-panel, .voice-mic-btn').forEach(el => {
+      el.style.display = 'none';
+    });
+
+    // Find the voice hero element and replace with fallback message
+    const voiceHeroEl = screenEl.querySelector('.voice-hero');
+    if (voiceHeroEl) {
+      voiceHeroEl.innerHTML = `
+        <div class="voice-unsupported-message">
+          <p>Voice input isn't supported in your browser. Use Chrome or Safari for voice logging.</p>
+        </div>
+      `;
+    }
     return;
   }
 
