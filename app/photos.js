@@ -66,7 +66,12 @@ const Photos = {
           const ctx = canvas.getContext('2d');
           ctx.drawImage(img, 0, 0, w, h);
 
-          resolve(canvas.toDataURL('image/jpeg', quality));
+          const dataUrl = canvas.toDataURL('image/jpeg', quality);
+          // Release GPU backing store (critical on iOS WebKit to prevent memory leak)
+          canvas.width = 0;
+          canvas.height = 0;
+          img.src = '';
+          resolve(dataUrl);
         };
 
         img.src = /** @type {string} */ (e.target.result);
@@ -106,7 +111,7 @@ const Photos = {
     try {
       localStorage.setItem(`signaltrace_photo_person_${personId}`, dataUrl);
     } catch (err) {
-      console.warn('[Photos] savePersonPhotoDataUrl — quota exceeded?', err);
+      alert('Storage is full. Please delete some old photos or interactions to free up space.');
     }
   },
 
@@ -137,7 +142,7 @@ const Photos = {
         JSON.stringify(dataUrls.slice(0, 3)),
       );
     } catch (err) {
-      console.warn('[Photos] saveInteractionPhotos — quota exceeded?', err);
+      alert('Storage is full. Please delete some old photos or interactions to free up space.');
     }
   },
 
