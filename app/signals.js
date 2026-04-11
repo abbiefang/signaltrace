@@ -442,6 +442,82 @@
     );
   }
 
+  /**
+   * SILENCE / FADING (time-since-last-interaction)
+   */
+  function detectSilenceFading(interactions) {
+    if (!interactions.length) return null;
+
+    const lastDate = interactions[interactions.length - 1].date;
+    if (!lastDate) return null;
+
+    const daysSince = daysBetween(lastDate, new Date().toISOString().slice(0, 10));
+    if (daysSince === null) return null;
+
+    if (daysSince > 14) {
+      return makeSignal(
+        'silence',
+        'high',
+        'Gone Quiet',
+        `No interaction logged in ${Math.round(daysSince)} days.`,
+        1,
+        'A long silence can mean fading interest on either side. Reach out intentionally or accept the fade.'
+      );
+    }
+    if (daysSince > 7) {
+      return makeSignal(
+        'silence',
+        'medium',
+        'Momentum Slowing',
+        `Last interaction was ${Math.round(daysSince)} days ago.`,
+        1,
+        'Things have slowed down. Consider whether this is mutual or one-sided.'
+      );
+    }
+    return null;
+  }
+
+  /**
+   * RED FLAG ACCUMULATION
+   */
+  function detectRedFlagAccumulation(interactions) {
+    if (!interactions.length) return null;
+
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const recentCount = interactions.reduce(function (sum, i) {
+      const isRecent = i.date && new Date(i.date) >= thirtyDaysAgo;
+      return sum + (isRecent && Array.isArray(i.redFlags) ? i.redFlags.length : 0);
+    }, 0);
+
+    const totalCount = interactions.reduce(function (sum, i) {
+      return sum + (Array.isArray(i.redFlags) ? i.redFlags.length : 0);
+    }, 0);
+
+    if (recentCount >= 3) {
+      return makeSignal(
+        'red_flag_accumulation',
+        'high',
+        'Red Flags Stacking Up',
+        `${recentCount} red flags logged in the last 30 days.`,
+        recentCount,
+        'Multiple recent red flags is a pattern, not a coincidence. Take a step back and assess.'
+      );
+    }
+    if (totalCount >= 3) {
+      return makeSignal(
+        'red_flag_accumulation',
+        'medium',
+        'Red Flag History',
+        `${totalCount} total red flags logged across all interactions.`,
+        totalCount,
+        'Red flags have been accumulating over time. Worth reviewing whether the pattern has improved.'
+      );
+    }
+    return null;
+  }
+
   // ─── Main Exports ─────────────────────────────────────────────────────────
 
   function analyzeSignals(personId) {
@@ -451,7 +527,8 @@
     const detectors = [
       detectBreadcrumbing, detectLowInitiation, detectResponseTimeDeterioration,
       detectGhostingPattern, detectHotAndCold, detectConsistentEffort,
-      detectFadingInterest, detectAllTheWork,
+      detectFadingInterest, detectAllTheWork, detectSilenceFading,
+      detectRedFlagAccumulation,
     ];
 
     const signals = detectors.map((fn) => { try { return fn(interactions); } catch (e) { return null; } }).filter(Boolean);
